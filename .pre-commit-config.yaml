@@ -34,3 +34,11 @@ repos:
     -   id: flake8
         args: ['--select', 'E9,F63,F7,F82,E501,E22,E23,W191,F403,N']
         additional_dependencies: [pep8-naming]
+        
+repos:
+-   repo: https://github.com/agucova/check-file-length
+    rev: fca651b8055f00a9f567e965265a9be375b12859
+    hooks:
+    # Script personalizado que revisa el criterio de modularización
+    # (LOCs <= 400)
+    -   id: check-file-length
