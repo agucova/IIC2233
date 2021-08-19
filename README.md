@@ -2,7 +2,7 @@
 
 Este es el repositorio que utilizarás durante el resto del curso. Tanto profesores, ayudantes y bots tenemos acceso a este y podremos ver todos los cambios que hagas en tu código. **Es tu deber darle un buen uso y solo con fines académicos.**
 
-**Asegúrate de seguir la estructura de las carpetas y archivos presentes en tu repo.** Puedes crear carpetas adicionales pero **no modifiques la estructura básica**, además de entregar los archivos en su carpeta correspondiente. 
+**Asegúrate de seguir la estructura de las carpetas y archivos presentes en tu repo.** Puedes crear carpetas adicionales pero **no modifiques la estructura básica**, además de entregar los archivos en su carpeta correspondiente.
 
 Todo el proceso de recolección de tareas y actividades está automatizado, por lo que **cualquier cambio inesperado en la estructura de tu repositorio podría tener consecuencias negativas para tu corrección y una penalización.**
 
