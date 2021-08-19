@@ -1,0 +1,36 @@
+name: Descuentos y buenas prácticas
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Instalar Python 3.8.11
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8.11
+        
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pep8-naming black
+        if [ -f .github/requirements.txt ]; then pip install -r .github/requirements.txt; fi
+        
+    - name: Revisar errores severos (flake8)
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        
+    - name: Revisar reglas de de descuentos (flake8)
+      run: |
+        flake8 . --count --select E501,E22,E23,W191,F403  --show-source --statistics
+        
+    - name: Revisar errores de estilo (black)
+      run: |
+        black --line-length 100 --target-version py38 --check .
+        
+    - name: Revisar errores generales (flake8)
+      run: |
+        flake8 . --count --exit-zero --max-complexity=10 --statistics
+        
