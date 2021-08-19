@@ -32,4 +32,4 @@ jobs:
 
     - name: Revisar lineas de código
       run: |
-        bash .github/check_long_lines.bash
+        bash .github/scripts/check_long_files.bash
