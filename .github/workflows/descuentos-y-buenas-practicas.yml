@@ -24,13 +24,12 @@ jobs:
         
     - name: Revisar reglas de de descuentos (flake8)
       run: |
-        flake8 . --count --select E501,E22,E23,W191,F403  --show-source --statistics
+        flake8 . --count --select E501,E22,E23,W191,F403,N  --show-source --statistics
         
     - name: Revisar errores de estilo (black)
       run: |
         black --line-length 100 --target-version py38 --check .
-        
-    - name: Revisar errores generales (flake8)
+
+    - name: Revisar lineas de código (scc)
       run: |
-        flake8 . --count --exit-zero --max-complexity=10 --statistics
-        
+        bash .github/check_long_lines.bash
