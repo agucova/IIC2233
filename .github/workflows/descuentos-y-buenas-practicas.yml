@@ -30,6 +30,6 @@ jobs:
       run: |
         black --line-length 100 --target-version py38 --check .
 
-    - name: Revisar lineas de código (scc)
+    - name: Revisar lineas de código
       run: |
         bash .github/check_long_lines.bash
