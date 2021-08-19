@@ -23,12 +23,14 @@ repos:
 -   repo: https://github.com/psf/black
     rev: 21.6b0
     hooks:
-      # Revisa que el código esté en formato Black
+      # Revisa que el código esté en formato Black/PEP-8
       -   id: black
 
 -   repo: https://github.com/pycqa/flake8
-    rev: '3.8.3'  # pick a git hash / tag to point to
+    rev: '3.8.3'
     hooks:
+    # Revisa que el código no rompa ninguna regla severa
+    # o bien produzca descuentos
     -   id: flake8
         args: ['--select', 'E9,F63,F7,F82,E501,E22,E23,W191,F403,N']
         additional_dependencies: [pep8-naming]
