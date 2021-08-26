@@ -10,7 +10,9 @@ def cargar_datos(path: str) -> list[list[str]]:
 
 
 # Completa esta función para encontrar la información del ayudante entregado
-def buscar_info_ayudante(nombre_ayudante: str, lista_ayudantes: list[list[str]]) -> Union[list[str], None]:
+def buscar_info_ayudante(
+    nombre_ayudante: str, lista_ayudantes: list[list[str]]
+) -> Union[list[str], None]:
     nombre_ayudante = nombre_ayudante.lower()
     for ayudante in lista_ayudantes:
         if ayudante[0].lower() == nombre_ayudante:
@@ -23,7 +25,7 @@ def saludar_ayudante(info_ayudante: list[str]) -> str:
     return f"Hola {info_ayudante[0]}, tu cargo es {info_ayudante[1]} y eres {info_ayudante[2]} en GitHub y {info_ayudante[3]} en Discord."
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass
     # El código que aquí escribas se ejecutará solo al llamar a este módulo.
     # Aquí puedes probar tu código llamando a las funciones definidas.
