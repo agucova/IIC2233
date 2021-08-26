@@ -4,8 +4,16 @@ from typing import Union
 
 
 def cargar_datos(path: str) -> list[list[str]]:
-    with open(path, "r") as ayudantesf:
-        ayudantes = [ayudante.strip().split(",") for ayudante in ayudantesf.readlines()]
+    try:
+        with open(path, "r") as ayudantesf:
+            ayudantes = [
+                ayudante.strip().split(",") for ayudante in ayudantesf.readlines()
+            ]
+    except FileNotFoundError as e:
+        print(f"El archivo {path} no se pudo encontrar.")
+        raise e
+
+    assert len(ayudantes[0]) == 4
     return ayudantes
 
 
@@ -13,6 +21,7 @@ def cargar_datos(path: str) -> list[list[str]]:
 def buscar_info_ayudante(
     nombre_ayudante: str, lista_ayudantes: list[list[str]]
 ) -> Union[list[str], None]:
+    assert len(lista_ayudantes[0]) == 4
     nombre_ayudante = nombre_ayudante.lower()
     for ayudante in lista_ayudantes:
         if ayudante[0].lower() == nombre_ayudante:
@@ -22,6 +31,7 @@ def buscar_info_ayudante(
 
 # Completa esta función para que los ayudnates puedan saludar
 def saludar_ayudante(info_ayudante: list[str]) -> str:
+    assert len(info_ayudante) == 4
     return f"Hola {info_ayudante[0]}, tu cargo es {info_ayudante[1]} y eres {info_ayudante[2]} en GitHub y {info_ayudante[3]} en Discord."
 
 
@@ -39,6 +49,6 @@ if __name__ == "__main__":
 
     # Hint: la función print puede se útil para revisar
     #       lo que se está retornando.
-    ayudantes = cargar_datos("Actividades/AP0/ayudantes.csv")
+    ayudantes = cargar_datos("Actividades/AP0/ayudanddtes.csv")
     ayudante = buscar_info_ayudante("Francisca Ibarra", ayudantes)
     print(saludar_ayudante(ayudante))
