@@ -28,7 +28,7 @@ jobs:
 
     - name: Revisar errores de estilo (black)
       run: |
-        black --line-length 100 --target-version py38 --check .
+        black --target-version py38 --check .
 
     - name: Revisar lineas de código
       run: |
