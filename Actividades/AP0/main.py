@@ -1,18 +1,26 @@
 # Debes completar esta función para que retorne la información de los ayudantes
+from os import listxattr
+from typing import Union
+
+
 def cargar_datos(path: str) -> list[list[str]]:
     with open(path, "r") as ayudantesf:
-        ayudantes = [ayudante.strip() for ayudante in ayudantesf.readlines()]
+        ayudantes = [ayudante.strip().split(",") for ayudante in ayudantesf.readlines()]
     return ayudantes
 
 
 # Completa esta función para encontrar la información del ayudante entregado
-def buscar_info_ayudante(nombre_ayudante, lista_ayudantes):
-    
+def buscar_info_ayudante(nombre_ayudante: str, lista_ayudantes: list[list[str]]) -> Union[list[str], None]:
+    nombre_ayudante = nombre_ayudante.lower()
+    for ayudante in lista_ayudantes:
+        if ayudante[0].lower() == nombre_ayudante:
+            return ayudante
+    return None
 
 
 # Completa esta función para que los ayudnates puedan saludar
-def saludar_ayudante(info_ayudante):
-    pass
+def saludar_ayudante(info_ayudante: list[str]) -> str:
+    return f"Hola {info_ayudante[0]}, tu cargo es {info_ayudante[1]} y eres {info_ayudante[2]} en GitHub y {info_ayudante[3]} en Discord."
 
 
 if __name__ == '__main__':
@@ -29,3 +37,6 @@ if __name__ == '__main__':
 
     # Hint: la función print puede se útil para revisar
     #       lo que se está retornando.
+    ayudantes = cargar_datos("Actividades/AP0/ayudantes.csv")
+    ayudante = buscar_info_ayudante("Francisca Ibarra", ayudantes)
+    print(saludar_ayudante(ayudante))
