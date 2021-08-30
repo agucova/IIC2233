@@ -1,4 +1,4 @@
-# Tarea X: Nombre de la tarea :school_satchel:
+# Tarea 0: DCCommerce :school_satchel:
 
 
 Un buen ```README.md``` puede marcar una gran diferencia en la facilidad con la que corregimos una tarea, y consecuentemente cómo funciona su programa, por lo en general, entre más ordenado y limpio sea éste, mejor será
@@ -17,15 +17,31 @@ en cierta línea del código o comentar una función>
 
 ### Cosas implementadas y no implementadas :white_check_mark: :x:
 
-* <Nombre item pauta<sub>1</sub>>: Hecha completa
-* <Nombre item pauta<sub>2</sub>>: Me faltó hacer <insertar qué cosa faltó>
-    * <Nombre subitem pauta<sub>2.1</sub>>: Hecha completa
-    * <Nombre subitem pauta<sub>2.2</sub>>: Me faltó hacer <insertar qué cosa faltó>
-    * ...
-* <Nombre item pauta<sub>3</sub>>: Me faltó hacer <insertar qué cosa faltó>
-* ...
-* <Nombre item pauta<sub>n</sub>>: Me faltó hacer <insertar qué cosa faltó>
-
+Explicación: mantén el emoji correspondiente, de manera honesta, para cada item. Si quieres, también puedes agregarlos a los títulos:
+- ❌ si **NO** completaste lo pedido
+- ✅ si completaste **correctamente** lo pedido
+- 🟠 si el item está **incompleto** o tiene algunos errores
+#### Menú de Inicio (14pts) (14%)
+##### ❌✅🟠 Requisitos
+##### ❌✅🟠 Iniciar sesión
+##### ❌✅🟠 Ingresar como usuario anónimo
+##### ❌✅🟠 Registrar usuario
+##### ❌✅🟠 Salir
+#### Flujo del programa (35pts) (35%)
+##### ❌✅🟠 Menú Principal
+##### ❌✅🟠 Menú Publicaciones
+##### ❌✅🟠 Menú Publicaciones Realizadas
+#### Entidades 15pts (15%)
+##### ❌✅🟠 Usuarios
+##### ❌✅🟠 Publicaciones
+##### ❌✅🟠 Comentarios
+#### Archivos: 15 pts (15%)
+##### ❌✅🟠 Manejo de Archivos
+#### General: 21 pts (21%)
+##### ❌✅🟠 Menús
+##### ❌✅🟠 Parámetros
+##### ❌✅🟠 Módulos
+##### ❌✅🟠 PEP8
 ## Ejecución :computer:
 El módulo principal de la tarea a ejecutar es  ```archivo.py```. Además se debe crear los siguientes archivos y directorios adicionales:
 1. ```archivo.ext``` en ```ubicación```
@@ -95,4 +111,4 @@ Para realizar mi tarea saqué código de:
 
 
 ## Descuentos
-La guía de descuentos se encuentra [link](https://github.com/IIC2233/syllabus/blob/master/Tareas/Descuentos.md).
+La guía de descuentos se encuentra [link](https://github.com/IIC2233/syllabus/blob/main/Tareas/Descuentos.md).
