@@ -4,4 +4,5 @@
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
     "python.linting.flake8Enabled": true,
+    "python.analysis.typeCheckingMode": "strict",
 }
