@@ -3,16 +3,19 @@ from typing import NamedTuple, List, Union
 from model import Publication, User, Price
 from parametros import MIN_CARACTERES, MAX_CARACTERES
 
-CSVData = NamedTuple("CSVData", [("header", List[str]), ("lines", List[List[str]])])
-
 PROJECT_PATH = "Tareas/T0"
 USERS_PATH = f"{PROJECT_PATH}/usuarios.csv"
 PUBLICATIONS_PATH = f"{PROJECT_PATH}/publicaciones.csv"
 COMMENTS_PATH = f"{PROJECT_PATH}/comentarios.csv"
 
 
+# This named tuple allows us to distinguish the header and
+# the content itself when processing the files
+CSVData = NamedTuple("CSVData", [("header", List[str]), ("lines", List[List[str]])])
+
+
 def load_csv(filepath: str) -> CSVData:
-    """Loads a csv file and returns a CSVData object"""
+    """Loads a csv file and returns a CSVData object to aid further processing"""
     # Idealmente filepath sería Union[str, Path],
     # pero no tengo ganas de solicitar soporte a pathlib
     with open(filepath, "r", encoding="utf-8") as file:
@@ -33,6 +36,9 @@ def load_users(filepath: str = USERS_PATH) -> List[User]:
     return users
 
 
+# TODO: Figure out irregular use of commas in the CSV file
+# It seems like there's no proper comma escaping or use of double quotes.
+# Check for the irregular lists corresponding to each line!
 def load_publications(
     users: List[User], filepath: str = PUBLICATIONS_PATH
 ) -> List[Publication]:

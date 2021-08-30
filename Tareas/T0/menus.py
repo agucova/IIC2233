@@ -55,6 +55,9 @@ def show_option_menu(
         raise e
 
 
+# MUY WIP
+# Todavía no estoy seguro si me gusta esta arquitectura
+# Tener a initial_menu orquestrando el flujo se siente incorrecto
 def initial_menu(users: List[User]):
     """Prints the initial menu."""
     option = show_option_menu(

@@ -15,6 +15,7 @@ class User:
         self.publications: Set[Publication] = set()
 
     def add_publication(self, publication: Publication):
+        # Make sure the references match!
         assert publication.seller == self
         self.publications.add(publication)
 
@@ -28,6 +29,7 @@ class User:
 @dataclass
 class Price:
     value: int
+    # Just in case we go international!
     currency: str = "CLP"
 
 
