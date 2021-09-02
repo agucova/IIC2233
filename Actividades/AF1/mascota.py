@@ -1,9 +1,12 @@
 import random
 import parametros as p
+from comida import Comida
 
 
 class Mascota:
-    def __init__(self, nombre, raza, dueno, saciedad, entretencion):
+    def __init__(
+        self, nombre: str, raza: str, dueno: str, saciedad: int, entretencion: int
+    ):
         self.nombre = nombre
         self.raza = raza
         self.dueno = dueno
@@ -12,56 +15,66 @@ class Mascota:
         self._saciedad = saciedad
         self._entretencion = entretencion
 
-    # COMPLETAR
+    @property
     def saciedad(self):
-        pass
+        return self._saciedad
 
-    # COMPLETAR
+    @saciedad.setter
+    def saciedad(self, nueva_saciedad):
+        if nueva_saciedad > 100:
+            self._saciedad = 100
+        elif nueva_saciedad < 0:
+            raise ValueError("La saciedad debe ser mayor o igual a 0")
+        else:
+            self._entretencion = nueva_saciedad
+
+    @property
     def entretencion(self):
-        pass
+        return self._entretencion
+
+    @entretencion.setter
+    def entretencion(self, nueva_entretencion):
+        if nueva_entretencion > 100:
+            self._entretencion = 100
+        elif nueva_entretencion < 0:
+            raise ValueError("La entretencion debe ser mayor o igual a 0")
+        else:
+            self._entretencion = nueva_entretencion
 
     @property
     def satisfaccion(self):
         return self.saciedad // 2 + self.entretencion // 2
 
-    def comer(self, comida):
-        # COMPLETAR
-        pass
+    def comer(self, comida: Comida):
+        if random.random() < comida.probabilidad_vencer:
+            # Comida vencida
+            print(f"La comida estaba vencida! {self.nombre} perdió saciedad :(")
+            self.saciedad -= comida.calorias
+        else:
+            print(f"{self.nombre} comió {comida.nombre}!")
+            self.saciedad += comida.calorias
 
     def pasear(self):
         self.entretencion += p.ENTRETENCION_PASEAR
         self.saciedad += p.SACIEDAD_PASEAR
 
     def __str__(self):
-        # COMPLETAR
-        pass
+        return f"{self.nombre} - {self.raza}\n SAC: {self.saciedad}\nENT: {self.entretencion}\nSAT: {self.saciedad}"
 
 
-class Perro:
-    def __init__(self, *args, **kwargs):
-        # COMPLETAR
-        pass
-
+class Perro(Mascota):
     def saludar(self):
         # COMPLETAR
         pass
 
 
-class Gato:
-    def __init__(self, *args, **kwargs):
-        # COMPLETAR
-        pass
-
+class Gato(Mascota):
     def saludar(self):
         # COMPLETAR
         pass
 
 
-class Conejo:
-    def __init__(self, *args, **kwargs):
-        # COMPLETAR
-        pass
-
+class Conejo(Mascota):
     def saludar(self):
         # COMPLETAR
         pass
