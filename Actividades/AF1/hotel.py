@@ -5,8 +5,8 @@ import parametros as p
 
 class Hotel:
     def __init__(self):
-        self.__energia = 100
-        self.__dias = 0
+        self.__energia: int = 100
+        self.__dias: int = 0
         self.max_energia = p.MAXIMO_ENERGIA_HOTEL
         self.mascotas = list()
         self.funcionando = True
@@ -16,13 +16,30 @@ class Hotel:
             Comida("Pollo y Arroz", 20, 0.1),
         ]
 
-    # COMPLETAR
-    def energia(self):
-        pass
+    @property
+    def energia(self) -> int:
+        return self.__energia
 
-    # COMPLETAR
-    def dias(self):
-        pass
+    @energia.setter
+    def energia(self, nueva_energia):
+        if 0 < nueva_energia <= self.max_energia:
+            self.__energia = nueva_energia
+        else:
+            raise ValueError("Energía inválida")
+
+    @property
+    def dias(self) -> int:
+        self.__dias
+
+    @dias.setter
+    def dias(self, dias_act):
+        assert self.__dias is not None
+        if dias_act > 0 and dias_act > self.__dias:
+            self.__dias = dias_act
+        else:
+            raise ValueError(
+                "El número de dias debe ser mayor que 0 y debe ser incremental."
+            )
 
     def hotel_en_buen_estado(self):
         """
@@ -42,8 +59,13 @@ class Hotel:
         return True
 
     def imprimir_estado(self):
-        # COMPLETAR
-        pass
+        print("# Estado del Hotel #")
+        print(f"Día {self.dias}")
+        print(f"Energía del Cuidador: {self.energia}")
+        if len(self.mascotas) >= 1:
+            print(f"Mascotas ({len(self.mascotas)}: {self.mascotas}")
+        else:
+            print("No hay mascotas aún.")
 
     def recibir_mascota(self, mascotas):
         self.mascotas += mascotas
@@ -73,8 +95,17 @@ class Hotel:
             print(mascota)
 
     def nuevo_dia(self):
-        # COMPLETAR
-        pass
+        if self.hotel_en_buen_estado():
+            print("# Nuevo día #")
+            self.dias += 1
+            self.energia = self.max_energia
+            for i, mascota in enumerate(self.mascotas):
+                self.mascotas[i].entretencion -= randint(0, 30)
+                self.mascotas[i].saciedad -= randint(0, 30)
+        else:
+            self.funcionando = False
+            print("# Simulación Finalizada #")
+            print(f"{self.dias} dias transcurridos.")
 
     def revisar_energia(self):
         if self.energia >= min(p.COSTO_ENERGIA_ALIMENTAR, p.COSTO_ENERGIA_PASEAR):
@@ -87,5 +118,5 @@ class Hotel:
         print(f"{mascota.nombre} salió a pasear feliz!")
 
     def alimentar_mascota(self, mascota):
-        # COMPLETAR
-        pass
+        mascota.comer(choice(self.comidas))
+        self.energia -= p.COSTO_ENERGIA_ALIMENTAR
