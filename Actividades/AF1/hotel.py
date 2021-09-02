@@ -37,7 +37,7 @@ class Hotel:
 
     @dias.setter
     def dias(self, dias_act: int):
-        if dias_act > 0 and dias_act > self.__dias:
+        if dias_act > 0 and dias_act - self.__dias == 1:
             self.__dias = dias_act
         else:
             raise ValueError(
