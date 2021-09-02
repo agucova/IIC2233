@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from parametros import MIN_CARACTERES, MAX_CARACTERES
 from datetime import datetime
 from typing import Set
 from dataclasses import dataclass
@@ -8,33 +7,33 @@ from dataclasses import dataclass
 
 class User:
     def __init__(self, username: str, is_anonymous: bool):
-        assert MIN_CARACTERES <= len(username) <= MAX_CARACTERES
-
         self.username = username
         self.is_anonymous = is_anonymous
-        self.publications: Set[Publication] = set()
+        self.publications: Set[int] = set()
 
-    def add_publication(self, publication: Publication):
-        # Make sure the references match!
-        assert publication.seller == self
-        self.publications.add(publication)
+    def __repr__(self) -> str:
+        return f"User({self.username}): {len(self.publications)} publications."
 
-    def remove_publication(self, publication: Publication):
+    def add_publication(self, pub_id: int):
+        self.publications.add(pub_id)
+
+    def remove_publication(self, pub_id: str):
         try:
-            self.publications.remove(publication)
+            self.publications.remove(pub_id)
         except KeyError:
             raise KeyError(f"Publication not found for user {self.username}")
 
 
-@dataclass
+@dataclass(repr=True)
 class Price:
     value: int
     # Just in case we go international!
     currency: str = "CLP"
 
 
-@dataclass
+@dataclass(repr=True)
 class Publication:
+    pub_id: int
     name: str
     description: str
     price: Price
@@ -42,7 +41,7 @@ class Publication:
     creation_date: datetime
 
 
-@dataclass
+@dataclass(repr=True)
 class Comment:
     publication: Publication
     user: User

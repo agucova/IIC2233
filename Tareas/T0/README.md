@@ -43,19 +43,16 @@ Explicación: mantén el emoji correspondiente, de manera honesta, para cada ite
 ##### ❌✅🟠 Módulos
 ##### ❌✅🟠 PEP8
 ## Ejecución :computer:
-El módulo principal de la tarea a ejecutar es  ```archivo.py```. Además se debe crear los siguientes archivos y directorios adicionales:
-1. ```archivo.ext``` en ```ubicación```
-2. ```directorio``` en ```ubicación```
-3. ...
-
+El módulo principal de la tarea a ejecutar es  ```main.py```.
 
 ## Librerías :books:
 ### Librerías externas utilizadas
 La lista de librerías externas que utilicé fue la siguiente:
 
-1. ```librería_1```: ```función() / módulo```
-2. ```librería_2```: ```función() / módulo``` (debe instalarse)
-3. ...
+1. `typing` (librería estándar): Utilizado para facilitar type hints de colecciones, NamedTuples y otras estructuras.
+2. `__future__` (librería estándar): `annotations`, permite usar anotaciones de type hints evaluadas de forma retrasada.
+3. `dataclasses` (librería estándar): Utilizado para crear dataclasses, clases eficientes para contener datos estructurados.
+4. `colorama`: Facilita el uso de colores para el terminal (debe instalarse)
 
 ### Librerías propias
 Por otro lado, los módulos que fueron creados fueron los siguientes:
