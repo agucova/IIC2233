@@ -21,7 +21,7 @@ class Hotel:
         return self.__energia
 
     @energia.setter
-    def energia(self, nueva_energia):
+    def energia(self, nueva_energia: int):
         if nueva_energia < 0:
             self.__energia = 0
         elif nueva_energia > self.max_energia:
@@ -34,7 +34,7 @@ class Hotel:
         return self.__dias
 
     @dias.setter
-    def dias(self, dias_act):
+    def dias(self, dias_act: int):
         assert dias_act is not None
         if dias_act > 0 and dias_act > self.__dias:
             self.__dias = dias_act

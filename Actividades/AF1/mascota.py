@@ -18,11 +18,11 @@ class Mascota:
         self.especie = "Forma platónica de un animal"
 
     @property
-    def saciedad(self):
+    def saciedad(self) -> int:
         return self._saciedad
 
     @saciedad.setter
-    def saciedad(self, nueva_saciedad):
+    def saciedad(self, nueva_saciedad: int):
         if nueva_saciedad > 100:
             self._saciedad = 100
         elif nueva_saciedad < 0:
@@ -31,11 +31,11 @@ class Mascota:
             self._saciedad = nueva_saciedad
 
     @property
-    def entretencion(self):
+    def entretencion(self) -> int:
         return self._entretencion
 
     @entretencion.setter
-    def entretencion(self, nueva_entretencion):
+    def entretencion(self, nueva_entretencion: int):
         if nueva_entretencion > 100:
             self._entretencion = 100
         elif nueva_entretencion < 0:
