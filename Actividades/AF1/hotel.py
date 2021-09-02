@@ -22,18 +22,20 @@ class Hotel:
 
     @energia.setter
     def energia(self, nueva_energia):
-        if 0 < nueva_energia <= self.max_energia:
-            self.__energia = nueva_energia
+        if nueva_energia < 0:
+            self.__energia = 0
+        elif nueva_energia > self.max_energia:
+            self.__energia = self.max_energia
         else:
-            raise ValueError("Energía inválida")
+            self.__energia = nueva_energia
 
     @property
     def dias(self) -> int:
-        self.__dias
+        return self.__dias
 
     @dias.setter
     def dias(self, dias_act):
-        assert self.__dias is not None
+        assert dias_act is not None
         if dias_act > 0 and dias_act > self.__dias:
             self.__dias = dias_act
         else:
@@ -63,9 +65,12 @@ class Hotel:
         print(f"Día {self.dias}")
         print(f"Energía del Cuidador: {self.energia}")
         if len(self.mascotas) >= 1:
-            print(f"Mascotas ({len(self.mascotas)}: {self.mascotas}")
+            print(
+                f"Mascotas ({len(self.mascotas)}): {[mascota.nombre for mascota in self.mascotas]}"
+            )
         else:
             print("No hay mascotas aún.")
+        print()
 
     def recibir_mascota(self, mascotas):
         self.mascotas += mascotas
