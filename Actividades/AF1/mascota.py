@@ -26,7 +26,7 @@ class Mascota:
         if nueva_saciedad > 100:
             self._saciedad = 100
         elif nueva_saciedad < 0:
-            raise ValueError("La saciedad debe ser mayor o igual a 0")
+            self._saciedad = 0
         else:
             self._entretencion = nueva_saciedad
 
@@ -39,7 +39,7 @@ class Mascota:
         if nueva_entretencion > 100:
             self._entretencion = 100
         elif nueva_entretencion < 0:
-            raise ValueError("La entretencion debe ser mayor o igual a 0")
+            self._entretencion = 0
         else:
             self._entretencion = nueva_entretencion
 
@@ -50,7 +50,9 @@ class Mascota:
     def comer(self, comida: Comida):
         if random.random() < comida.probabilidad_vencer:
             # Comida vencida
-            print(f"La comida estaba vencida! {self.nombre} perdió saciedad :(")
+            print(
+                f"La comida {comida.nombre} estaba vencida! {self.nombre} perdió saciedad :("
+            )
             self.saciedad -= comida.calorias
         else:
             print(f"{self.nombre} comió {comida.nombre}!")
