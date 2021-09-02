@@ -15,6 +15,8 @@ class Mascota:
         self._saciedad = saciedad
         self._entretencion = entretencion
 
+        self.especie = "Forma platónica de un animal"
+
     @property
     def saciedad(self):
         return self._saciedad
@@ -59,22 +61,37 @@ class Mascota:
         self.saciedad += p.SACIEDAD_PASEAR
 
     def __str__(self):
-        return f"{self.nombre} - {self.raza}\n SAC: {self.saciedad}\nENT: {self.entretencion}\nSAT: {self.saciedad}"
+        return f"{self.nombre} - {self.especie} ({self.raza})\nSAC: {self.saciedad}\nENT: {self.entretencion}\nSAT: {self.saciedad}"
 
 
 class Perro(Mascota):
+    def __init__(
+        self, nombre: str, raza: str, dueno: str, saciedad: int, entretencion: int
+    ):
+        super().__init__(nombre, raza, dueno, saciedad, entretencion)
+        self.especie = "PERRO"
+
     def saludar(self):
-        # COMPLETAR
-        pass
+        print(f"{self.nombre} dice WOOF!")
 
 
 class Gato(Mascota):
+    def __init__(
+        self, nombre: str, raza: str, dueno: str, saciedad: int, entretencion: int
+    ):
+        super().__init__(nombre, raza, dueno, saciedad, entretencion)
+        self.especie = "GATO"
+
     def saludar(self):
-        # COMPLETAR
-        pass
+        print(f"{self.nombre} maulla")
 
 
 class Conejo(Mascota):
+    def __init__(
+        self, nombre: str, raza: str, dueno: str, saciedad: int, entretencion: int
+    ):
+        super().__init__(nombre, raza, dueno, saciedad, entretencion)
+        self.especie = "CONEJO"
+
     def saludar(self):
-        # COMPLETAR
-        pass
+        print(f"{self.nombre} salta en emoción")
