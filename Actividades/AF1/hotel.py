@@ -22,6 +22,8 @@ class Hotel:
 
     @energia.setter
     def energia(self, nueva_energia: int):
+        # Implementamos operaciones modulares con tal de
+        # fácilmente gestionar los descuentos aleatorios
         if nueva_energia < 0:
             self.__energia = 0
         elif nueva_energia > self.max_energia:

@@ -15,6 +15,8 @@ class Mascota:
         self._saciedad = saciedad
         self._entretencion = entretencion
 
+        # Esto es un fallback en caso de que se utilice la forma abstracta
+        # Esto evita indefiniciones en el método de __str__.
         self.especie = "Forma platónica de un animal"
 
     @property
@@ -23,6 +25,8 @@ class Mascota:
 
     @saciedad.setter
     def saciedad(self, nueva_saciedad: int):
+        # Implementamos operaciones modulares con tal de
+        # fácilmente gestionar los descuentos aleatorios
         if nueva_saciedad > 100:
             self._saciedad = 100
         elif nueva_saciedad < 0:
@@ -55,6 +59,7 @@ class Mascota:
             )
             self.saciedad -= comida.calorias
         else:
+            # Comida normal
             print(f"{self.nombre} comió {comida.nombre}!")
             self.saciedad += comida.calorias
 
@@ -70,6 +75,8 @@ class Perro(Mascota):
     def __init__(
         self, nombre: str, raza: str, dueno: str, saciedad: int, entretencion: int
     ):
+        # En vez de reescribir __init__,
+        # simplemente ejecutamos el __init__ de la clase padre.
         super().__init__(nombre, raza, dueno, saciedad, entretencion)
         self.especie = "PERRO"
 
