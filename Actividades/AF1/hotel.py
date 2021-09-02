@@ -105,8 +105,8 @@ class Hotel:
             self.dias += 1
             self.energia = self.max_energia
             for i, mascota in enumerate(self.mascotas):
-                self.mascotas[i].entretencion -= randint(0, 30)
-                self.mascotas[i].saciedad -= randint(0, 30)
+                self.mascotas[i].entretencion -= randint(0, 50)
+                self.mascotas[i].saciedad -= randint(0, 50)
         else:
             self.funcionando = False
             print("# Simulación Finalizada #")

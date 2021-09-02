@@ -28,7 +28,7 @@ class Mascota:
         elif nueva_saciedad < 0:
             self._saciedad = 0
         else:
-            self._entretencion = nueva_saciedad
+            self._saciedad = nueva_saciedad
 
     @property
     def entretencion(self):
