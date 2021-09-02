@@ -127,5 +127,7 @@ class Hotel:
         print(f"{mascota.nombre} salió a pasear feliz!")
 
     def alimentar_mascota(self, mascota):
+        """Alimenta a una mascota con una de las comidas disponibles en el hotel.
+        Asume que las comidas son recursos infinitos y no los elimina del inventario."""
         mascota.comer(choice(self.comidas))
         self.energia -= p.COSTO_ENERGIA_ALIMENTAR

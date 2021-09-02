@@ -9,6 +9,8 @@ from mascota import Perro, Gato, Conejo, Mascota
 
 def cargar_mascotas(archivo_mascotas: str) -> List[Union[Type[Mascota], Mascota]]:
     """Carga las mascotas a una lista con los tipos adecuados."""
+    # Idealmente también gestionariamos rutas tipo PurePath
+    # Pero pathlib parece estar prohibido
     with open(archivo_mascotas, "r") as f:
         lines = [line.strip().split(",") for line in f.readlines()]
 
@@ -38,6 +40,7 @@ def cargar_mascotas(archivo_mascotas: str) -> List[Union[Type[Mascota], Mascota]
 
 
 if __name__ == "__main__":
+    # Para testeo de carga de datos
     lista_mascotas = cargar_mascotas("mascotas.csv")
     for mascota in lista_mascotas:
         print(mascota)

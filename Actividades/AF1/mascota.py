@@ -52,6 +52,7 @@ class Mascota:
         return self.saciedad // 2 + self.entretencion // 2
 
     def comer(self, comida: Comida):
+        """Alimenta a la mascota con una comida y notifica si esta se encontraba vencida."""
         if random.random() < comida.probabilidad_vencer:
             # Comida vencida
             print(
