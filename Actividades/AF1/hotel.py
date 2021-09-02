@@ -35,7 +35,6 @@ class Hotel:
 
     @dias.setter
     def dias(self, dias_act: int):
-        assert dias_act is not None
         if dias_act > 0 and dias_act > self.__dias:
             self.__dias = dias_act
         else:
@@ -61,6 +60,7 @@ class Hotel:
         return True
 
     def imprimir_estado(self):
+        """Printea un resumen del estado del hotel."""
         print("# Estado del Hotel #")
         print(f"Día {self.dias}")
         print(f"Energía del Cuidador: {self.energia}")
@@ -100,17 +100,19 @@ class Hotel:
             print(mascota)
 
     def nuevo_dia(self):
+        """Transiciona el estado del hotel a un nuevo día"""
         if self.hotel_en_buen_estado():
             print("# Nuevo día #")
             self.dias += 1
             self.energia = self.max_energia
-            for i, mascota in enumerate(self.mascotas):
+            for i in range(len(self.mascotas)):
                 self.mascotas[i].entretencion -= randint(0, 50)
                 self.mascotas[i].saciedad -= randint(0, 50)
         else:
             self.funcionando = False
             print("# Simulación Finalizada #")
             print(f"{self.dias} dias transcurridos.")
+            print()
 
     def revisar_energia(self):
         if self.energia >= min(p.COSTO_ENERGIA_ALIMENTAR, p.COSTO_ENERGIA_PASEAR):
