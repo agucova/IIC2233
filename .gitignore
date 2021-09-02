@@ -9,3 +9,6 @@ __pycache__/
 
 *.idea
 *.DS_STORE
+
+# PDFs
+*.pdf
