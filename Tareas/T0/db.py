@@ -39,7 +39,7 @@ def load_users(filepath: str = USERS_PATH) -> List[User]:
     users: List[User] = []
     for line in load_csv(filepath, n_columns=0).lines:
         username: str = line[0]
-        users.append(User(username=username))
+        users.append(User(username=username, publications=[]))
     assert len(users) > 0
     return users
 
@@ -59,19 +59,20 @@ def load_publications(
 
         # Load the price as Price
         try:
-            price = Price(value=int(line[4].strip()))
+            price = Price(value=float(line[4].strip()))
         except ValueError:
             raise ValueError("Precio inválido al cargar publicaciones.")
 
         # Search for the seller
         seller_search: Union[User, None] = None
+        user_index: Union[int, None] = None
         for i, user in enumerate(users):
             if user.username == line[2]:
                 seller_search = user
                 user_index = i
                 break
 
-        if seller_search is None:
+        if seller_search is None or user_index is None:
             raise Exception(
                 f"El usuario {line[2]} no fue encontrado al cargar publicaciones."
             )

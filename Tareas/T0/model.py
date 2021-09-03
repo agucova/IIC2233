@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Set, List
+from typing import List
 from dataclasses import dataclass
 
 
@@ -23,9 +23,19 @@ class User:
 
 @dataclass(repr=True, frozen=True)
 class Price:
-    value: int
+    value: float
     # Just in case we go international!
     currency: str = "CLP"
+
+    def __str__(self):
+        # Reverts usual float formatting as it works
+        # in the chilean locale
+        display_value = (
+            f"{self.value:,.2f}".replace(",", "%temp%")
+            .replace(".", ",")
+            .replace("%temp%", ".")
+        )
+        return f"${display_value} ({self.currency})"
 
 
 @dataclass(repr=True)
