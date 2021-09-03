@@ -2,7 +2,8 @@ import os
 from typing import List, Union, Tuple
 from parametros import MIN_CARACTERES, MAX_CARACTERES
 from art import ART
-from model import Publication, User
+from model import Publication, User, Comment
+from datetime import datetime
 
 # TODO: Make portable
 def bold(string: str) -> str:
@@ -26,6 +27,15 @@ def clear_screen():
         return os.system("cls")
 
 
+def show_menu_header(title: str, body: Union[str, None]) -> None:
+    clear_screen()
+    print(bold(f"[{title}]"))
+    print()
+    if body:
+        print(body)
+        print()
+
+
 def show_option_menu(
     title: str, options: List[str], body: Union[str, None] = None
 ) -> int:
@@ -34,11 +44,7 @@ def show_option_menu(
 
     Example: `show_menu("Menú de publicaciones realizadas", ["Crear nueva publicación", "Eliminar publicación", "Volver"], body="Mis publicaciones:\\n - Pato de goma")`
     """
-    print(bold(f"[{title}]"))
-    print()
-    if body:
-        print(body)
-        print()
+    show_menu_header(title, body)
 
     for i, option in enumerate(options):
         print(f"[{i}] {option}")
@@ -62,7 +68,6 @@ def initial_menu(users: List[User], publications: List[Publication]):
         body=ART,
     )
     assert isinstance(option, int) and 0 <= option <= 3
-    clear_screen()
 
     user = None
     if option == 0:
@@ -86,9 +91,15 @@ def login_menu(users: List[User]) -> Union[User, None]:
     Prints the login menu. Returns the user as searched in database. If not found, returns None.
     """
 
-    username = input("Usuario: ").strip().lower()
+    while True:
+        username = input("Usuario: ").strip()
 
-    user: Union[User, None] = next((u for u in users if u.username == username), None)
+        user: Union[User, None] = next(
+            (u for u in users if u.username == username), None
+        )
+
+        if user:
+            break
 
     return user
 
@@ -99,7 +110,7 @@ def register_menu(users: List[User]) -> Tuple[List[User], User]:
     """
 
     while True:
-        username = input("Usuario: ").strip().lower()
+        username = input("Usuario: ").strip()
         if username in [u.username for u in users]:
             print("El usuario ya existe.")
         elif not username:
@@ -121,30 +132,63 @@ def publications_menu(
 ):
     """Print the publications menu."""
     while True:
-        option = show_option_menu(
+        pub_option = show_option_menu(
             "Menú de Publicaciones",
             [p.name for p in publications] + ["Regresar"],
             body="Bienvenido a DCComercio. Escoge una publicación para seguir.",
         )
-        if option == len(publications) + 1:
+
+        if pub_option == len(publications) + 1:
             return login_menu(users)
 
-        publication = publications[option]
-        body = f"""Creado: {publication.creation_date}
-        Vendedor: {publication.seller_username}
-        Precio: ${publication.price.value} ({publication.price.currency})
-        Descripción: {publication.description}"""
+        while True:
+            publication = publications[pub_option]
+            body = (
+                f"Creado: {publication.creation_date}\n"
+                + f"Vendedor: {publication.seller_username}\n"
+                + f"Precio: ${publication.price.value} ({publication.price.currency})\n"
+                + f"Descripción: {publication.description}\n"
+            )
 
-        body += "Comentarios:"
-        body += "\n".join(
-            [f"{c.creation_date}, {c.username}: {c.body}" for c in publication.comments]
-        )
-        option = show_option_menu(
-            publication.name,
-            ["Agregar comentario", "Regresar"],
-            body,
-        )
-        if option == 0:
-            pass
-        elif option == 1:
-            pass
+            body += "\nComentarios:\n"
+            body += "\n" + "\n".join(
+                [
+                    f"{c.creation_date}, {c.username}: {c.body}"
+                    for c in publication.comments
+                ]
+            )
+            in_pub_option = show_option_menu(
+                publication.name,
+                ["Agregar comentario", "Regresar"],
+                body,
+            )
+
+            if in_pub_option == 0:
+                if user:
+                    publication = comment_menu(user, publication)
+            elif in_pub_option == 1:
+                break
+
+
+def comment_menu(user: User, publication: Publication):
+    assert user is not None
+    assert publication is not None
+
+    show_menu_header("Agregar comentario", "Por favor se respetuoso!")
+    while True:
+        comentario = input("Comentario: ").strip()
+        if len(comentario) >= 500:
+            print("El comentario es demasiado largo.")
+        elif comentario:
+            break
+
+    comment = Comment(
+        pub_id=publication.pub_id,
+        body=comentario,
+        username=user.username,
+        creation_date=datetime.now(),
+    )
+
+    publication.comments.append(comment)
+
+    return publication

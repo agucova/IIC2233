@@ -101,7 +101,9 @@ def load_comments(
     comments: List[Comment] = []
     for line in load_csv(filepath, n_columns=4).lines:
         # Search for publication
-        pub_id: int = int(line[0])
+        # We're using zero indexing!
+        pub_id: int = int(line[0]) - 1
+        assert pub_id >= 0
         publication_search: Union[Publication, None] = next(
             (p for p in publications if p.pub_id == pub_id), None
         )
@@ -141,6 +143,7 @@ def load_comments(
 
 if __name__ == "__main__":
     users = load_users()
-    publications = load_publications(users)
-    comments = load_comments(users, publications)
+    publications, users = load_publications(users)
+    publications = load_comments(users, publications)
+
     print("hey!")
