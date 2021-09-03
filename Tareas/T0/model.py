@@ -5,16 +5,14 @@ from typing import Set, List
 from dataclasses import dataclass
 
 
+@dataclass()
 class User:
-    def __init__(self, username: str):
-        self.username = username
-        self.publications: Set[int] = set()
-
-    def __repr__(self) -> str:
-        return f"User({self.username}): {len(self.publications)} publications."
+    username: str
+    publications: List[int]
 
     def add_publication(self, pub_id: int):
-        self.publications.add(pub_id)
+        assert pub_id >= 0
+        self.publications.append(pub_id)
 
     def remove_publication(self, pub_id: int):
         try:
@@ -23,7 +21,7 @@ class User:
             raise KeyError(f"Publication {pub_id} not found for user {self.username}")
 
 
-@dataclass(repr=True)
+@dataclass(repr=True, frozen=True)
 class Price:
     value: int
     # Just in case we go international!
