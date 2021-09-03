@@ -128,7 +128,7 @@ def register_menu(users: List[User]) -> Tuple[List[User], User]:
         else:
             break
 
-    user = User(username=username)
+    user = User(username=username, publications=[])
     # The order here is important, in case we have a IOError when inserting
     # Expected behaviour is a crash in that case.
     insert_new_user(user)
@@ -147,14 +147,17 @@ def principal_menu(
             [
                 "Menú de Publicaciones",
                 "Menú de Publicaciones Realizadas",
-                "Volver",
+                "Salir",
             ],
             "Bienvenido a DCComercio. Selecciona una opción para seguir",
         )
         if option == 0:
             publications_menu(user, users, publications)
         elif option == 1:
-            my_publications_menu(user, users, publications)
+            if user is not None:
+                my_publications_menu(user, users, publications)
+            else:
+                print("Debes iniciar sesión para esto.")
         elif option == 2:
             break
 
@@ -178,7 +181,7 @@ def publications_menu(
             body = (
                 f"Creado: {publication.creation_date}\n"
                 + f"Vendedor: {publication.seller_username}\n"
-                + f"Precio: ${publication.price.value} ({publication.price.currency})\n"
+                + f"Precio: {publication.price}\n"
                 + f"Descripción: {publication.description}\n"
             )
 
@@ -214,28 +217,46 @@ def my_publications_menu(
             ["Crear una nueva publicación", "Eliminar publicación", "Volver"],
             body,
         )
-        if option == 1:
+        if option == 0:
             new_publication_menu(user, users, publications)
-        elif option == 2:
+        elif option == 1:
             pass
-        elif option == 3:
+        elif option == 2:
             break
 
 
 def new_publication_menu(
     user: User, users=List[User], publications=List[Publication]
-) -> Publication:
+) -> Union[Publication, None]:
     show_menu_header("Crear una nueva publicación", "")
     name = input("Nombre: ").strip().replace("\n", " ")
     description = input("Descripción: ").strip().replace("\n", " ")
 
     while True:
         try:
-            price = int(input("Precio (CLP): ").strip().replace(" ", ""))
+            price = Price(
+                value=int(
+                    input("Precio (CLP): ").strip().replace(" ", "").replace(".", "")
+                ),
+                currency="CLP",
+            )
         except ValueError:
             print("Ingresa un número entero sin símbolos.")
         else:
             break
+
+    print(bold("\nPublicación a crear:"))
+    print(f"Nombre: {name}")
+    print(f"Descripción: {description}")
+    print(f"Precio: {price}\n")
+    confirm = (
+        input("¿Estás seguro que quieres crear esta publicación? (s/n): ")
+        .strip()
+        .lower()
+        == "s"
+    )
+    if not confirm:
+        return None
 
     creation_date = datetime.now()
 
@@ -243,7 +264,7 @@ def new_publication_menu(
         pub_id=len(publications),
         name=name,
         description=description,
-        price=Price(value=price),
+        price=price,
         creation_date=creation_date,
         seller_username=user.username,
         comments=[],
