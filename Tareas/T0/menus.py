@@ -1,5 +1,5 @@
 import os
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Dict
 from parametros import MIN_CARACTERES, MAX_CARACTERES
 from art import ART
 from model import Publication, User, Comment, Price
@@ -68,7 +68,7 @@ def show_option_menu(
         raise e
 
 
-def initial_menu(users: List[User], publications: List[Publication]):
+def initial_menu(users: List[User], publications: Dict[int, Publication]):
     """Prints the initial menu."""
     option = show_option_menu(
         "Menú de inicio",
@@ -144,7 +144,7 @@ def register_menu(users: List[User]) -> Tuple[List[User], User]:
 
 
 def principal_menu(
-    user: Union[User, None], users: List[User], publications: List[Publication]
+    user: Union[User, None], users: List[User], publications: Dict[int, Publication]
 ):
     """Print the prinicipal menu for choosing between public or user publications."""
     while True:
@@ -169,13 +169,13 @@ def principal_menu(
 
 
 def publications_menu(
-    user: Union[User, None], users: List[User], publications: List[Publication]
+    user: Union[User, None], users: List[User], publications: Dict[int, Publication]
 ):
     """Print the publications menu."""
     while True:
         pub_option = show_option_menu(
             "Menú de Publicaciones",
-            [p.name for p in publications] + ["Volver"],
+            [p.name for p in publications.values()] + ["Volver"],
             body="Este es el tablero público de publicaciones. Escoge una publicación para seguir.",
         )
 
@@ -212,7 +212,7 @@ def publications_menu(
 
 
 def my_publications_menu(
-    user: User, users: List[User], publications: List[Publication]
+    user: User, users: List[User], publications: Dict[int, Publication]
 ):
     assert user is not None
     while True:
@@ -226,16 +226,20 @@ def my_publications_menu(
         if option == 0:
             new_publication_menu(user, users, publications)
         elif option == 1:
-            remove_publication_menu(user, users, publications)
+            user, publications = remove_publication_menu(user, users, publications)
         elif option == 2:
             break
 
 
 def new_publication_menu(
-    user: User, users=List[User], publications=List[Publication]
+    user: User, users=List[User], publications=Dict[int, Publication]
 ) -> Union[Publication, None]:
     show_menu_header("Crear una nueva publicación", "")
-    name = input("Nombre: ").strip().replace("\n", " ")
+    while True:
+        name = input("Nombre: ").strip().replace("\n", " ")
+        if name:
+            break
+
     description = input("Descripción: ").strip().replace("\n", " ")
 
     while True:
@@ -277,7 +281,7 @@ def new_publication_menu(
     )
 
     insert_new_publication(publication)
-    publications.append(publication)
+    publications[publication.pub_id] = publication
     user.add_publication(publication.pub_id)
 
     print(f"Publicación {publication.name} creada con éxito.")
@@ -285,24 +289,24 @@ def new_publication_menu(
 
 
 def remove_publication_menu(
-    user: User, users: List[User], publications: List[Publication]
-) -> List[Publication]:
+    user: User, users: List[User], publications: Dict[int, Publication]
+) -> Tuple[User, Dict[int, Publication]]:
     publication_list = [f"{publications[pid].name}" for pid in user.publications]
     option = show_option_menu(
         "Remover una publicación",
         publication_list + ["Cancelar"],
-        body="Elige una publicación para remover.\n"
+        body="Elige una publicación para remover.\n\n"
         + bold("ADVERTENCIA:")
         + " Esto es permanente.",
     )
 
     if option == len(publication_list):
-        return publications
+        return user, publications
     else:
         publication = publications[user.publications[option]]
         confirm = (
             input(
-                f"¿Estás seguro de quieres remover la publicación {publication.name}? (s/n)"
+                f"¿Estás seguro de quieres remover la publicación {publication.name}? (s/n) "
             )
             .strip()
             .lower()
@@ -310,16 +314,16 @@ def remove_publication_menu(
         )
 
         if not confirm:
-            return publications
+            return user, publications
 
         # delete_publication is fault-tolerant, and should opt for crashing the program
         # over comprimising data integrity.
         delete_publication(publication)
         user.remove_publication(publication.pub_id)
-        publications.remove(publication)
+        publications.pop(publication.pub_id)
 
         print(f"Publicación {publication.name} removida con éxito.")
-        return publications
+        return user, publications
 
 
 def comment_menu(user: User, publication: Publication):

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import NamedTuple, List, Union, Tuple
+from typing import NamedTuple, List, Union, Tuple, Dict
 from model import Publication, User, Price, Comment
 from random import randint
 import os
@@ -22,7 +22,7 @@ def load_csv(filepath: str, n_columns: int = -1) -> CSVData:
     with open(filepath, "r", encoding="utf-8") as file:
         lines = file.readlines()
 
-    lines = [line.strip().split(",", n_columns) for line in lines]
+    lines = [line.strip().split(",", n_columns - 1) for line in lines]
     return CSVData(header=lines[0], lines=lines[1:])
 
 
@@ -48,9 +48,9 @@ def load_users(filepath: str = USERS_PATH) -> List[User]:
 
 def load_publications(
     users: List[User], filepath: str = PUBLICATIONS_PATH
-) -> Tuple[List[Publication], List[User]]:
+) -> Tuple[Dict[int, Publication], List[User]]:
     """Loads a publication data CSV file and returns a list of Publication objects"""
-    publications: List[Publication] = []
+    publications: Dict[int, Publication] = {}
     for line in load_csv(filepath, n_columns=6).lines:
         # We move it to a zero index to ease interaction with lists
         pub_id: int = int(line[0]) - 1
@@ -92,19 +92,20 @@ def load_publications(
             creation_date=creation_date,
             comments=[],
         )
-        publications.append(publication)
+        publications[pub_id] = publication
         seller.add_publication(publication.pub_id)
 
         # Not sure if given pass by reference this is necessary
         users[user_index] = seller
 
-    assert len(publications) > 0
     return publications, users
 
 
 def load_comments(
-    users: List[User], publications: List[Publication], filepath: str = COMMENTS_PATH
-) -> List[Publication]:
+    users: List[User],
+    publications: Dict[int, Publication],
+    filepath: str = COMMENTS_PATH,
+) -> Dict[int, Publication]:
     """Loads a comment data CSV file and returns an updated list of publications that include the comments."""
     comments: List[Comment] = []
     for line in load_csv(filepath, n_columns=4).lines:
@@ -112,15 +113,11 @@ def load_comments(
         # We're using zero indexing!
         pub_id: int = int(line[0]) - 1
         assert pub_id >= 0
-        publication_search: Union[Publication, None] = next(
-            (p for p in publications if p.pub_id == pub_id), None
-        )
-        if publication_search is None:
-            raise Exception(
-                f"Publicación {pub_id} no encontrada al cargar comentarios."
-            )
-        else:
-            publication: Publication = publication_search
+        try:
+            publication = publications[pub_id]
+        except KeyError:
+            raise KeyError(f"Publicación {pub_id} no encontrada al cargar comentarios.")
+
         # Search for user
         username: str = line[1]
 
@@ -198,15 +195,18 @@ def delete_publication(publication: Publication, filepath: str = PUBLICATIONS_PA
     # if something goes wrong in the middle of the process.
     # We can later swap once we know everything worked right.
     tmp_filepath = f".rm-{randint(0, 9999999999999999999)}.tmp"
-    with open(tmp_filepath, "r+", encoding="utf-8") as f_tmp:
+
+    # These are the lines we want to *not* write to the tmp file.
+    target_line = f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{publication.price.value},{publication.description}\n"
+    # We decided to move to floats for international precision, so we need to handle cases where the int was written by the legacy system.
+    target_line_alt = f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{round(publication.price.value)},{publication.description}\n"
+
+    with open(tmp_filepath, "w+", encoding="utf-8") as f_tmp:
         # Let's start at the beginning
         f_tmp.seek(0)
         # Write everything but an exact match of the expected line.
         for line in lines:
-            if (
-                line
-                != f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{publication.price.value},{publication.description}\n"
-            ):
+            if line not in [target_line, target_line_alt]:
                 f_tmp.write(line)
         f_tmp.truncate()
 
