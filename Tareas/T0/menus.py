@@ -2,8 +2,10 @@ import os
 from typing import List, Union, Tuple
 from parametros import MIN_CARACTERES, MAX_CARACTERES
 from art import ART
-from model import Publication, User, Comment
+from model import Publication, User, Comment, Price
 from datetime import datetime
+from db import insert_new_comment, insert_new_user, insert_new_publication
+
 
 # TODO: Make portable
 def bold(string: str) -> str:
@@ -83,7 +85,7 @@ def initial_menu(users: List[User], publications: List[Publication]):
         print("Adiós!")
         return None
 
-    publications_menu(user, users, publications)
+    principal_menu(user, users, publications)
 
 
 def login_menu(users: List[User]) -> Union[User, None]:
@@ -119,12 +121,42 @@ def register_menu(users: List[User]) -> Tuple[List[User], User]:
             print(f"El usuario {username} es demasiado largo.")
         elif len(username) < MIN_CARACTERES:
             print(f"El usuario {username} es demasiado corto.")
+        elif not username.isalnum():
+            print(
+                f"El usuario {username} contiene carácteres no esperados. Utiliza letras o números."
+            )
         else:
             break
+
     user = User(username=username)
+    # The order here is important, in case we have a IOError when inserting
+    # Expected behaviour is a crash in that case.
+    insert_new_user(user)
     users.append(user)
 
     return users, user
+
+
+def principal_menu(
+    user: Union[User, None], users: List[User], publications: List[Publication]
+):
+    """Print the prinicipal menu for choosing between public or user publications."""
+    while True:
+        option = show_option_menu(
+            "Menú Principal",
+            [
+                "Menú de Publicaciones",
+                "Menú de Publicaciones Realizadas",
+                "Volver",
+            ],
+            "Bienvenido a DCComercio. Selecciona una opción para seguir",
+        )
+        if option == 0:
+            publications_menu(user, users, publications)
+        elif option == 1:
+            my_publications_menu(user, users, publications)
+        elif option == 2:
+            break
 
 
 def publications_menu(
@@ -134,12 +166,12 @@ def publications_menu(
     while True:
         pub_option = show_option_menu(
             "Menú de Publicaciones",
-            [p.name for p in publications] + ["Regresar"],
-            body="Bienvenido a DCComercio. Escoge una publicación para seguir.",
+            [p.name for p in publications] + ["Volver"],
+            body="Este es el tablero público de publicaciones. Escoge una publicación para seguir.",
         )
 
-        if pub_option == len(publications) + 1:
-            return login_menu(users)
+        if pub_option == len(publications):
+            return principal_menu(user, users, publications)
 
         while True:
             publication = publications[pub_option]
@@ -159,7 +191,7 @@ def publications_menu(
             )
             in_pub_option = show_option_menu(
                 publication.name,
-                ["Agregar comentario", "Regresar"],
+                ["Agregar comentario", "Volver"],
                 body,
             )
 
@@ -170,13 +202,72 @@ def publications_menu(
                 break
 
 
+def my_publications_menu(
+    user: User, users: List[User], publications: List[Publication]
+):
+    assert user is not None
+    while True:
+        body = "Mis publicaciones:\n"
+        body += "\n".join([f"- {publications[pid].name}" for pid in user.publications])
+        option = show_option_menu(
+            "Menú de Publicaciones Realizadas",
+            ["Crear una nueva publicación", "Eliminar publicación", "Volver"],
+            body,
+        )
+        if option == 1:
+            new_publication_menu(user, users, publications)
+        elif option == 2:
+            pass
+        elif option == 3:
+            break
+
+
+def new_publication_menu(
+    user: User, users=List[User], publications=List[Publication]
+) -> Publication:
+    show_menu_header("Crear una nueva publicación", "")
+    name = input("Nombre: ").strip().replace("\n", " ")
+    description = input("Descripción: ").strip().replace("\n", " ")
+
+    while True:
+        try:
+            price = int(input("Precio (CLP): ").strip().replace(" ", ""))
+        except ValueError:
+            print("Ingresa un número entero sin símbolos.")
+        else:
+            break
+
+    creation_date = datetime.now()
+
+    publication = Publication(
+        pub_id=len(publications),
+        name=name,
+        description=description,
+        price=Price(value=price),
+        creation_date=creation_date,
+        seller_username=user.username,
+        comments=[],
+    )
+
+    insert_new_publication(publication)
+    publications.append(publication)
+    user.add_publication(publication.pub_id)
+
+    print(f"Publicación {publication.name} creada con éxito.")
+    return publication
+
+
 def comment_menu(user: User, publication: Publication):
     assert user is not None
     assert publication is not None
 
     show_menu_header("Agregar comentario", "Por favor se respetuoso!")
+
+    # Note how we're not sanitizing the comments other than replacing newlines
+    # In theory this shouldn't be a problem because of how the CVS parser
+    # works, but it's worth keeping in mind.
     while True:
-        comentario = input("Comentario: ").strip()
+        comentario = input("Comentario: ").strip().replace("\n", " ")
         if len(comentario) >= 500:
             print("El comentario es demasiado largo.")
         elif comentario:
@@ -188,6 +279,9 @@ def comment_menu(user: User, publication: Publication):
         username=user.username,
         creation_date=datetime.now(),
     )
+
+    # The order here is important, in case we have a IOError when inserting
+    insert_new_comment(comment)
 
     publication.comments.append(comment)
 
