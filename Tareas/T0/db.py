@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import NamedTuple, List, Union
+from typing import NamedTuple, List, Union, Tuple
 from model import Publication, User, Price, Comment
 
 PROJECT_PATH = "Tareas/T0"
@@ -34,20 +34,29 @@ def load_users(filepath: str = USERS_PATH) -> List[User]:
     users: List[User] = []
     for line in load_csv(filepath, n_columns=0).lines:
         username: str = line[0]
-        users.append(User(username=username, is_anonymous=False))
+        users.append(User(username=username))
     assert len(users) > 0
     return users
 
 
 def load_publications(
     users: List[User], filepath: str = PUBLICATIONS_PATH
-) -> List[Publication]:
+) -> Tuple[List[Publication], List[User]]:
     """Loads a publication data CSV file and returns a list of Publication objects"""
     publications: List[Publication] = []
     for line in load_csv(filepath, n_columns=6).lines:
-        pub_id: int = int(line[0])
+        # We move it to a zero index to ease interaction with lists
+        pub_id: int = int(line[0]) - 1
+        assert pub_id >= 0
+
         name: str = line[1]
         description: str = line[5]
+
+        # Load the price as Price
+        try:
+            price = Price(value=int(line[4].strip()))
+        except ValueError:
+            raise ValueError("Precio inválido al cargar publicaciones.")
 
         # Search for the seller
         seller_search: Union[User, None] = None
@@ -66,31 +75,29 @@ def load_publications(
 
         creation_date: datetime = parse_date(line[3])
 
-        # Load the price as Price
-        try:
-            price = Price(value=int(line[4].strip()))
-        except ValueError:
-            raise ValueError("Precio inválido al cargar publicaciones.")
-
         publication = Publication(
             pub_id=pub_id,
             name=name,
             description=description,
-            seller=seller,
+            seller_username=seller.username,
             price=price,
             creation_date=creation_date,
+            comments=[],
         )
         publications.append(publication)
-        user.add_publication(publication.pub_id)
-        users[user_index] = user
+        seller.add_publication(publication.pub_id)
+
+        # Not sure if given pass by reference this is necessary
+        users[user_index] = seller
+
     assert len(publications) > 0
-    return publications
+    return publications, users
 
 
 def load_comments(
     users: List[User], publications: List[Publication], filepath: str = COMMENTS_PATH
-) -> List[Comment]:
-    """Loads a comment data CSV file and returns a list of Comment objects"""
+) -> List[Publication]:
+    """Loads a comment data CSV file and returns an updated list of publications that include the comments."""
     comments: List[Comment] = []
     for line in load_csv(filepath, n_columns=4).lines:
         # Search for publication
@@ -119,14 +126,17 @@ def load_comments(
 
         comments.append(
             Comment(
-                publication=publication,
-                user=user,
+                pub_id=publication.pub_id,
+                username=user.username,
                 body=body,
                 creation_date=creation_date,
             )
         )
-    assert len(comments) > 0
-    return comments
+
+    for comment in comments:
+        publications[comment.pub_id].comments.append(comment)
+
+    return publications
 
 
 if __name__ == "__main__":
