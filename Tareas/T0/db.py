@@ -29,6 +29,11 @@ def parse_date(date: str) -> datetime:
     return datetime.strptime(date.strip(), "%Y/%m/%d %H:%M:%S")
 
 
+def print_date(date: datetime) -> str:
+    """Generates a date str in the format YYYY/MM/DD HH:MM:SS"""
+    return date.strftime("%Y/%m/%d %H:%M:%S")
+
+
 def load_users(filepath: str = USERS_PATH) -> List[User]:
     """Loads a user data CSV file and returns a list of User objects"""
     users: List[User] = []
@@ -139,6 +144,43 @@ def load_comments(
         publications[comment.pub_id].comments.append(comment)
 
     return publications
+
+
+def insert_new_user(user: User, filepath: str = USERS_PATH):
+    """Inserts a newly generated user into the corresponding CSV file.
+    Don't use this with users that already have made publications, since that information is not written to the database."""
+    assert user is not None
+    assert not user.publications
+
+    with open(filepath, "a", encoding="utf-8") as file:
+        file.write(f"{user.username}\n")
+
+
+def insert_new_comment(comment: Comment, filepath: str = COMMENTS_PATH):
+    """Inserts a a new comment into the corresponding CSV file."""
+    assert comment is not None
+    assert comment.pub_id is not None
+    assert "\n" not in comment.body
+
+    # We don't use escaping per the existing CSV file, although it's not really great
+    # The + 1 in pub_id uses the 1-indexing of the CSV file
+    with open(filepath, "a", encoding="utf-8") as file:
+        file.write(
+            f"{comment.pub_id + 1},{comment.username},{print_date(comment.creation_date)},{comment.body}\n"
+        )
+
+
+def insert_new_publication(publication: Publication, filepath: str = PUBLICATIONS_PATH):
+    """Inserts a new publication into the corresponding CSV file.
+    Don't use this for publications that already have comments in them, as this won't insert them for you."""
+    assert not publication.comments
+    assert publication.seller_username is not None
+    assert "\n" not in publication.name and "\n" not in publication.description
+
+    with open(filepath, "a", encoding="utf-8") as file:
+        file.write(
+            f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{publication.price.value},{publication.description}\n"
+        )
 
 
 if __name__ == "__main__":
