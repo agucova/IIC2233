@@ -4,7 +4,13 @@ from parametros import MIN_CARACTERES, MAX_CARACTERES
 from art import ART
 from model import Publication, User, Comment, Price
 from datetime import datetime
-from db import insert_new_comment, insert_new_user, insert_new_publication
+from db import (
+    delete_publication,
+    insert_new_comment,
+    insert_new_user,
+    insert_new_publication,
+    delete_publication,
+)
 
 
 # TODO: Make portable
@@ -220,7 +226,7 @@ def my_publications_menu(
         if option == 0:
             new_publication_menu(user, users, publications)
         elif option == 1:
-            pass
+            remove_publication_menu(user, users, publications)
         elif option == 2:
             break
 
@@ -276,6 +282,44 @@ def new_publication_menu(
 
     print(f"Publicación {publication.name} creada con éxito.")
     return publication
+
+
+def remove_publication_menu(
+    user: User, users: List[User], publications: List[Publication]
+) -> List[Publication]:
+    publication_list = [f"{publications[pid].name}" for pid in user.publications]
+    option = show_option_menu(
+        "Remover una publicación",
+        publication_list + ["Cancelar"],
+        body="Elige una publicación para remover.\n"
+        + bold("ADVERTENCIA:")
+        + " Esto es permanente.",
+    )
+
+    if option == len(publication_list):
+        return publications
+    else:
+        publication = publications[user.publications[option]]
+        confirm = (
+            input(
+                f"¿Estás seguro de quieres remover la publicación {publication.name}? (s/n)"
+            )
+            .strip()
+            .lower()
+            == "s"
+        )
+
+        if not confirm:
+            return publications
+
+        # delete_publication is fault-tolerant, and should opt for crashing the program
+        # over comprimising data integrity.
+        delete_publication(publication)
+        user.remove_publication(publication.pub_id)
+        publications.remove(publication)
+
+        print(f"Publicación {publication.name} removida con éxito.")
+        return publications
 
 
 def comment_menu(user: User, publication: Publication):

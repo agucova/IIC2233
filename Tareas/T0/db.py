@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import NamedTuple, List, Union, Tuple
 from model import Publication, User, Price, Comment
+from random import randint
+import os
 
 PROJECT_PATH = "Tareas/T0"
 USERS_PATH = f"{PROJECT_PATH}/usuarios.csv"
@@ -182,6 +184,41 @@ def insert_new_publication(publication: Publication, filepath: str = PUBLICATION
         file.write(
             f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{publication.price.value},{publication.description}\n"
         )
+
+
+def delete_publication(publication: Publication, filepath: str = PUBLICATIONS_PATH):
+    """Deletes a publication through an ID lookup on the CSV.
+    Tries to be as fault-tolerant as possible, with the cost of significant IO performance."""
+
+    with open(filepath, "r", encoding="utf-8") as f_original:
+        lines = f_original.readlines()
+        n_lines = len(lines)
+
+    # Using a temporary files prevent a broken state or corrupted database
+    # if something goes wrong in the middle of the process.
+    # We can later swap once we know everything worked right.
+    tmp_filepath = f".rm-{randint(0, 9999999999999999999)}.tmp"
+    with open(tmp_filepath, "r+", encoding="utf-8") as f_tmp:
+        # Let's start at the beginning
+        f_tmp.seek(0)
+        # Write everything but an exact match of the expected line.
+        for line in lines:
+            if (
+                line
+                != f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{publication.price.value},{publication.description}\n"
+            ):
+                f_tmp.write(line)
+        f_tmp.truncate()
+
+    assert os.path.isfile(tmp_filepath)
+    assert os.stat(tmp_filepath).st_size > 0
+    with open(tmp_filepath, "r", encoding="utf-8") as f_tmp:
+        lines = f_tmp.readlines()
+        assert len(lines) == n_lines - 1
+
+    # This is the crucial step
+    # We swap the tmpfile for the actual file
+    os.replace(tmp_filepath, filepath)
 
 
 if __name__ == "__main__":
