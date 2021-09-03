@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import NamedTuple, List, Union, Tuple, Dict
+from typing import NamedTuple, List, Union, Tuple, Dict, Optional
 from model import Publication, User, Price, Comment
 from random import randint
 import os
@@ -183,42 +183,89 @@ def insert_new_publication(publication: Publication, filepath: str = PUBLICATION
         )
 
 
-def delete_publication(publication: Publication, filepath: str = PUBLICATIONS_PATH):
-    """Deletes a publication through an ID lookup on the CSV.
-    Tries to be as fault-tolerant as possible, with the cost of significant IO performance."""
+def _remove_line_helper(
+    filepath: str,
+    mode: str,
+    target_lines: Optional[List[str]] = None,
+    pub_id: Optional[int] = None,
+):
+    """Removes lines from a CSV file in a fault tolerant manner. Modes for comments or publications."""
+    assert mode in ("c", "p")
+    if mode == "p":
+        assert target_lines is not None
+    elif mode == "c":
+        assert pub_id is not None
 
     with open(filepath, "r", encoding="utf-8") as f_original:
         lines = f_original.readlines()
-        n_lines = len(lines)
+
+    n_lines = len(lines)
 
     # Using a temporary files prevent a broken state or corrupted database
     # if something goes wrong in the middle of the process.
     # We can later swap once we know everything worked right.
-    tmp_filepath = f".rm-{randint(0, 9999999999999999999)}.tmp"
-
-    # These are the lines we want to *not* write to the tmp file.
-    target_line = f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{publication.price.value},{publication.description}\n"
-    # We decided to move to floats for international precision, so we need to handle cases where the int was written by the legacy system.
-    target_line_alt = f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{round(publication.price.value)},{publication.description}\n"
+    tmp_filepath = f".rm{mode}-{randint(0, 9999999999999999999)}.tmp"
 
     with open(tmp_filepath, "w+", encoding="utf-8") as f_tmp:
         # Let's start at the beginning
         f_tmp.seek(0)
         # Write everything but an exact match of the expected line.
         for line in lines:
-            if line not in [target_line, target_line_alt]:
-                f_tmp.write(line)
+            if mode == "c" and pub_id is not None:
+                if line.strip().split(",")[0] != pub_id:
+                    f_tmp.write(line)
+            elif mode == "p" and target_lines is not None:
+                if line not in target_lines:
+                    f_tmp.write(line)
         f_tmp.truncate()
 
     assert os.path.isfile(tmp_filepath)
     assert os.stat(tmp_filepath).st_size > 0
     with open(tmp_filepath, "r", encoding="utf-8") as f_tmp:
         lines = f_tmp.readlines()
-        assert len(lines) == n_lines - 1
+        if mode == "p":
+            assert len(lines) == n_lines - 1
 
     # This is the crucial step
     # We swap the tmpfile for the actual file
     os.replace(tmp_filepath, filepath)
+
+
+def _remove_publication_comments(
+    publication: Publication, com_filepath: str = COMMENTS_PATH
+):
+    """Removes all comments from a given publication."""
+    _remove_line_helper(com_filepath, mode="c", pub_id=publication.pub_id)
+
+
+def _remove_publication_line(
+    publication: Publication, pub_filepath: str = PUBLICATIONS_PATH
+):
+    """Removes a given publication from the database."""
+    # These are the target lines to be extracted from the file
+    target_line = f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{publication.price.value},{publication.description}\n"
+    # We decided to move to floats for international precision, so we need to handle cases where the int was written by the legacy system.
+    target_line_alt = f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{round(publication.price.value)},{publication.description}\n"
+
+    _remove_line_helper(
+        pub_filepath, mode="p", target_lines=[target_line, target_line_alt]
+    )
+
+
+def delete_publication(
+    publication: Publication,
+    pub_filepath: str = PUBLICATIONS_PATH,
+    com_filepath: str = COMMENTS_PATH,
+):
+    """Deletes a publication through an ID lookup on the CSVs.
+    Tries to be as fault-tolerant as possible, with the cost of significant IO performance."""
+    assert publication
+    assert publication.pub_id is not None
+
+    # We start by deleting the comments
+    _remove_publication_comments(publication, com_filepath)
+    # And now the publication
+    _remove_publication_line(publication, pub_filepath)
 
 
 if __name__ == "__main__":
