@@ -1,5 +1,4 @@
 from datetime import datetime
-from multiprocessing.sharedctypes import Value
 from typing import NamedTuple, List, Union, Tuple, Dict, Optional
 from model import Publication, User, Price, Comment
 from random import randint

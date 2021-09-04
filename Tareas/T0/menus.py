@@ -353,7 +353,7 @@ def comment_menu(user: User, publication: Publication):
         creation_date=datetime.now(),
     )
 
-    # The order here is important, in case we have a IOError when inserting
+    # The order here is important, in case we have a IOError while inserting
     insert_new_comment(comment)
 
     publication.comments.append(comment)
