@@ -1,4 +1,5 @@
 from datetime import datetime
+from multiprocessing.sharedctypes import Value
 from typing import NamedTuple, List, Union, Tuple, Dict, Optional
 from model import Publication, User, Price, Comment
 from random import randint
@@ -212,8 +213,15 @@ def _remove_line_helper(
         # Write everything but an exact match of the expected line.
         for line in lines:
             if mode == "c" and pub_id is not None:
-                if line.strip().split(",")[0] != pub_id:
+                # + 1 because of the zero/one indexing difference
+                try:
+                    c_pub_id = int(line.strip().split(",")[0])
+                except ValueError:
+                    c_pub_id = None
+
+                if c_pub_id != pub_id + 1:
                     f_tmp.write(line)
+
             elif mode == "p" and target_lines is not None:
                 if line not in target_lines:
                     f_tmp.write(line)

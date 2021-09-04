@@ -291,6 +291,7 @@ def new_publication_menu(
 def remove_publication_menu(
     user: User, users: List[User], publications: Dict[int, Publication]
 ) -> Tuple[User, Dict[int, Publication]]:
+    # TODO: Add creation_date
     publication_list = [f"{publications[pid].name}" for pid in user.publications]
     option = show_option_menu(
         "Remover una publicación",
