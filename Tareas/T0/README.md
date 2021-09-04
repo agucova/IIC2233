@@ -1,11 +1,8 @@
 # Tarea 0: DCCommerce :school_satchel:
 
 ## Consideraciones generales :octocat:
-Todo debería funcionar bien, menos la remoción de comentarios junto con publicaciones. Corregí ese bug 1 minuto 9 segundos después de la entrega en el commit [`6c510ed`](https://github.com/IIC2233/agucova-iic2233-2021-2/commit/6c510edd1bd5b0b15d3010c86d9adf5a21407d80), no dándome cuenta que se entregaba a las 8:00 y no a las 8:30 :(
 
- Es un simple error de conversión de tipos de conversión entre un `str` con un `int`, y se puede utilizar el commit como referencia para arreglar la funcionalidad.
-
-Todos los cambios posteriores eran cosméticos o de calidad, así que debería tener todo el resto de la funcionalidad ya implementada. Noté que dejé unos `TODO` en comentarios dando vuelta, pero todas esas mejoras ya están implementadas.
+Creí que se entregaba a las 8:30, pero por suerte todos los cambios posteriores eran cosméticos o de pequeñas mejoras en el flujo de interacción, así que debería tener todo la funcionalidad ya implementada. Noté que dejé unos `TODO` en comentarios dando vuelta, pero todas esas mejoras ya están implementadas.
 
 ### Cosas implementadas y no implementadas :white_check_mark: :x:
 
@@ -24,7 +21,7 @@ Todos los cambios posteriores eran cosméticos o de calidad, así que debería t
 ##### ✅ Publicaciones
 ##### ✅ Comentarios
 #### Archivos: 15 pts (15%)
-##### 🟠 Manejo de Archivos (Remoción de comentarios)
+##### ✅ Manejo de Archivos (Remoción de comentarios)
 #### General: 21 pts (21%)
 ##### ✅ Menús
 ##### ✅ Parámetros
@@ -64,4 +61,6 @@ Los supuestos que realicé durante la tarea son los siguientes:
 ----
 
 ## Referencias de código externo :book:
-No utilicé código externo.
+- Para el método de remoción de líneas de código me orientó mucho [esta](https://stackoverflow.com/a/28057753) respuesta de StackOverflow pero la real inspiracion fue [este](https://stackoverflow.com/questions/4710067/how-to-delete-a-specific-line-in-a-file#comment97330530_28057753) comentario.
+- Para el código de `clear_screen()` me basé en [este](https://www.geeksforgeeks.org/clear-screen-python/) artículo.
+- [Copilot](https://copilot.github.com/) me ayudó con la secuencia ANSI de `bold()` y el formato de fechas con `datetime` (sigo sorprendido), pero no hizo ningún otro aporte sustancial.
