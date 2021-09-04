@@ -21,7 +21,7 @@ Creí que se entregaba a las 8:30, pero por suerte todos los cambios posteriores
 ##### ✅ Publicaciones
 ##### ✅ Comentarios
 #### Archivos: 15 pts (15%)
-##### ✅ Manejo de Archivos (Remoción de comentarios)
+##### ✅ Manejo de Archivos
 #### General: 21 pts (21%)
 ##### ✅ Menús
 ##### ✅ Parámetros
@@ -29,7 +29,7 @@ Creí que se entregaba a las 8:30, pero por suerte todos los cambios posteriores
 ##### ✅ PEP8
 
 ## Ejecución :computer:
-El módulo principal de la tarea a ejecutar es  ```main```.
+El módulo principal de la tarea a ejecutar es  ```main```, y debe ser ejecutado desde la raíz del repositorio.
 
 ## Librerías :books:
 ### Librerías externas utilizadas
