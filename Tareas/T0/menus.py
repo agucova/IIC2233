@@ -9,7 +9,7 @@ from db import (
     insert_new_comment,
     insert_new_user,
     insert_new_publication,
-    delete_publication,
+    print_date,
 )
 
 
@@ -292,7 +292,10 @@ def remove_publication_menu(
     user: User, users: List[User], publications: Dict[int, Publication]
 ) -> Tuple[User, Dict[int, Publication]]:
     # TODO: Add creation_date
-    publication_list = [f"{publications[pid].name}" for pid in user.publications]
+    publication_list = [
+        f"{publications[pid].name} -- Creado el {print_date(publications[pid].creation_date)}"
+        for pid in user.publications
+    ]
     option = show_option_menu(
         "Remover una publicación",
         publication_list + ["Cancelar"],
