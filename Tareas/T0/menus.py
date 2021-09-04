@@ -81,17 +81,17 @@ def initial_menu(users: List[User], publications: Dict[int, Publication]):
     if option == 0:
         # Ingresar
         user = login_menu(users)
+        principal_menu(user, users, publications)
     elif option == 1:
         # Registrarse
         users, user = register_menu(users)
+        principal_menu(user, users, publications)
     elif option == 2:
-        pass
+        publications_menu(None, users, publications)
     elif option == 3:
         # Salir
         print("Adiós!")
         return None
-
-    principal_menu(user, users, publications)
 
 
 def login_menu(users: List[User]) -> Union[User, None]:
@@ -180,35 +180,48 @@ def publications_menu(
         )
 
         if pub_option == len(publications):
-            return principal_menu(user, users, publications)
+            if user is not None:
+                return principal_menu(user, users, publications)
+            else:
+                return initial_menu(users, publications)
 
         while True:
             publication = publications[pub_option]
             body = (
-                f"Creado: {publication.creation_date}\n"
+                f"Creado: {print_date(publication.creation_date)}\n"
                 + f"Vendedor: {publication.seller_username}\n"
                 + f"Precio: {publication.price}\n"
                 + f"Descripción: {publication.description}\n"
             )
 
-            body += "\nComentarios:\n"
+            body += "\n" + bold("Comentarios:") + "\n"
             body += "\n" + "\n".join(
                 [
                     f"{c.creation_date}, {c.username}: {c.body}"
                     for c in publication.comments
                 ]
             )
-            in_pub_option = show_option_menu(
-                publication.name,
-                ["Agregar comentario", "Volver"],
-                body,
-            )
+            if user is not None:
+                in_pub_option = show_option_menu(
+                    publication.name,
+                    ["Agregar comentario", "Volver"],
+                    body,
+                )
 
-            if in_pub_option == 0:
-                if user:
-                    publication = comment_menu(user, publication)
-            elif in_pub_option == 1:
-                break
+                if in_pub_option == 0:
+                    if user:
+                        publication = comment_menu(user, publication)
+                elif in_pub_option == 1:
+                    break
+            else:
+                in_pub_option = show_option_menu(
+                    publication.name,
+                    ["Volver"],
+                    body,
+                )
+
+                if in_pub_option == 0:
+                    break
 
 
 def my_publications_menu(
@@ -216,8 +229,13 @@ def my_publications_menu(
 ):
     assert user is not None
     while True:
-        body = "Mis publicaciones:\n"
-        body += "\n".join([f"- {publications[pid].name}" for pid in user.publications])
+        if len(user.publications) != 0:
+            body = "Mis publicaciones:\n"
+            body += "\n".join(
+                [f"- {publications[pid].name}" for pid in user.publications]
+            )
+        else:
+            body = "No tienes publicaciones todavía."
         option = show_option_menu(
             "Menú de Publicaciones Realizadas",
             ["Crear una nueva publicación", "Eliminar publicación", "Volver"],
