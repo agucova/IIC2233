@@ -175,7 +175,7 @@ def publications_menu(
     while True:
         pub_option = show_option_menu(
             "Menú de Publicaciones",
-            [p.name for p in publications.values()] + ["Volver"],
+            [p.name for p in publications.values()] + [bold("Volver")],
             body="Este es el tablero público de publicaciones. Escoge una publicación para seguir.",
         )
 
@@ -195,7 +195,7 @@ def publications_menu(
             )
 
             body += "\n" + bold("Comentarios:") + "\n"
-            body += "\n" + "\n".join(
+            body += "\n".join(
                 [
                     f"{c.creation_date}, {c.username}: {c.body}"
                     for c in publication.comments
@@ -204,7 +204,7 @@ def publications_menu(
             if user is not None:
                 in_pub_option = show_option_menu(
                     publication.name,
-                    ["Agregar comentario", "Volver"],
+                    ["Agregar comentario", bold("Volver")],
                     body,
                 )
 
@@ -216,7 +216,7 @@ def publications_menu(
             else:
                 in_pub_option = show_option_menu(
                     publication.name,
-                    ["Volver"],
+                    [bold("Volver")],
                     body,
                 )
 
@@ -236,17 +236,35 @@ def my_publications_menu(
             )
         else:
             body = "No tienes publicaciones todavía."
-        option = show_option_menu(
-            "Menú de Publicaciones Realizadas",
-            ["Crear una nueva publicación", "Eliminar publicación", "Volver"],
-            body,
-        )
-        if option == 0:
-            new_publication_menu(user, users, publications)
-        elif option == 1:
-            user, publications = remove_publication_menu(user, users, publications)
-        elif option == 2:
-            break
+
+        if len(user.publications) >= 1:
+            options = [
+                "Crear una nueva publicación",
+                "Eliminar publicación",
+                bold("Volver"),
+            ]
+            option = show_option_menu(
+                "Menú de Publicaciones Realizadas",
+                options,
+                body,
+            )
+            if option == 0:
+                new_publication_menu(user, users, publications)
+            elif option == 1:
+                user, publications = remove_publication_menu(user, users, publications)
+            elif option == 2:
+                break
+        else:
+            options = ["Crear una nueva publicación", bold("Volver")]
+            option = show_option_menu(
+                "Menú de Publicaciones Realizadas",
+                options,
+                body,
+            )
+            if option == 0:
+                new_publication_menu(user, users, publications)
+            elif option == 1:
+                break
 
 
 def new_publication_menu(
