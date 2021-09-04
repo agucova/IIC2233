@@ -57,6 +57,7 @@ Los supuestos que realicé durante la tarea son los siguientes:
 3. Asumo que los requisitos de usuarios no aplican retroactivamente.
 4. Usé [colorama](https://pypi.org/project/colorama/) para las hacer portable el código de las negritas (`bold()`) y el `clear_screen()` también debería ser portable. Lamentablemente, no tenía como probarlo en Windows. Si por alguna razón no funciona, eliminaría los cuerpos de ambas funciones en `menu.py`.
 5. Uso [type hints](https://realpython.com/lessons/type-hinting/) acorde con [PEP 448](https://www.python.org/dev/peps/pep-0484/) de forma externa en mi programa, por lo que se puede notar anotaciones de tipos adicionales en la definición de funciones, métodos y algunas variables. Éstas anotaciones no cambian la funcionalidad del programa y solo sirven para complementar herramientas de análisis estático como [Pyright](https://github.com/microsoft/pyright).
+6. Mi editor auto-importó una línea no deseada (e inutilizada) en `db.py:2`, se puede ignorar.
 
 ----
 
