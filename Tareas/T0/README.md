@@ -1,9 +1,7 @@
 # Tarea 0: DCCommerce :school_satchel:
 
-**Dejar claro lo que NO pudieron implementar y lo que no funciona a la perfección. Esto puede sonar innecesario pero permite que el ayudante se enfoque en lo que sí podría subir su puntaje.**
-
 ## Consideraciones generales :octocat:
-Todo debería funcionar bien, menos la remoción de comentarios junto con publicaciones. Corregí ese bug en el commit [`6c510ed`](https://github.com/IIC2233/agucova-iic2233-2021-2/commit/6c510edd1bd5b0b15d3010c86d9adf5a21407d80), no dándome cuenta que se entregaba a las 8:00 y no a las 8:30 :(.
+Todo debería funcionar bien, menos la remoción de comentarios junto con publicaciones. Corregí ese bug dos minutos después de la entrega en el commit [`6c510ed`](https://github.com/IIC2233/agucova-iic2233-2021-2/commit/6c510edd1bd5b0b15d3010c86d9adf5a21407d80), no dándome cuenta que se entregaba a las 8:00 y no a las 8:30 :(.
 
  Es un simple error de conversión de tipos de conversión entre un `str` con un `int`, y se puede utilizar el commit como referencia para arreglar la funcionalidad.
 
