@@ -3,7 +3,7 @@ import parametros as p
 
 
 # Recuerda definir esta clase como abstracta!
-class Atraccion:
+class Atraccion(ABC):
     def __init__(self, nombre, capacidad):
         # No modificar
         self.nombre = nombre
@@ -46,7 +46,7 @@ class Atraccion:
 
 
 # Recuerda completar la herencia!
-class AtraccionFamiliar:
+class AtraccionFamiliar(Atraccion):
     def __init__(self):
         # COMPLETAR
         pass
@@ -57,7 +57,7 @@ class AtraccionFamiliar:
 
 
 # Recuerda completar la herencia!
-class AtraccionAdrenalinica:
+class AtraccionAdrenalinica(Atraccion):
     def __init__(self):
         # COMPLETAR
         pass
@@ -68,7 +68,7 @@ class AtraccionAdrenalinica:
 
 
 # Recuerda completar la herencia!
-class AtraccionAcuatica:
+class AtraccionAcuatica(Atraccion):
     def __init__(self):
         # COMPLETAR
         pass
@@ -79,7 +79,7 @@ class AtraccionAcuatica:
 
 
 # Recuerda completar la herencia!
-class MontanaAcuatica:
+class MontanaAcuatica(Atraccion):
     def __init__(self):
         # COMPLETAR
         pass

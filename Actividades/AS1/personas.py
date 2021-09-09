@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from random import randint
+from typing import List
 
 
 # Recuerda definir esta clase como abstracta!
-class Persona:
+class Persona(ABC):
     def __init__(self, nombre, edad, tiene_pase, juegos):
         # No modificar
         self.nombre = nombre
@@ -56,8 +57,15 @@ class Persona:
 
     # --------------
     # Completa los métodos abstractos aqui
-
     # --------------
+
+    @abstractmethod
+    def definir_estados(self):
+        pass
+
+    @abstractmethod
+    def actuar(self):
+        pass
 
     def __str__(self):
         return (
@@ -67,15 +75,21 @@ class Persona:
 
 
 # Recuerda completar la herencia!
-class Adulto:
-    def __init__(self):
-        # COMPLETAR
-        pass
+class Adulto(Persona):
+    def __init__(
+        self, nombre: str, edad: int, tiene_pase: bool, juegos: List, dinero: int
+    ):
+        self.dinero = dinero
+        super().__init__(nombre, edad, tiene_pase, juegos)
 
     # --------------
     # Completa el método abstracto aquí
-
     # --------------
+
+    def definir_estados(self):
+        assert self.dinero
+        self.salud: int = self.edad * randint(1, 3)
+        self.felicidad: int = self.edad * self.dinero
 
     def actuar(self):
         # No modificar
@@ -100,15 +114,20 @@ class Adulto:
 
 
 # Recuerda completar la herencia!
-class Nino:
-    def __init__(self):
-        # COMPLETAR
-        pass
+class Nino(Persona):
+    def __init__(
+        self, nombre: str, edad: int, tiene_pase: bool, juegos: List, padre: str
+    ):
+        self.padre = padre
+        super().__init__(nombre, edad, tiene_pase, juegos)
 
     # --------------
     # Completa el método abstracto aquí
-
     # --------------
+
+    def definir_estados(self):
+        self.salud: int = self.edad * randint(1, 5)
+        self.felicidad: int = len(self.padre) * 10
 
     def actuar(self):
         # No modificar
