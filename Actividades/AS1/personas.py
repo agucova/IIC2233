@@ -2,6 +2,10 @@ from abc import ABC, abstractmethod
 from random import randint
 from typing import List
 
+# Uso type hints por si acaso!
+# https://docs.python.org/3/library/typing.html
+# https://www.python.org/dev/peps/pep-0484/
+
 
 # Recuerda definir esta clase como abstracta!
 class Persona(ABC):
