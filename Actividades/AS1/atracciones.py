@@ -74,8 +74,8 @@ class AtraccionAdrenalinica(Atraccion):
             persona.salud -= self.efecto_salud
         else:
             print(f"*** {persona.nombre} fue bajado del juego por su salud")
-            persona.salud -= p.SALUD_ADRENALINA // 2
-            persona.felicidad -= p.FELICIDAD_ADRENALINA // 2
+            persona.salud -= self.efecto_salud // 2
+            persona.felicidad -= self.efecto_felicidad // 2
 
 
 # Recuerda completar la herencia!
