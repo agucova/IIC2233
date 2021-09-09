@@ -47,10 +47,10 @@ class Persona(ABC):
                 print(".")
         self.__salud = valor
 
-    def revision_juegos(self):
+    def revision_juegos(self) -> bool:
         return not self.esperando and len(self.juegos) >= 1
 
-    def siguiente_juego(self):
+    def siguiente_juego(self) -> str:
         return self.juegos.pop(0)
 
     # --------------
@@ -77,7 +77,7 @@ class Adulto(Persona):
     def __init__(
         self, nombre: str, edad: int, tiene_pase: bool, juegos: List, dinero: int
     ):
-        self.dinero = dinero
+        self.dinero: int = dinero
         super().__init__(nombre, edad, tiene_pase, juegos)
 
     # --------------
