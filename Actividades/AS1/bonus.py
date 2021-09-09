@@ -14,6 +14,7 @@ class AtraccionTerrorifica(AtraccionAdrenalinica):
             if persona.salud <= 2 * self.salud_necesaria:
                 print(f"{persona.nombre} necesitará capacitación antes de jugar")
                 persona.definir_estados()
+
         super().iniciar_juego(personas)
 
 

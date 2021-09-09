@@ -128,6 +128,7 @@ class Nino(Persona):
     # --------------
 
     def definir_estados(self):
+        assert self.edad is not None and self.padre is not None
         self.salud: int = self.edad * randint(1, 5)
         self.felicidad: int = len(self.padre) * 10
 

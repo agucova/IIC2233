@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Union
 import parametros as p
-from personas import Adulto, Nino
+from personas import Persona, Adulto, Nino
 
 
 # Recuerda definir esta clase como abstracta!
@@ -68,7 +68,10 @@ class AtraccionAdrenalinica(Atraccion):
         self.efecto_salud: int = p.SALUD_ADRENALINA
         self.efecto_felicidad: int = p.FELICIDAD_ADRENALINA
 
-    def efecto_atraccion(self, persona):
+    def efecto_atraccion(self, persona: Union[Adulto, Nino]):
+        assert persona.salud is not None
+        assert isinstance(persona, Persona)
+
         if persona.salud > self.salud_necesaria:
             persona.felicidad += self.efecto_felicidad
             persona.salud -= self.efecto_salud
@@ -87,6 +90,8 @@ class AtraccionAcuatica(AtraccionFamiliar):
         self.efecto_felicidad = p.FELICIDAD_ACUATICA
 
     def ingresar_persona(self, persona: Union[Nino, Adulto]):
+        assert isinstance(persona, Persona)
+
         if persona.tiene_pase:
             super().ingresar_persona(persona)
         else:
