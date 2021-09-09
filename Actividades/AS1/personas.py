@@ -48,12 +48,10 @@ class Persona(ABC):
         self.__salud = valor
 
     def revision_juegos(self):
-        # COMPLETAR
-        pass
+        return not self.esperando and len(self.juegos) >= 1
 
     def siguiente_juego(self):
-        # COMPLETAR
-        pass
+        return self.juegos.pop(0)
 
     # --------------
     # Completa los métodos abstractos aqui

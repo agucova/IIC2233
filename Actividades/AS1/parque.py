@@ -5,8 +5,10 @@ class Parque:
         self.atracciones = atracciones
 
     def distribuir_personas(self):
-        # COMPLETAR
-        pass
+        for persona in self.personas:
+            if persona.revision_juegos():
+                nombre_juego: str = persona.siguiente_juego()
+                self.atracciones[nombre_juego].ingresar_persona(persona)
 
     def simular_hora(self, hora):
         # No modificar
