@@ -114,3 +114,4 @@ class MontanaAcuatica(AtraccionAdrenalinica, AtraccionAcuatica):
                 print(f"*** {persona.nombre} se cayó del agua y perdió su pase")
                 persona.tiene_pase = False
             self.efecto_atraccion(persona)
+        print(f"HOLI {self.efecto_felicidad}")
