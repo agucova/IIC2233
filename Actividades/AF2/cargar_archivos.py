@@ -17,7 +17,8 @@ def cargar_invitades(nombre_archivo):
         elif pase == "false":
             pase = False
         tos = tos == "true"
-        dolor_cabeza = tos == "true"
+        # corregido error de enunciado!
+        dolor_cabeza = dolor_cabeza == "true"
         invitade = Invitade(
             nombre, int(edad), pase, float(temp), tos, dolor_cabeza, mail
         )
