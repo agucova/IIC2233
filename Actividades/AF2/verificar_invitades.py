@@ -31,7 +31,9 @@ def corregir_pase_movilidad(invitade: Invitade):
     except TypeError as e:
         print(e)
         invitade.pase_movilidad = True
-        print(f"Error: el pase de movilidad de {invitade.nombre} no es un bool")
+        print(
+            f"El error en el pase de movilidad de {invitade.nombre} ha sido corregido"
+        )
 
 
 def verificar_mail(invitade: Invitade):
