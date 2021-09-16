@@ -1,5 +1,6 @@
 class RiesgoCovid(Exception):
     def __init__(self, sintoma: str, nombre_invitade: str):
+        assert sintoma in ("fiebre", "dolor_cabeza", "tos")
         self.sintoma = sintoma
         self.nombre_invitade = nombre_invitade
 

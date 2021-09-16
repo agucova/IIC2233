@@ -55,14 +55,17 @@ def corregir_mail(invitade: Invitade):
     except ValueError as e:
         print(e)
         mail = invitade.mail.strip().split("@")
+
         assert len(mail) == 2
         assert mail[0] == "uc"
 
         dominio = mail[1].split(".")
-        tld = dominio.pop()
+        sld = dominio[:-1]
+        tld = dominio[-1]
         assert tld == "cl"
-        usuario = ".".join(dominio)
-        invitade.mail = f"{usuario}@uc.cl"
+
+        usuario_corregido = ".".join(sld)
+        invitade.mail = f"{usuario_corregido}@uc.cl"
         print(f"El error en el mail de {invitade.nombre} ha sido corregido")
 
 
