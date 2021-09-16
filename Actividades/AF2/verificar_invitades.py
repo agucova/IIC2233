@@ -36,15 +36,15 @@ def corregir_pase_movilidad(invitade: Invitade):
 
 def verificar_mail(invitade: Invitade):
     assert isinstance(invitade.mail, str)
-    mail = invitade.mail.split("@")
+    mail = invitade.mail.strip().split("@")
     assert len(mail) == 2
-    if mail[0] == "uc.cl" and mail[1] != "uc.cl":
+    if mail[0] == "uc" and mail[1] != "uc.cl":
         raise ValueError(
             f"Error: El mail de {invitade.nombre} no está en el formato correcto"
         )
     elif mail[1] != "uc.cl":
         print(
-            "Advertencia: El dominio de {invitade.nombre} no es uc.cl, sin embargo cumple la especificación."
+            f"Advertencia: El dominio de {invitade.nombre} no es uc.cl, sin embargo cumple la especificación."
         )
 
 
@@ -54,9 +54,15 @@ def corregir_mail(invitade: Invitade):
         verificar_mail(invitade)
     except ValueError as e:
         print(e)
-        mail = invitade.mail.split("@")
+        mail = invitade.mail.strip().split("@")
         assert len(mail) == 2
-        invitade.mail = f"{mail[1]}@uc.cl"
+        assert mail[0] == "uc"
+
+        dominio = mail[1].split(".")
+        tld = dominio.pop()
+        assert tld == "cl"
+        usuario = ".".join(dominio)
+        invitade.mail = f"{usuario}@uc.cl"
         print(f"El error en el mail de {invitade.nombre} ha sido corregido")
 
 
