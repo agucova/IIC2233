@@ -3,6 +3,7 @@ class RiesgoCovid(Exception):
         assert sintoma in ("fiebre", "dolor_cabeza", "tos")
         self.sintoma = sintoma
         self.nombre_invitade = nombre_invitade
+        super().__init__("Se encontró riesgo COVID-19.")
 
     def alerta_de_covid(self):
         if self.sintoma == "fiebre":
