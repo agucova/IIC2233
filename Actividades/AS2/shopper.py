@@ -55,7 +55,7 @@ class Shopper(Thread):
                 self.pedido_actual.entregado = True
                 self.posicion = 0
                 self.pedido_actual = None
-                self.evento_disponible.set()
+                Shopper.evento_disponible.set()
 
 
 if __name__ == "__main__":
