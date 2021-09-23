@@ -25,10 +25,13 @@ class Tienda(Thread):
         # De todas formas agregué daemon=True, aunque parece funcionar con o sin esto.
 
     def ingresar_pedido(self, pedido: Pedido, shopper: Shopper):
-        with self.lock_cola:
-            if self.abierta:
+        if self.abierta:
+            with self.lock_cola:
                 self.cola_pedidos.append((pedido, shopper))
-        shopper.asignar_pedido(pedido)
+            shopper.asignar_pedido(pedido)
+        else:
+            # Esto es comportamiento indefinido
+            raise (Exception("La tienda está cerrada y recibió un pedido"))
 
     def preparar_pedido(self, pedido: Pedido):
         assert not pedido.evento_pedido_listo.is_set()
