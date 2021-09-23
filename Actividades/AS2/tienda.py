@@ -16,7 +16,13 @@ class Tienda(Thread):
         # MODIFICACIÓN ADICIONAL
         # Le pongo nombre al Thread para que sea
         # legible en debugging (pedí permiso)
-        super().__init__(name=f"{nombre} (Tienda)")
+        super().__init__(name=f"{nombre} (Tienda)", daemon=True)
+        # Nota: Además el enunciado dice
+        # "deberás completarla de modo que su ejecución termine con el resto del programa".
+        # Si bien no veo por qué esto tendría que ser así
+        # (al menos que la tienda sea abierta externamente),
+        # esto entra en conflicto con que el __init__ esté bajo no modificar.
+        # De todas formas agregué daemon=True, aunque parece funcionar con o sin esto.
 
     def ingresar_pedido(self, pedido: Pedido, shopper: Shopper):
         with self.lock_cola:
