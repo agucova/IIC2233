@@ -8,12 +8,15 @@ from random import randint
 class Tienda(Thread):
     def __init__(self, nombre):
         # NO MODIFICAR
-        super().__init__()
         self.nombre = nombre
         self.cola_pedidos = []
         self.abierta = True
         # COMPLETAR DESDE AQUI
         self.lock = Lock()
+        # MODIFICACIÓN ADICIONAL
+        # Le pongo nombre al Thread para que sea
+        # legible en debugging (pedí permiso)
+        super().__init__(name=nombre)
 
     def ingresar_pedido(self, pedido: Pedido, shopper: Shopper):
         with self.lock:

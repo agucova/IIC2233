@@ -9,16 +9,19 @@ class Shopper(Thread):
 
     def __init__(self, nombre: str, velocidad: int):
         # No Modificar
-        super().__init__()
         self.posicion = 0
         self.distancia_tienda = 0
         self.distancia_destino = 0
         self.pedido_actual = None
         self.termino_jornada = False
+
         # COMPLETAR DESDE AQUI
         self.nombre: str = nombre
         self.velocidad: int = velocidad
-        super().__init__()
+        # MODIFICACIÓN ADICIONAL
+        # Le pongo nombre al Thread para que sea
+        # legible en debugging (pedí permiso)
+        super().__init__(name=nombre)
 
     @property
     def ocupado(self):

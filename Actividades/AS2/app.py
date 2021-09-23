@@ -15,10 +15,14 @@ class DCComidApp(Thread):
         pedidos: list[tuple[str, str, str]],
     ):
         # NO MODIFICAR
-        super().__init__()
         self.shoppers = shoppers
         self.pedidos = pedidos
         self.tiendas = tiendas
+
+        # MODIFICACIÓN ADICIONAL
+        # Le pongo nombre al Thread para que sea
+        # legible en debugging (pedí permiso)
+        super().__init__(name="DCComidApp")
 
     def obtener_shopper(self):
         while True:
