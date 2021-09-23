@@ -41,7 +41,9 @@ class Shopper(Thread):
         print(f"El pedido {pedido.id_} fue asignado a {self.nombre}.")
 
     def avanzar(self):
-        assert self.posicion >= 0
+        assert self.ocupado
+        assert 0 <= self.posicion <= self.distancia_destino
+
         self.posicion += 1
         sleep(1 / self.velocidad)
         print(f"{self.nombre} avanzó a {self.posicion}.")
