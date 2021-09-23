@@ -38,7 +38,7 @@ class Shopper(Thread):
         self.distancia_destino = self.distancia_tienda + pedido.distancia_destino
         self.pedido_actual = pedido
         self.posicion = 0
-        print(f"El pedido {pedido.id_} fue asignado a {self.nombre},")
+        print(f"El pedido {pedido.id_} fue asignado a {self.nombre}.")
 
     def avanzar(self):
         assert self.posicion >= 0

@@ -22,16 +22,18 @@ class Tienda(Thread):
         with self.lock_cola:
             if self.abierta:
                 self.cola_pedidos.append((pedido, shopper))
-                print(
-                    f"{self.nombre} recibió un pedido con el shopper {shopper.nombre}."
-                )
         shopper.asignar_pedido(pedido)
 
-    def preparar_pedido(self, pedido):
+    def preparar_pedido(self, pedido: Pedido):
+        assert not pedido.evento_pedido_listo.is_set()
+        assert not pedido.entregado
+
         tiempo_a_completar = randint(1, 10)
-        print(f"El pedido para {self.nombre} se demorará {tiempo_a_completar}.")
+        print(
+            f"El pedido {pedido.id_} para {self.nombre} se demorará {tiempo_a_completar}."
+        )
         sleep(tiempo_a_completar)
-        print(f"El pedido en {self.nombre} está listo para ser retirado.")
+        print(f"El pedido {pedido.id_} en {self.nombre} está listo para ser retirado.")
 
     def run(self):
         while self.abierta:
