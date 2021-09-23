@@ -40,7 +40,6 @@ class DCComidApp(Thread):
             pedido = Pedido(id_, nombre_tienda, descripcion)
 
             shopper: Shopper = self.obtener_shopper()
-            shopper.asignar_pedido(pedido)
             tienda.ingresar_pedido(pedido, shopper)
             trafico_de_red = randint(1, 5)
             sleep(trafico_de_red)
