@@ -20,13 +20,13 @@ class Tienda(Thread):
             if self.abierta:
                 self.cola_pedidos.append((pedido, shopper))
                 print(
-                    f"{self.nombre} recibió un pedido con el shopper {shopper.nombre}"
+                    f"{self.nombre} recibió un pedido con el shopper {shopper.nombre}."
                 )
         shopper.asignar_pedido(pedido)
 
     def preparar_pedido(self, pedido):
         tiempo_a_completar = randint(1, 10)
-        print(f"El pedido para {self.nombre} se demorará {tiempo_a_completar}")
+        print(f"El pedido para {self.nombre} se demorará {tiempo_a_completar}.")
         sleep(tiempo_a_completar)
         print(f"El pedido en {self.nombre} está listo para ser retirado.")
 
@@ -37,9 +37,9 @@ class Tienda(Thread):
                     pedido, shopper = self.cola_pedidos.pop(0)
                 self.preparar_pedido(pedido)
                 pedido.evento_pedido_listo.set()
-                shopper.evento_llego_repartidor.wait()
+                pedido.evento_llego_repartidor.wait()
                 print(
-                    f"El pedido a {self.nombre} ha sido retirado por {shopper.nombre}"
+                    f"El pedido a {self.nombre} ha sido retirado por {shopper.nombre}."
                 )
             else:
                 descanso = randint(1, 5)

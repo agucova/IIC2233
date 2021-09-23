@@ -11,7 +11,7 @@ class DCComidApp(Thread):
     def __init__(
         self,
         shoppers: list[Shopper],
-        tiendas: list[Tienda],
+        tiendas: dict[str, Tienda],
         pedidos: list[tuple[str, str, str]],
     ):
         # NO MODIFICAR
@@ -31,11 +31,7 @@ class DCComidApp(Thread):
     def run(self):
         while self.pedidos:
             id_, nombre_tienda, descripcion = self.pedidos.pop(0)
-            q_tiendas: list[Tienda] = [
-                tienda for tienda in self.tiendas if tienda.nombre == nombre_tienda
-            ]
-            assert len(q_tiendas) == 1
-            tienda: Tienda = q_tiendas[0]
+            tienda: Tienda = self.tiendas[nombre_tienda]
 
             pedido = Pedido(id_, nombre_tienda, descripcion)
 
