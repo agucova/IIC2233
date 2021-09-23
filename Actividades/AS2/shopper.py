@@ -45,17 +45,18 @@ class Shopper(Thread):
 
     def run(self):
         # Completar
-        if self.pedido_actual:
-            self.avanzar()
-            if self.posicion == self.distancia_tienda:
-                print(f"{self.nombre} llegó a la tienda")
-                self.pedido_actual.evento_llego_repartidor.set()
-                self.pedido_actual.evento_pedido_listo.wait()
-            elif self.posicion == self.distancia_destino:
-                self.pedido_actual.entregado = True
-                self.posicion = 0
-                self.pedido_actual = None
-                Shopper.evento_disponible.set()
+        while not self.termino_jornada or self.pedido_actual:
+            if self.pedido_actual:
+                self.avanzar()
+                if self.posicion == self.distancia_tienda:
+                    print(f"{self.nombre} llegó a la tienda")
+                    self.pedido_actual.evento_llego_repartidor.set()
+                    self.pedido_actual.evento_pedido_listo.wait()
+                elif self.posicion == self.distancia_destino:
+                    self.pedido_actual.entregado = True
+                    self.posicion = 0
+                    self.pedido_actual = None
+                    Shopper.evento_disponible.set()
 
 
 if __name__ == "__main__":
