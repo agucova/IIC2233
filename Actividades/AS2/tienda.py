@@ -12,14 +12,14 @@ class Tienda(Thread):
         self.cola_pedidos = []
         self.abierta = True
         # COMPLETAR DESDE AQUI
-        self.lock = Lock()
+        self.lock_cola = Lock()
         # MODIFICACIÓN ADICIONAL
         # Le pongo nombre al Thread para que sea
         # legible en debugging (pedí permiso)
-        super().__init__(name=nombre)
+        super().__init__(name=f"{nombre} (Tienda)")
 
     def ingresar_pedido(self, pedido: Pedido, shopper: Shopper):
-        with self.lock:
+        with self.lock_cola:
             if self.abierta:
                 self.cola_pedidos.append((pedido, shopper))
                 print(
@@ -36,7 +36,7 @@ class Tienda(Thread):
     def run(self):
         while self.abierta:
             if self.cola_pedidos:
-                with self.lock:
+                with self.lock_cola:
                     pedido, shopper = self.cola_pedidos.pop(0)
                 self.preparar_pedido(pedido)
                 pedido.evento_pedido_listo.set()

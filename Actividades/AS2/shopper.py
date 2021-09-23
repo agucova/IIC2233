@@ -18,10 +18,11 @@ class Shopper(Thread):
         # COMPLETAR DESDE AQUI
         self.nombre: str = nombre
         self.velocidad: int = velocidad
+
         # MODIFICACIÓN ADICIONAL
         # Le pongo nombre al Thread para que sea
         # legible en debugging (pedí permiso)
-        super().__init__(name=nombre)
+        super().__init__(name=f"{nombre} (Shopper)")
 
     @property
     def ocupado(self):
@@ -40,14 +41,12 @@ class Shopper(Thread):
         print(f"El pedido {pedido.id_} fue asignado a {self.nombre},")
 
     def avanzar(self):
-        # Completar
         assert self.posicion >= 0
         self.posicion += 1
         sleep(1 / self.velocidad)
         print(f"{self.nombre} avanzó a {self.posicion}.")
 
     def run(self):
-        # Completar
         while not self.termino_jornada or self.pedido_actual:
             if self.pedido_actual:
                 self.avanzar()
