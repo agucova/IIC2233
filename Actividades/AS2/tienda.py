@@ -57,5 +57,5 @@ class Tienda(Thread):
                 )
             else:
                 descanso = randint(1, 5)
-                print(f"La tienda se tomará un descanso de {descanso}.")
+                print(f"La tienda {self.nombre} se tomará un descanso de {descanso}.")
                 sleep(descanso)
