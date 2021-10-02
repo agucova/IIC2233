@@ -27,7 +27,7 @@ repos:
       - id: black
 
   - repo: https://github.com/pycqa/flake8
-    rev: "3.8.3"
+    rev: "3.8.4"
     hooks:
       # Revisa que el código no rompa ninguna regla severa
       # o bien produzca descuentos
@@ -36,7 +36,7 @@ repos:
         additional_dependencies: [pep8-naming]
 
   - repo: https://github.com/agucova/check-file-length
-    rev: 2fd3b0728585d95a5674cef8eba3f6f46048e7ee
+    rev: 9813753639a82b864abe0b01ff364193438c61db
     hooks:
       # Script personalizado que revisa el criterio de modularización
       # (LOCs <= 400)

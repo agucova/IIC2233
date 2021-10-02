@@ -22,13 +22,26 @@ def limpiar_pantalla():
         return os.system("cls")
 
 
-def mostrar_cabecera(title: str, body: Optional[str]) -> None:
+def confirmar_enter():
+    print()
+    input("Presiona " + negrita("Enter") + " para continuar.")
+    print()
+
+
+def mostrar_cabecera(title: str, body: Optional[str] = None) -> None:
     limpiar_pantalla()
     print(negrita(f"[{title}]"))
     print()
     if body:
         print(body)
         print()
+
+
+def mostrar_advertencia(titulo: str, mensaje: str):
+    """Muestra una advertencia"""
+    opcion = mostrar_menu_opciones(titulo, ["Volver", "Salir"], body=mensaje)
+    if opcion == 2:
+        sys.exit()
 
 
 def mostrar_menu_opciones(
@@ -69,7 +82,7 @@ def menu_inicio(tributos: list[Tributo], objetos: list[Objeto], arenas: list[Are
         arena = escoger_arena(arenas)
         arena.cargar_jugadores(jugador, tributos)
 
-        menu_principal(jugador, arena, tributos)
+        menu_principal(jugador, arena, tributos, objetos)
     elif opcion == 1:
         print("¡Hasta pronto!")
         sys.exit()
@@ -91,7 +104,17 @@ def escoger_arena(arenas: list[Arena]):
     return arenas[opcion]
 
 
-def menu_principal(jugador: Tributo, arena: Arena, tributos: list[Tributo]):
+def escoger_objeto(objetos: list[Objeto]):
+    """Escoger un objeto"""
+    opcion = mostrar_menu_opciones(
+        "Selecciona un objeto", [f"{a.nombre} ({a.peso} g)" for a in objetos]
+    )
+    return objetos[opcion]
+
+
+def menu_principal(
+    jugador: Tributo, arena: Arena, tributos: list[Tributo], objetos: list[Objeto]
+):
     """Mostrar el menú principal"""
     opcion = mostrar_menu_opciones(
         "Menú Principal",
@@ -106,7 +129,73 @@ def menu_principal(jugador: Tributo, arena: Arena, tributos: list[Tributo]):
     )
 
     if opcion == 0:
-        simulacion_hora()
+        # Simulación hora
+        ## Acción del usuario
+        exito = False
+        while not exito:
+            accion = mostrar_menu_opciones(
+                "Menú de Acciones",
+                [
+                    "Acción heroíca",
+                    "Atacar a un tributo",
+                    "Pedir objeto a patrocinadores",
+                    "Hacerse bolita",
+                ],
+            )
+            limpiar_pantalla()
+            if accion == 0:
+                # Acción heroíca
+                exito = jugador.accion_heroica()
+                confirmar_enter()
+            elif accion == 1:
+                # Atacar a un tributo
+                tributo = escoger_tributo(tributos)
+                exito = jugador.atacar(tributo)
+                confirmar_enter()
+            elif accion == 2:
+                # Pedir objeto a patrocinadores
+                exito = bool(jugador.pedir_objeto(objetos))
+                confirmar_enter()
+            elif accion == 3:
+                # Hacerse bolita
+                exito = jugador.hacerse_bolita()
+                confirmar_enter()
+        ## Encuentros
+        arena.realizar_encuentros()
+        confirmar_enter
+        ## Evento
+        arena.ejecutar_evento()
+        ## Cambiar ambiente
+        arena.siguiente_ambiente()
+        confirmar_enter()
+        ## Volver al menú principal
+        menu_principal(jugador, arena, tributos, objetos)
+
+    elif opcion == 1:
+        # Mostrar estado del tributo
+        mostrar_cabecera(f"Estado de {jugador.nombre}")
+        jugador.mostrar_estado()
+        confirmar_enter()
+        menu_principal(jugador, arena, tributos, objetos)
+
+    elif opcion == 2:
+        # Utilizar objeto
+        if jugador.mochila:
+            objeto = escoger_objeto(jugador.mochila)
+            jugador.utilizar_objeto(objeto, arena)
+        else:
+            mostrar_advertencia("Error", "No tienes objetos en tu mochila.")
+
+        menu_principal(jugador, arena, tributos, objetos)
+
+    elif opcion == 3:
+        # Resumen DCCapitolio
+        pass
+
+    elif opcion == 4:
+        # TODO: Volver
+        pass
+
     elif opcion == 5:
         print("¡Hasta pronto!")
         sys.exit()

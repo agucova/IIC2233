@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import parameters as p
 from random import choice, random
-from typing import Optional
+import sys
 
 
 class Tributo:
@@ -51,36 +51,45 @@ class Tributo:
         else:
             self._vida = max(valor, 100)
 
-    def atacar(
-        self, tributo: Tributo
-    ) -> bool:  # TODO: Agregar logica de ataque fallido, cansancio?
-        """Ataca a otro tribute. Retorna si es que el otro tribute a muerto en el ataque."""
-        dano = round(
-            min(
-                [
-                    90,
-                    max(
-                        [
-                            5,
-                            (
-                                60 * self.fuerza
-                                + 40 * self.agilidad
-                                + 40 * self.ingenio
-                                - 30 * self.peso
-                            )
-                            / self.edad,
-                        ]
-                    ),
-                ]
+    def atacar(self, tributo: Tributo, es_encuentro: bool = False) -> bool:
+        """Ataca a otro tributo. Si recibe es_encuentro, no se resta energía del tributo.
+        Retorna si es que el otro tribute a muerto en el ataque."""
+        if (self.energia >= p.ENERGIA_ATACAR) or es_encuentro:
+            self.energia -= p.ENERGIA_ATACAR if not es_encuentro else 0
+            dano = round(
+                min(
+                    [
+                        90,
+                        max(
+                            [
+                                5,
+                                (
+                                    60 * self.fuerza
+                                    + 40 * self.agilidad
+                                    + 40 * self.ingenio
+                                    - 30 * self.peso
+                                )
+                                / self.edad,
+                            ]
+                        ),
+                    ]
+                )
             )
-        )
 
-        tributo.vida -= dano
-        print(
-            f"{self.nombre} ha atacado a {tributo.nombre}, quitándole {dano} de vida."
-        )
-
-        return not tributo.esta_vive
+            tributo.vida -= dano
+            if tributo.esta_vive:
+                print(
+                    f"{self.nombre} ha atacado a {tributo.nombre}, quitándole {dano} de vida."
+                )
+            else:
+                self.popularidad += p.POPULARIDAD_ATACAR
+                print(f"{self.nombre} ha atacado a {tributo.nombre}, matándolo.")
+            return True
+        else:
+            print(
+                f"{self.nombre} no tiene suficiente energía para atacar a {tributo.nombre}."
+            )
+            return False
 
     def utilizar_objeto(self, objeto: Objeto, arena: Arena):
         """Utiliza el objeto entregado de la mochila del tributo.
@@ -90,19 +99,23 @@ class Tributo:
         self.mochila.remove(objeto)
         print(f"{self.nombre} ha utilizado {objeto.nombre}.")
 
-    def pedir_objeto(self, objetos: list[Objeto]) -> Optional[Objeto]:
+    def pedir_objeto(self, objetos: list[Objeto]) -> bool:
         """Solicita un objeto a les patrocinadores,
         costándole popularidad al tributo. Recibe la lista de objetos existentes."""
         if self.popularidad >= p.COSTO_OBJETO:
             self.popularidad -= p.COSTO_OBJETO
             objeto = choice(objetos)
             self.mochila.append(objeto)
-            return objeto
+            print(
+                f"{self.nombre} ha solicitado un objeto y les patrocinadores han respondido:"
+                f" obtenido un {objeto.nombre}."
+            )
+            return True
         else:
             print(
                 f"{self.nombre} no tiene suficiente popularidad para pedir un objeto."
             )
-            return None
+            return False
 
     def accion_heroica(self) -> bool:
         """Realiza una acción heroíca"""
@@ -119,6 +132,29 @@ class Tributo:
                 f"{self.nombre} no tiene suficiente energía para hacer una acción heroica."
             )
             return False
+
+    def hacerse_bolita(self) -> bool:
+        self.energia += p.ENERGIA_BOLITA
+        print(
+            f"{self.nombre} se hizo bolita, recuperando {p.ENERGIA_BOLITA} de energía."
+        )
+        return True
+
+    def mostrar_estado(self):
+        print(f"Distrito: {self.distrito}")
+        print(f"Edad: {self.edad}")
+        print(f"Vida: {self.vida}")
+        print(f"Energía: {self.energia}")
+        print(f"Agilidad: {self.agilidad}")
+        print(f"Fuerza: {self.fuerza}")
+        print(f"Ingenio: {self.ingenio}")
+        print(f"Popularidad: {self.popularidad}")
+        if self.mochila:
+            lista_objetos = ", ".join([objeto.nombre for objeto in self.mochila])
+            print(f"Mochila: {lista_objetos}")
+            print(f"Peso: {self.peso}")
+        else:
+            print("Nada en la mochila")
 
 
 @dataclass
@@ -201,6 +237,9 @@ class Objeto(ABC):
     def entregar_beneficio(tributo: Tributo, arena: Arena):
         pass
 
+    def __str__(self):
+        return self.nombre
+
 
 class Consumible(Objeto):
     def __init__(self, nombre: str, peso: int):
@@ -266,7 +305,11 @@ class Arena:
         return self.tributos + [self.jugador]
 
     def siguiente_ambiente(self) -> Ambiente:
-        """Trancisiona al siguiente ambiente."""
+        """Trancisiona al siguiente ambiente, limpiando cadáveres en la arena."""
+        for tributo in self.tributos:
+            if not tributo.esta_vive:
+                self.tributos.remove(tributo)
+
         self.i_ambiente = (self.i_ambiente + 1) % 3
         return self.ambiente
 
@@ -307,6 +350,26 @@ class Arena:
 
             assert t1.esta_vive and t2.esta_vive
             if t1 != t2:
-                muerte = t1.atacar(t2)
+                print(
+                    f"Se aproxima un encuentro entre {t1.nombre} (HEA: {t1.vida}, "
+                    f"ENE: {t1.energia}) y {t2.nombre} (HEA: {t2.vida}, ENE: {t2.energia})."
+                )
+                muerte = t1.atacar(t2, es_encuentro=True)
                 if muerte:
-                    self.tributos.remove(t2)
+                    if t2 is self.jugador:
+                        print(
+                            f"Tu jugador {self.jugador.nombre} ha muerto"
+                            f" peleando contra {t1.nombre}."
+                        )
+                        print(f"Has perdido el DCCapitolio.")
+                        sys.exit()
+                    else:
+                        self.tributos.remove(t2)
+                        print(
+                            f"El encuentro ha terminado, {t1.nombre} queda con {t1.vida} de vida."
+                        )
+                else:
+                    print(
+                        f"El encuentro ha terminado, {t1.nombre} ha quedado con {t1.vida} de vida,"
+                        f" y {t2.nombre} con {t2.vida} de vida."
+                    )
