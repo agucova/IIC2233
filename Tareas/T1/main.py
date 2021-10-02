@@ -1,6 +1,7 @@
+import colorama
+
 from db import cargar_tributos, cargar_objetos, cargar_ambientes, cargar_arenas
 from menus import menu_inicio
-import colorama
 
 if __name__ == "__main__":
 

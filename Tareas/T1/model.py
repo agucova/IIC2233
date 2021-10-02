@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-import parameters as p
 from random import choice, random
+
+import parameters as p
 
 
 class Tributo:
@@ -236,9 +238,6 @@ class Objeto(ABC):
     @abstractmethod
     def entregar_beneficio(tributo: Tributo, arena: Arena):
         pass
-
-    def __str__(self):
-        return self.nombre
 
 
 class Consumible(Objeto):

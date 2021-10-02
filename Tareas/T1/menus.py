@@ -1,9 +1,10 @@
 from __future__ import annotations
+
+import os
+import sys
 from typing import Optional
 
 from model import Arena, Objeto, Tributo
-import os
-import sys
 
 
 def negrita(string: str) -> str:
