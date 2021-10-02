@@ -34,87 +34,87 @@ class Tributo:
         self.esta_vive = True
         self.mochila: list[Objeto] = []
 
-        @property
-        def peso(self):
-            return sum(objeto.peso for objeto in self.mochila)
+    @property
+    def peso(self):
+        return sum(objeto.peso for objeto in self.mochila)
 
-        @property
-        def vida(self):
-            return self._vida
+    @property
+    def vida(self):
+        return self._vida
 
-        @vida.setter
-        def vida(self, valor):
-            if valor <= 0:
-                self.esta_vive = False
-                self._vida = 0
-                print(f"El tributo {self.nombre} ha muerto.")
-            else:
-                self._vida = max(valor, 100)
+    @vida.setter
+    def vida(self, valor):
+        if valor <= 0:
+            self.esta_vive = False
+            self._vida = 0
+            print(f"El tributo {self.nombre} ha muerto.")
+        else:
+            self._vida = max(valor, 100)
 
-        def atacar(
-            self, tributo: Tributo
-        ) -> bool:  # TODO: Agregar logica de ataque fallido, cansancio?
-            """Ataca a otro tribute. Retorna si es que el otro tribute a muerto en el ataque."""
-            dano = min(
-                [
-                    90,
-                    max(
-                        [
-                            5,
-                            (
-                                60 * self.fuerza
-                                + 40 * self.agilidad
-                                + 40 * self.ingenio
-                                - 30 * self.peso
-                            )
-                            / self.edad,
-                        ]
-                    ),
-                ]
-            )
+    def atacar(
+        self, tributo: Tributo
+    ) -> bool:  # TODO: Agregar logica de ataque fallido, cansancio?
+        """Ataca a otro tribute. Retorna si es que el otro tribute a muerto en el ataque."""
+        dano = min(
+            [
+                90,
+                max(
+                    [
+                        5,
+                        (
+                            60 * self.fuerza
+                            + 40 * self.agilidad
+                            + 40 * self.ingenio
+                            - 30 * self.peso
+                        )
+                        / self.edad,
+                    ]
+                ),
+            ]
+        )
 
-            tributo.vida -= dano
+        tributo.vida -= dano
+        print(
+            f"{self.nombre} ha atacado a {tributo.nombre}, quitándole {dano} de vida."
+        )
+
+        return not tributo.esta_vive
+
+    def utilizar_objeto(self, objeto: Objeto, arena: Arena):
+        """Utiliza el objeto entregado de la mochila del tributo. Recibe la arena para verificar atributos de riesgo."""
+        assert objeto in self.mochila
+        objeto.entregar_beneficio(self, arena)
+        self.mochila.remove(objeto)
+        print(f"{self.nombre} ha utilizado {objeto.nombre}.")
+
+    def pedir_objeto(self, objetos: list[Objeto]) -> Optional[Objeto]:
+        """Solicita un objeto a les patrocinadores, costándole popularidad al tributo. Recibe la lista de objetos existentes."""
+        if self.popularidad >= p.COSTO_OBJETO:
+            self.popularidad -= p.COSTO_OBJETO
+            objeto = choice(objetos)
+            self.mochila.append(objeto)
+            return objeto
+        else:
             print(
-                f"{self.nombre} ha atacado a {tributo.nombre}, quitándole {dano} de vida."
+                f"{self.nombre} no tiene suficiente popularidad para pedir un objeto."
             )
+            return None
 
-            return not tributo.esta_vive
-
-        def utilizar_objeto(self, objeto: Objeto, arena: Arena):
-            """Utiliza el objeto entregado de la mochila del tributo. Recibe la arena para verificar atributos de riesgo."""
-            assert objeto in self.mochila
-            objeto.entregar_beneficio(self, arena)
-            self.mochila.remove(objeto)
-            print(f"{self.nombre} ha utilizado {objeto.nombre}.")
-
-        def pedir_objeto(self, objetos: list[Objeto]) -> Optional[Objeto]:
-            """Solicita un objeto a les patrocinadores, costándole popularidad al tributo. Recibe la lista de objetos existentes."""
-            if self.popularidad >= p.COSTO_OBJETO:
-                self.popularidad -= p.COSTO_OBJETO
-                objeto = choice(objetos)
-                self.mochila.append(objeto)
-                return objeto
-            else:
-                print(
-                    f"{self.nombre} no tiene suficiente popularidad para pedir un objeto."
-                )
-                return None
-
-        def accion_heroica(self) -> bool:
-            """Realiza una acción heroíca"""
-            if self.energia >= p.ENERGIA_ACCION_HEROICA:
-                self.energia -= p.ENERGIA_ACCION_HEROICA
-                # TODO: Agregar aleatoridad?
-                self.popularidad += p.POPULARIDAD_ACCION_HEROICA
-                print(
-                    f"{self.nombre} ha hecho una acción heroíca, impresionando a les patrocinadores."
-                )
-                return True
-            else:
-                print(
-                    f"{self.nombre} no tiene suficiente energía para hacer una acción heroica."
-                )
-                return False
+    def accion_heroica(self) -> bool:
+        """Realiza una acción heroíca"""
+        if self.energia >= p.ENERGIA_ACCION_HEROICA:
+            self.energia -= p.ENERGIA_ACCION_HEROICA
+            # TODO: Agregar aleatoridad?
+            self.popularidad += p.POPULARIDAD_ACCION_HEROICA
+            print(
+                f"{self.nombre} ha hecho una acción heroíca, impresionando a les patrocinadores."
+            )
+            return True
+        else:
+            print(
+                f"{self.nombre} no tiene suficiente energía para hacer una acción heroica."
+            )
+            return False
 
 
 @dataclass
@@ -242,50 +242,50 @@ class Arena:
         self.jugadores_cargados = False
         self.i_ambiente = 0
 
-        @property
-        def ambiente(self) -> Ambiente:
-            return self.ambientes[self.i_ambiente]
+    @property
+    def ambiente(self) -> Ambiente:
+        return self.ambientes[self.i_ambiente]
 
-        @property
-        def jugadores(self) -> list[Tributo]:
-            return self.tributos + [self.jugador]
+    @property
+    def jugadores(self) -> list[Tributo]:
+        return self.tributos + [self.jugador]
 
-        def cargar_jugadores(self, jugador: Tributo, tributos: list[Tributo]):
-            assert len(tributos) > 0
-            assert jugador not in tributos
-            assert not self.jugadores_cargados
+    def cargar_jugadores(self, jugador: Tributo, tributos: list[Tributo]):
+        assert len(tributos) > 0
+        assert jugador not in tributos
+        assert not self.jugadores_cargados
 
-            self.jugador = jugador
-            self.tributos: list[Tributo] = tributos
-            self.jugadores_cargados = True
+        self.jugador = jugador
+        self.tributos: list[Tributo] = tributos
+        self.jugadores_cargados = True
 
-        def ejecutar_evento(self) -> bool:
-            """Ejecuta un evento del ambiente probabilísticamente en base a los parámetros del juego. Retorna si es que se ejecutó un evento."""
-            hay_evento = random() < p.PROBABILIDAD_EVENTO
+    def ejecutar_evento(self) -> bool:
+        """Ejecuta un evento del ambiente probabilísticamente en base a los parámetros del juego. Retorna si es que se ejecutó un evento."""
+        hay_evento = random() < p.PROBABILIDAD_EVENTO
 
-            if hay_evento:
-                evento = choice(self.ambiente.eventos)
-                dano = evento.calcular_dano()
-                print(f"Se ha producido un evento: {evento.nombre}.")
-                for tributo in self.jugadores:
-                    tributo.vida -= dano
+        if hay_evento:
+            evento = choice(self.ambiente.eventos)
+            dano = evento.calcular_dano()
+            print(f"Se ha producido un evento: {evento.nombre}.")
+            for tributo in self.jugadores:
+                tributo.vida -= dano
 
-            return hay_evento
+        return hay_evento
 
-        def realizar_encuentros(self):
-            """Realiza los encuentros entre tributos en una partida."""
-            assert len(self.tributos) > 0
+    def realizar_encuentros(self):
+        """Realiza los encuentros entre tributos en una partida."""
+        assert len(self.tributos) > 0
 
-            n_encuentros = self.riesgo * len(self.jugadores) // 2
-            for _ in range(n_encuentros):
-                t1: Tributo = choice(self.jugadores)
-                while True:
-                    t2: Tributo = choice(self.jugadores)
-                    if t1 != t2:
-                        break
-
-                assert t1.esta_vive and t2.esta_vive
+        n_encuentros = round((self.riesgo * len(self.jugadores)) // 2)
+        for _ in range(n_encuentros):
+            t1: Tributo = choice(self.jugadores)
+            while True:
+                t2: Tributo = choice(self.jugadores)
                 if t1 != t2:
-                    muerte = t1.atacar(t2)
-                    if muerte:
-                        self.tributos.remove(t2)
+                    break
+
+            assert t1.esta_vive and t2.esta_vive
+            if t1 != t2:
+                muerte = t1.atacar(t2)
+                if muerte:
+                    self.tributos.remove(t2)
