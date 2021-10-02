@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#/home/agucova/repos/agucova-iic2233-2021-2/Tareas/T1/model.py</OriginalElement>
+  <nodes>
+    <node x="1216.0" y="266.3480662983427">model.Montana</node>
+    <node x="1005.9723756906078" y="862.0">model.Arma</node>
+    <node x="1717.9723756906078" y="873.5">model.Especial</node>
+    <node x="1361.9723756906078" y="873.5">model.Consumible</node>
+    <node x="0.0" y="0.0">model.Tributo</node>
+    <node x="1752.0" y="266.3480662983427">model.Playa</node>
+    <node x="1484.0" y="266.3480662983427">model.Bosque</node>
+    <node x="1361.9723756906078" y="685.0">model.Objeto</node>
+    <node x="0.0" y="563.0">model.Arena</node>
+    <node x="1447.0" y="80.45303867403322">model.Ambiente</node>
+    <node x="1915.9723756906078" y="103.95303867403322">model.Evento</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="model.Consumible" target="model.Objeto" relationship="REALIZATION">
+      <point x="0.0" y="-52.0" />
+      <point x="0.0" y="63.5" />
+    </edge>
+    <edge source="model.Especial" target="model.Objeto" relationship="REALIZATION">
+      <point x="0.0" y="-52.0" />
+      <point x="1885.9723756906078" y="837.0" />
+      <point x="1529.9723756906078" y="837.0" />
+      <point x="0.0" y="63.5" />
+    </edge>
+    <edge source="model.Montana" target="model.Ambiente" relationship="REALIZATION">
+      <point x="0.0" y="-28.5" />
+      <point x="1340.0" y="241.3480662983427" />
+      <point x="1608.0" y="241.3480662983427" />
+      <point x="0.0" y="63.5" />
+    </edge>
+    <edge source="model.Arma" target="model.Objeto" relationship="REALIZATION">
+      <point x="0.0" y="-63.5" />
+      <point x="1173.9723756906078" y="837.0" />
+      <point x="1529.9723756906078" y="837.0" />
+      <point x="0.0" y="63.5" />
+    </edge>
+    <edge source="model.Playa" target="model.Ambiente" relationship="REALIZATION">
+      <point x="0.0" y="-28.5" />
+      <point x="1876.0" y="241.3480662983427" />
+      <point x="1608.0" y="241.3480662983427" />
+      <point x="0.0" y="63.5" />
+    </edge>
+    <edge source="model.Bosque" target="model.Ambiente" relationship="REALIZATION">
+      <point x="0.0" y="-28.5" />
+      <point x="0.0" y="63.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="1027.0" y="494.49999999999994" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Methods</Category>
+  </Categories>
+</Diagram>
