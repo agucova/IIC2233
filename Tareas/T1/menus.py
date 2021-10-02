@@ -83,7 +83,7 @@ def menu_inicio(tributos: list[Tributo], objetos: list[Objeto], arenas: list[Are
         arena = escoger_arena(arenas)
         arena.cargar_jugadores(jugador, tributos)
 
-        menu_principal(jugador, arena, tributos, objetos)
+        menu_principal(jugador, arena, objetos)
     elif opcion == 1:
         print("¡Hasta pronto!")
         sys.exit()
@@ -113,9 +113,7 @@ def escoger_objeto(objetos: list[Objeto]):
     return objetos[opcion]
 
 
-def menu_principal(
-    jugador: Tributo, arena: Arena, tributos: list[Tributo], objetos: list[Objeto]
-):
+def menu_principal(jugador: Tributo, arena: Arena, objetos: list[Objeto]):
     """Mostrar el menú principal"""
     opcion = mostrar_menu_opciones(
         "Menú Principal",
@@ -144,13 +142,14 @@ def menu_principal(
                 ],
             )
             limpiar_pantalla()
+            mostrar_cabecera("Simulación de la Hora (Resumen)")
             if accion == 0:
                 # Acción heroíca
                 exito = jugador.accion_heroica()
                 confirmar_enter()
             elif accion == 1:
                 # Atacar a un tributo
-                tributo = escoger_tributo(tributos)
+                tributo = escoger_tributo(arena.tributos)
                 exito = jugador.atacar(tributo)
                 confirmar_enter()
             elif accion == 2:
@@ -171,16 +170,23 @@ def menu_principal(
             arena.ejecutar_evento()
             ## Cambiar ambiente
             arena.siguiente_ambiente()
+            ## Información extra para el resumen
+            print(negrita("Tributos vivos: "), end="")
+            tributos_vivos = ", ".join(
+                [t.nombre for t in arena.tributos if t.esta_vive]
+            )
+            print(tributos_vivos)
             confirmar_enter()
+
             ## Volver al menú principal
-            menu_principal(jugador, arena, tributos, objetos)
+            menu_principal(jugador, arena, objetos)
 
     elif opcion == 1:
         # Mostrar estado del tributo
         mostrar_cabecera(f"Estado de {jugador.nombre}")
         jugador.mostrar_estado()
         confirmar_enter()
-        menu_principal(jugador, arena, tributos, objetos)
+        menu_principal(jugador, arena, objetos)
 
     elif opcion == 2:
         # Utilizar objeto
@@ -191,14 +197,14 @@ def menu_principal(
         else:
             mostrar_advertencia("Error", "No tienes objetos en tu mochila.")
 
-        menu_principal(jugador, arena, tributos, objetos)
+        menu_principal(jugador, arena, objetos)
 
     elif opcion == 3:
         # Resumen DCCapitolio
         mostrar_cabecera("Estado DCCapitolio")
         arena.mostrar_estado()
         confirmar_enter()
-        menu_principal(jugador, arena, tributos, objetos)
+        menu_principal(jugador, arena, objetos)
 
     elif opcion == 5:
         print("¡Hasta pronto!")
