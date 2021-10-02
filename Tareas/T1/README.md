@@ -104,7 +104,7 @@ def funcion(argumento):
 Lo importante es que expliquen qué hace la función y que si saben que alguna parte puede quedar complicada de entender o tienen alguna función mágica usen los comentarios/documentación para que el ayudante entienda sus intenciones.
 
 ## Referencias de código externo :book:
-Las funciones que ayudan a generar menús fueron tomado mi tarea 0.
+Las funciones que ayudan a generar menús fueron tomado mi tarea 0, al igual que las funciones que ayudan a cargar CSVs.
 
 Para realizar mi tarea saqué código de:
 1. \<link de código>: este hace \<lo que hace> y está implementado en el archivo <nombre.py> en las líneas <número de líneas> y hace <explicación breve de que hace>

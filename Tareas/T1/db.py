@@ -1,222 +1,117 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-import parameters as p
-from random import choice
-from typing import Optional
+from typing import NamedTuple
+from model import (
+    Ambiente,
+    Arena,
+    Evento,
+    Objeto,
+    Tributo,
+    Arma,
+    Especial,
+    Consumible,
+    Bosque,
+    Playa,
+    Montana,
+)
+
+PROJECT_PATH = "."
+RUTA_TRIBUTOS = f"{PROJECT_PATH}/tributos.csv"
+RUTA_ARENAS = f"{PROJECT_PATH}/arenas.csv"
+RUTA_AMBIENTES = f"{PROJECT_PATH}/ambientes.csv"
+RUTA_OBJETOS = f"{PROJECT_PATH}/objetos.csv"
+
+DatosCSV = NamedTuple(
+    "DatosCSV", [("cabecera", list[str]), ("lineas", list[list[str]])]
+)
 
 
-class Tributo:
-    def __init__(
-        self,
-        nombre: str,
-        distrito: str,
-        edad: int,
-        vida: int,
-        energia: int,
-        agilidad: int,
-        fuerza: int,
-        ingenio: int,
-        popularidad: int,
-    ):
-        self.nombre = nombre
-        self.distrito = distrito
-        self.edad = edad
-        assert 0 <= vida <= 100
-        self._vida = vida
-        assert 0 <= energia <= 100
-        self.energia = energia
-        self.agilidad = agilidad
-        self.ingenio = ingenio
-        self.popularidad = popularidad
-        self.fuerza = fuerza
+def cargar_csv(ruta: str, n_columnas: int = -1) -> DatosCSV:
+    """Carga un archivo CSV y retorna un objeto DatosCSV para facilitar su procesamiento. Toma un argumento opcional de n_columnas para casos donde haya columnas literales que incluyan comas."""
+    # Idealmente filepath sería Union[str, Path],
+    # pero no tengo ganas de solicitar soporte a pathlib
+    with open(ruta, "r", encoding="utf-8") as archivo:
+        lineas = archivo.readlines()
 
-        self.esta_vivo = True
-        self.mochila: list[Objeto] = []
-
-        @property
-        def peso(self):
-            return sum(objeto.peso for objeto in self.mochila)
-
-        @property
-        def vida(self):
-            return self._vida
-
-        @vida.setter
-        def vida(self, valor):
-            if valor <= 0:
-                self.esta_vivo = False
-                self._vida = 0
-                print(f"El tributo {self.nombre} ha muerto.")
-            else:
-                self._vida = max(valor, 100)
-
-        def atacar(
-            self, tributo: Tributo
-        ):  # TODO: Agregar logica de ataque fallido, cansancio?
-            dano = min(
-                [
-                    90,
-                    max(
-                        [
-                            5,
-                            (
-                                60 * self.fuerza
-                                + 40 * self.agilidad
-                                + 40 * self.ingenio
-                                - 30 * self.peso
-                            )
-                            / self.edad,
-                        ]
-                    ),
-                ]
-            )
-
-            tributo.vida -= dano
-
-            return dano
-
-        def utilizar_objeto(self, objeto: Objeto, arena: Arena):
-            assert objeto in self.mochila
-            objeto.entregar_beneficio(self, arena)
-            self.mochila.remove(objeto)
-
-        def pedir_objeto(self, objetos: list[Objeto]) -> Optional[Objeto]:
-            if self.popularidad >= p.COSTO_OBJETO:
-                self.popularidad -= p.COSTO_OBJETO
-                objeto = choice(objetos)
-                self.mochila.append(objeto)
-                return objeto
-            else:
-                print(
-                    f"{self.nombre} no tiene suficiente popularidad para pedir un objeto."
-                )
-                return None
-
-        def accion_heroica(self) -> bool:
-            if self.energia >= p.ENERGIA_ACCION_HEROICA:
-                self.energia -= p.ENERGIA_ACCION_HEROICA
-                # TODO: Agregar aleatoridad?
-                self.popularidad += p.POPULARIDAD_ACCION_HEROICA
-                return True
-            else:
-                print(
-                    f"{self.nombre} no tiene suficiente energía para hacer una acción heroica."
-                )
-                return False
+    assert len(lineas) > 0
+    lineas = [line.strip().split(",", n_columnas - 1) for line in lineas]
+    return DatosCSV(cabecera=lineas[0], lineas=lineas[1:])
 
 
-@dataclass
-class Evento:
-    nombre: str
-    dano: int
-
-
-class Ambiente(ABC):
-    def __init__(self, nombre: str, eventos: list[Evento]):
-        self.nombre = nombre
-        self.eventos = eventos
-
-    @abstractmethod
-    def calcular_dano(self, evento: Evento):
-        pass
-
-
-class Playa(Ambiente):
-    def calcular_dano(self, evento: Evento):
-        return max(
-            [
-                5,
-                (0.4 * p.HUMEDAD_PLATA + 0.2 * p.VELOCIDAD_VIENTOS_PLATA + evento.dano)
-                / 5,
-            ]
+def cargar_tributos(ruta: str = RUTA_TRIBUTOS) -> list[Tributo]:
+    """Carga un archivo CSV de tributos y retorna una lista de objetos Tributo."""
+    datos = cargar_csv(ruta)
+    tributos = [
+        Tributo(
+            line[0],
+            line[1],
+            int(line[2]),
+            int(line[3]),
+            int(line[4]),
+            int(line[5]),
+            int(line[6]),
+            int(line[7]),
+            int(line[8]),
         )
+        for line in datos.lineas
+    ]
+    return tributos
 
 
-class Bosque(Ambiente):
-    def calcular_dano(self, evento: Evento):
-        return max(
-            [
-                5,
-                (
-                    0.2 * p.VELOCIDAD_VIENTOS_BOSQUE
-                    + 0.1 * p.PRECIPITACIONES_BOSQUE
-                    + evento.dano
-                )
-                / 5,
-            ]
-        )
+def cargar_objetos(ruta: str = RUTA_OBJETOS) -> list[Objeto]:
+    datos = cargar_csv(ruta)
+    objetos = []
+    for linea in datos.lineas:
+        nombre = linea[0]
+        tipo = linea[1]
+        peso = int(linea[2])
+
+        assert tipo in ["arma", "especial", "consumible"]
+
+        if tipo == "arma":
+            objetos.append(Arma(nombre, peso))
+        elif tipo == "consumible":
+            objetos.append(Consumible(nombre, peso))
+        elif tipo == "especial":
+            objetos.append(Especial(nombre, peso))
+
+    assert len(objetos) > 0
+    return objetos
 
 
-class Montana(Ambiente):
-    def calcular_dano(self, evento: Evento):
-        return max(
-            [
-                5,
-                (
-                    0.1 * p.PRECIPITACIONES_MONTANA
-                    + 0.3 * p.NUBOSIDAD_MONTANA
-                    + evento.dano
-                )
-                / 5,
-            ]
-        )
+def cargar_ambientes(ruta: str = RUTA_AMBIENTES) -> list[Ambiente]:
+    datos = cargar_csv(ruta)
+    ambientes = []
+    for linea in datos.lineas:
+        nombre = linea[0]
+        eventos = [evento.split(";") for evento in linea[1:4]]
+        eventos = [Evento(evento[0], int(evento[1])) for evento in eventos]
+
+        assert nombre in ["bosque", "montaña", "playa"]
+        if nombre == "bosque":
+            ambientes.append(Bosque(nombre, eventos))
+        elif nombre == "playa":
+            ambientes.append(Playa(nombre, eventos))
+        elif nombre == "montaña":
+            ambientes.append(Montana(nombre, eventos))
+
+    assert len(ambientes) > 0
+    return ambientes
 
 
-class Objeto(ABC):
-    def __init__(self, nombre: str, peso: int):
-        self.nombre = nombre
-        self.peso = peso
+def cargar_arenas(ruta: str = RUTA_ARENAS) -> list[Arena]:
+    datos = cargar_csv(ruta)
+    arenas = []
+    for linea in datos.lineas:
+        nombre = linea[0]
+        dificultad = linea[1]
+        riesgo = float(linea[2])
+        arenas.append(Arena(nombre, dificultad, riesgo))
 
-    @staticmethod
-    @abstractmethod
-    def entregar_beneficio(tributo: Tributo, arena: Arena):
-        pass
-
-
-class Consumible(Objeto):
-    def __init__(self, nombre: str, peso: int):
-        super().__init__(nombre, peso)
-        self.tipo = "consumible"
-
-    @staticmethod
-    def entregar_beneficio(tributo: Tributo, arena: Arena):
-        tributo.energia += p.AUMENTAR_ENERGIA
+    assert len(arenas) > 0
+    return arenas
 
 
-class Arma(Objeto):
-    def __init__(self, nombre: str, peso: int):
-        super().__init__(nombre, peso)
-        self.tipo = "arma"
-
-    @staticmethod
-    def entregar_beneficio(tributo: Tributo, arena: Arena):
-        nueva_fuerza = round(
-            tributo.fuerza * (p.PONDERADOR_AUMENTAR_FUERZA * arena.riesgo + 1)
-        )
-        tributo.fuerza = max(min(nueva_fuerza, 100), 0)
-
-
-class Especial(Objeto):
-    def __init__(self, nombre: str, peso: int):
-        super().__init__(nombre, peso)
-        self.tipo = "especial"
-
-    @staticmethod
-    def entregar_beneficio(tributo: Tributo, arena: Arena):
-        Arma.entregar_beneficio(tributo, arena)
-        Consumible.entregar_beneficio(tributo, arena)
-        tributo.agilidad += p.AUMENTAR_AGILIDAD
-        tributo.ingenio += p.AUMENTAR_INGENIO
-
-
-class Arena:
-    def __init__(self, nombre: str, dificultad: str, riesgo: float):
-        self.nombre = nombre
-        assert dificultad in ("principiante", "intermedio", "avanzado")
-        self.dificultad = dificultad
-        assert 0 <= riesgo <= 1
-        self.riesgo = riesgo
-
-        self.tributos = []
-        self.ambientos = []
+tributos = cargar_tributos()
+objetos = cargar_objetos()
+ambientes = cargar_ambientes()
+pass
