@@ -81,12 +81,14 @@ class Tributo:
             return not tributo.esta_vive
 
         def utilizar_objeto(self, objeto: Objeto, arena: Arena):
+            """Utiliza el objeto entregado de la mochila del tributo. Recibe la arena para verificar atributos de riesgo."""
             assert objeto in self.mochila
             objeto.entregar_beneficio(self, arena)
             self.mochila.remove(objeto)
             print(f"{self.nombre} ha utilizado {objeto.nombre}.")
 
         def pedir_objeto(self, objetos: list[Objeto]) -> Optional[Objeto]:
+            """Solicita un objeto a les patrocinadores, costándole popularidad al tributo. Recibe la lista de objetos existentes."""
             if self.popularidad >= p.COSTO_OBJETO:
                 self.popularidad -= p.COSTO_OBJETO
                 objeto = choice(objetos)
@@ -99,6 +101,7 @@ class Tributo:
                 return None
 
         def accion_heroica(self) -> bool:
+            """Realiza una acción heroíca"""
             if self.energia >= p.ENERGIA_ACCION_HEROICA:
                 self.energia -= p.ENERGIA_ACCION_HEROICA
                 # TODO: Agregar aleatoridad?
@@ -177,6 +180,7 @@ class Objeto(ABC):
         self.nombre = nombre
         self.peso = peso
 
+    # Usamos un staticmethod cosa de que pueda ser utilizado incluso sin inicializar en el caso de Especial.
     @staticmethod
     @abstractmethod
     def entregar_beneficio(tributo: Tributo, arena: Arena):
@@ -256,6 +260,7 @@ class Arena:
             self.jugadores_cargados = True
 
         def ejecutar_evento(self) -> bool:
+            """Ejecuta un evento del ambiente probabilísticamente en base a los parámetros del juego. Retorna si es que se ejecutó un evento."""
             hay_evento = random() < p.PROBABILIDAD_EVENTO
 
             if hay_evento:
@@ -268,6 +273,7 @@ class Arena:
             return hay_evento
 
         def realizar_encuentros(self):
+            """Realiza los encuentros entre tributos en una partida."""
             assert len(self.tributos) > 0
 
             n_encuentros = self.riesgo * len(self.jugadores) // 2
