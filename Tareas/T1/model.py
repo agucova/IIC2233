@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import parameters as p
 from random import choice, random
-import sys
 
 
 class Tributo:
@@ -49,7 +48,7 @@ class Tributo:
             self._vida = 0
             print(f"El tributo {self.nombre} ha muerto.")
         else:
-            self._vida = max(valor, 100)
+            self._vida = min(max(valor, 0), 100)
 
     def atacar(self, tributo: Tributo, es_encuentro: bool = False) -> bool:
         """Ataca a otro tributo. Si recibe es_encuentro, no se resta energía del tributo.
@@ -81,6 +80,7 @@ class Tributo:
                 print(
                     f"{self.nombre} ha atacado a {tributo.nombre}, quitándole {dano} de vida."
                 )
+                return False
             else:
                 self.popularidad += p.POPULARIDAD_ATACAR
                 print(f"{self.nombre} ha atacado a {tributo.nombre}, matándolo.")
@@ -95,9 +95,9 @@ class Tributo:
         """Utiliza el objeto entregado de la mochila del tributo.
         Recibe la arena para verificar atributos de riesgo."""
         assert objeto in self.mochila
+        print(f"{self.nombre} ha utilizado {objeto.nombre}.")
         objeto.entregar_beneficio(self, arena)
         self.mochila.remove(objeto)
-        print(f"{self.nombre} ha utilizado {objeto.nombre}.")
 
     def pedir_objeto(self, objetos: list[Objeto]) -> bool:
         """Solicita un objeto a les patrocinadores,
@@ -249,6 +249,7 @@ class Consumible(Objeto):
     @staticmethod
     def entregar_beneficio(tributo: Tributo, arena: Arena):
         tributo.energia += p.AUMENTAR_ENERGIA
+        print(f"Su energía ha subido {p.AUMENTAR_ENERGIA} puntos.")
 
 
 class Arma(Objeto):
@@ -261,7 +262,9 @@ class Arma(Objeto):
         nueva_fuerza = round(
             tributo.fuerza * (p.PONDERADOR_AUMENTAR_FUERZA * arena.riesgo + 1)
         )
-        tributo.fuerza = max(min(nueva_fuerza, 100), 0)
+        nueva_fuerza = max(min(nueva_fuerza, 100), 0)
+        print(f"Su fuerza ha subido {nueva_fuerza - tributo.fuerza} puntos.")
+        tributo.fuerza = nueva_fuerza
 
 
 class Especial(Objeto):
@@ -301,16 +304,21 @@ class Arena:
         return self.ambientes[self.i_ambiente]
 
     @property
+    def proximo_ambiente(self) -> Ambiente:
+        return self.ambientes[(self.i_ambiente + 1) % 3]
+
+    @property
     def jugadores(self) -> list[Tributo]:
         return self.tributos + [self.jugador]
 
     def siguiente_ambiente(self) -> Ambiente:
-        """Trancisiona al siguiente ambiente, limpiando cadáveres en la arena."""
+        """Transiciona al siguiente ambiente, limpiando cadáveres en la arena."""
         for tributo in self.tributos:
             if not tributo.esta_vive:
                 self.tributos.remove(tributo)
 
         self.i_ambiente = (self.i_ambiente + 1) % 3
+        print(f"El ambiente ha cambiado a {self.ambiente.nombre}.")
         return self.ambiente
 
     def cargar_jugadores(self, jugador: Tributo, tributos: list[Tributo]):
@@ -330,14 +338,16 @@ class Arena:
         if hay_evento:
             evento = choice(self.ambiente.eventos)
             dano = self.ambiente.calcular_dano(evento)
-            print(f"Se ha producido un evento: {evento.nombre}.")
+            print(f"Se ha producido un evento, {evento.nombre}.")
+            print(f"Se ha inflingido {dano} de daño a todos los tributos.")
             for tributo in self.jugadores:
                 tributo.vida -= dano
 
         return hay_evento
 
-    def realizar_encuentros(self):
-        """Realiza los encuentros entre tributos en una partida."""
+    def realizar_encuentros(self) -> bool:
+        """Realiza los encuentros entre tributos en una partida.
+        Retorna True si muere el jugador."""
         assert len(self.tributos) > 0
 
         n_encuentros = round((self.riesgo * len(self.jugadores)) // 2)
@@ -361,8 +371,8 @@ class Arena:
                             f"Tu jugador {self.jugador.nombre} ha muerto"
                             f" peleando contra {t1.nombre}."
                         )
-                        print(f"Has perdido el DCCapitolio.")
-                        sys.exit()
+                        return True
+
                     else:
                         self.tributos.remove(t2)
                         print(
@@ -373,3 +383,13 @@ class Arena:
                         f"El encuentro ha terminado, {t1.nombre} ha quedado con {t1.vida} de vida,"
                         f" y {t2.nombre} con {t2.vida} de vida."
                     )
+        return False
+
+    def mostrar_estado(self):
+        print(f"Dificultad: {self.dificultad}")
+        print(f"Tributos vivos:")
+        tributos_vivos = "".join(
+            [f"    {t.nombre}\n" for t in self.tributos if t.esta_vive]
+        )
+        print(tributos_vivos, end="")
+        print(f"Próximo ambiente: {self.proximo_ambiente.nombre}")

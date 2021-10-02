@@ -6,11 +6,11 @@ if __name__ == "__main__":
 
     colorama.init()
 
-    # Cargar datos
-    tributos = cargar_tributos()
-    objetos = cargar_objetos()
-    ambientes = cargar_ambientes()
-    arenas = cargar_arenas(ambientes)
-
     # Mostrar el menú de inicio
-    menu_inicio(tributos, objetos, arenas)
+    while True:
+        # Cargar datos
+        tributos = cargar_tributos()
+        objetos = cargar_objetos()
+        ambientes = cargar_ambientes()
+        arenas = cargar_arenas(ambientes)
+        menu_inicio(tributos, objetos, arenas)

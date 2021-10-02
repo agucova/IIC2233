@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Optional
+
 from model import Arena, Objeto, Tributo
 import os
 import sys
@@ -12,7 +13,7 @@ def negrita(string: str) -> str:
 
 
 def limpiar_pantalla():
-    """Clears the screen."""
+    """Limpia la pantalla."""
     posix = os.name == "posix"
     if posix:
         # POSIX shells
@@ -161,15 +162,18 @@ def menu_principal(
                 exito = jugador.hacerse_bolita()
                 confirmar_enter()
         ## Encuentros
-        arena.realizar_encuentros()
-        confirmar_enter
-        ## Evento
-        arena.ejecutar_evento()
-        ## Cambiar ambiente
-        arena.siguiente_ambiente()
-        confirmar_enter()
-        ## Volver al menú principal
-        menu_principal(jugador, arena, tributos, objetos)
+        if arena.realizar_encuentros():
+            print("Has perdido el juego.")
+            confirmar_enter()
+        else:
+            confirmar_enter()
+            ## Evento
+            arena.ejecutar_evento()
+            ## Cambiar ambiente
+            arena.siguiente_ambiente()
+            confirmar_enter()
+            ## Volver al menú principal
+            menu_principal(jugador, arena, tributos, objetos)
 
     elif opcion == 1:
         # Mostrar estado del tributo
@@ -183,6 +187,7 @@ def menu_principal(
         if jugador.mochila:
             objeto = escoger_objeto(jugador.mochila)
             jugador.utilizar_objeto(objeto, arena)
+            confirmar_enter()
         else:
             mostrar_advertencia("Error", "No tienes objetos en tu mochila.")
 
@@ -190,16 +195,11 @@ def menu_principal(
 
     elif opcion == 3:
         # Resumen DCCapitolio
-        pass
-
-    elif opcion == 4:
-        # TODO: Volver
-        pass
+        mostrar_cabecera("Estado DCCapitolio")
+        arena.mostrar_estado()
+        confirmar_enter()
+        menu_principal(jugador, arena, tributos, objetos)
 
     elif opcion == 5:
         print("¡Hasta pronto!")
         sys.exit()
-
-
-def simulacion_hora():
-    pass
