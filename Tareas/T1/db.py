@@ -98,14 +98,16 @@ def cargar_ambientes(ruta: str = RUTA_AMBIENTES) -> list[Ambiente]:
     return ambientes
 
 
-def cargar_arenas(ruta: str = RUTA_ARENAS) -> list[Arena]:
+def cargar_arenas(ambientes: list[Ambiente], ruta: str = RUTA_ARENAS) -> list[Arena]:
+    assert len(ambientes) > 0
+
     datos = cargar_csv(ruta)
     arenas = []
     for linea in datos.lineas:
         nombre = linea[0]
         dificultad = linea[1]
         riesgo = float(linea[2])
-        arenas.append(Arena(nombre, dificultad, riesgo))
+        arenas.append(Arena(nombre, dificultad, riesgo, ambientes))
 
     assert len(arenas) > 0
     return arenas
@@ -114,4 +116,4 @@ def cargar_arenas(ruta: str = RUTA_ARENAS) -> list[Arena]:
 tributos = cargar_tributos()
 objetos = cargar_objetos()
 ambientes = cargar_ambientes()
-pass
+arenas = cargar_arenas(ambientes)
