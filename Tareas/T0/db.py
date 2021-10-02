@@ -16,7 +16,8 @@ CSVData = NamedTuple("CSVData", [("header", List[str]), ("lines", List[List[str]
 
 
 def load_csv(filepath: str, n_columns: int = -1) -> CSVData:
-    """Loads a csv file and returns a CSVData object to aid further processing. Takes an optional n_columns to prevent accidental splitting of literal commas."""
+    """Loads a csv file and returns a CSVData object to aid further processing.
+    Takes an optional n_columns to prevent accidental splitting of literal commas."""
     # Idealmente filepath sería Union[str, Path],
     # pero no tengo ganas de solicitar soporte a pathlib
     with open(filepath, "r", encoding="utf-8") as file:
@@ -106,7 +107,8 @@ def load_comments(
     publications: Dict[int, Publication],
     filepath: str = COMMENTS_PATH,
 ) -> Dict[int, Publication]:
-    """Loads a comment data CSV file and returns an updated list of publications that include the comments."""
+    """Loads a comment data CSV file and returns an updated list of
+    publications that include the comments."""
     comments: List[Comment] = []
     for line in load_csv(filepath, n_columns=4).lines:
         # Search for publication
@@ -148,7 +150,8 @@ def load_comments(
 
 def insert_new_user(user: User, filepath: str = USERS_PATH):
     """Inserts a newly generated user into the corresponding CSV file.
-    Don't use this with users that already have made publications, since that information is not written to the database."""
+    Don't use this with users that already have made publications,
+    since that information is not written to the database."""
     assert user is not None
     assert not user.publications
 
@@ -166,20 +169,24 @@ def insert_new_comment(comment: Comment, filepath: str = COMMENTS_PATH):
     # The + 1 in pub_id uses the 1-indexing of the CSV file
     with open(filepath, "a", encoding="utf-8") as file:
         file.write(
-            f"{comment.pub_id + 1},{comment.username},{print_date(comment.creation_date)},{comment.body}\n"
+            f"{comment.pub_id + 1},{comment.username},"
+            f"{print_date(comment.creation_date)},{comment.body}\n"
         )
 
 
 def insert_new_publication(publication: Publication, filepath: str = PUBLICATIONS_PATH):
     """Inserts a new publication into the corresponding CSV file.
-    Don't use this for publications that already have comments in them, as this won't insert them for you."""
+    Don't use this for publications that already
+    have comments in them, as this won't insert them for you."""
     assert not publication.comments
     assert publication.seller_username is not None
     assert "\n" not in publication.name and "\n" not in publication.description
 
     with open(filepath, "a", encoding="utf-8") as file:
         file.write(
-            f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{publication.price.value},{publication.description}\n"
+            f"{publication.pub_id + 1},{publication.name},{publication.seller_username},"
+            f"{print_date(publication.creation_date)},"
+            f"{publication.price.value},{publication.description}\n"
         )
 
 
@@ -189,7 +196,8 @@ def _remove_line_helper(
     target_lines: Optional[List[str]] = None,
     pub_id: Optional[int] = None,
 ):
-    """Removes lines from a CSV file in a fault tolerant manner. Modes for comments or publications."""
+    """Removes lines from a CSV file in a fault tolerant manner.
+    Modes for comments or publications."""
     assert mode in ("c", "p")
     if mode == "p":
         assert target_lines is not None
@@ -250,9 +258,17 @@ def _remove_publication_line(
 ):
     """Removes a given publication from the database."""
     # These are the target lines to be extracted from the file
-    target_line = f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{publication.price.value},{publication.description}\n"
-    # We decided to move to floats for international precision, so we need to handle cases where the int was written by the legacy system.
-    target_line_alt = f"{publication.pub_id + 1},{publication.name},{publication.seller_username},{print_date(publication.creation_date)},{round(publication.price.value)},{publication.description}\n"
+    target_line = (
+        f"{publication.pub_id + 1},{publication.name},{publication.seller_username},"
+    )
+    f"{print_date(publication.creation_date)},{publication.price.value},{publication.description}\n"
+    # We decided to move to floats for international precision, so we
+    # need to handle cases where the int was written by the legacy system.
+    target_line_alt = (
+        f"{publication.pub_id + 1},{publication.name},{publication.seller_username},"
+        f"{print_date(publication.creation_date)},{round(publication.price.value)},"
+        f"{publication.description}\n"
+    )
 
     _remove_line_helper(
         pub_filepath, mode="p", target_lines=[target_line, target_line_alt]

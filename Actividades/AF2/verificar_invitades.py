@@ -46,7 +46,8 @@ def verificar_mail(invitade: Invitade):
         )
     elif mail[1] != "uc.cl":
         print(
-            f"Advertencia: El dominio de {invitade.nombre} no es uc.cl, sin embargo cumple la especificación."
+            f"Advertencia: El dominio de {invitade.nombre} no es uc.cl, "
+            f"sin embargo cumple la especificación."
         )
 
 

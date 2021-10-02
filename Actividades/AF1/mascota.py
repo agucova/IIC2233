@@ -69,7 +69,10 @@ class Mascota:
         self.saciedad += p.SACIEDAD_PASEAR
 
     def __str__(self):
-        return f"{self.nombre} - {self.especie} ({self.raza})\nSAC: {self.saciedad}\nENT: {self.entretencion}\nSAT: {self.saciedad}\n"
+        return (
+            f"{self.nombre} - {self.especie} ({self.raza})\nSAC: {self.saciedad}\n"
+            f"ENT: {self.entretencion}\nSAT: {self.saciedad}\n"
+        )
 
 
 class Perro(Mascota):

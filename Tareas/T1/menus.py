@@ -6,9 +6,8 @@ import sys
 
 
 def negrita(string: str) -> str:
-    """
-    Retorna un string en negrita. Debe ser utilizado con colorama para evitar problemas de portabilidad.
-    """
+    """Retorna un string en negrita. Debe ser utilizado con colorama
+    para evitar problemas de portabilidad."""
     return f"\033[1m{string}\033[0m"
 
 
@@ -36,9 +35,11 @@ def mostrar_menu_opciones(
     title: str, options: list[str], body: Optional[str] = None
 ) -> int:
     """
-    Prints a menu with a title and a body, along with a set of options the user can choose from. Returns the index of the corresponding option.
+    Prints a menu with a title and a body, along with a set of options the user can choose from.
+    Returns the index of the corresponding option.
 
-    Example: `show_menu("Menú de publicaciones realizadas", ["Crear nueva publicación", "Eliminar publicación", "Volver"], body="Mis publicaciones:\\n - Pato de goma")`
+    Example: `show_menu("Menú de publicaciones realizadas", ["Crear nueva publicación",
+    "Eliminar publicación", "Volver"], body="Mis publicaciones:\\n - Pato de goma")`
     """
     mostrar_cabecera(title, body)
 

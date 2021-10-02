@@ -12,7 +12,8 @@ class RiesgoCovid(Exception):
             )
         elif self.sintoma == "dolor_cabeza":
             print(
-                f"La persona {self.nombre_invitade} tiene dolor de cabeza y tiene prohibido el ingreso"
+                f"La persona {self.nombre_invitade} tiene dolor de cabeza y "
+                f"tiene prohibido el ingreso"
             )
         elif self.sintoma == "tos":
             print(

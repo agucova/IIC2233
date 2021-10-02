@@ -31,7 +31,10 @@ def buscar_info_ayudante(
 def saludar_ayudante(info_ayudante: list[str]) -> str:
     """Genera un string de saludo para un ayudante en base a su información."""
     assert len(info_ayudante) == 4
-    return f"Hola {info_ayudante[0]}, tu cargo es {info_ayudante[1]} y eres {info_ayudante[2]} en GitHub y {info_ayudante[3]} en Discord."
+    return (
+        f"Hola {info_ayudante[0]}, tu cargo es {info_ayudante[1]} y eres "
+        f"{info_ayudante[2]} en GitHub y {info_ayudante[3]} en Discord."
+    )
 
 
 if __name__ == "__main__":

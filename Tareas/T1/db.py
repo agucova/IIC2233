@@ -26,7 +26,9 @@ DatosCSV = NamedTuple(
 
 
 def cargar_csv(ruta: str, n_columnas: int = -1) -> DatosCSV:
-    """Carga un archivo CSV y retorna un objeto DatosCSV para facilitar su procesamiento. Toma un argumento opcional de n_columnas para casos donde haya columnas literales que incluyan comas."""
+    """Carga un archivo CSV y retorna un objeto DatosCSV para facilitar su procesamiento.
+    Toma un argumento opcional de n_columnas para casos
+    donde haya columnas literales que incluyan comas."""
     # Idealmente filepath sería Union[str, Path],
     # pero no tengo ganas de solicitar soporte a pathlib
     with open(ruta, "r", encoding="utf-8") as archivo:

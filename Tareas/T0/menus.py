@@ -48,9 +48,11 @@ def show_option_menu(
     title: str, options: List[str], body: Union[str, None] = None
 ) -> int:
     """
-    Prints a menu with a title and a body, along with a set of options the user can choose from. Returns the index of the corresponding option.
+    Prints a menu with a title and a body, along with a set of options the user can choose from.
+    Returns the index of the corresponding option.
 
-    Example: `show_menu("Menú de publicaciones realizadas", ["Crear nueva publicación", "Eliminar publicación", "Volver"], body="Mis publicaciones:\\n - Pato de goma")`
+    Example: `show_menu("Menú de publicaciones realizadas", ["Crear nueva publicación",
+    "Eliminar publicación", "Volver"], body="Mis publicaciones:\\n - Pato de goma")`
     """
     show_menu_header(title, body)
 
