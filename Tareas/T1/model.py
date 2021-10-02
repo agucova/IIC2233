@@ -43,7 +43,7 @@ class Tributo:
         return self._vida
 
     @vida.setter
-    def vida(self, valor):
+    def vida(self, valor: int):
         if valor <= 0:
             self.esta_vive = False
             self._vida = 0
@@ -55,22 +55,24 @@ class Tributo:
         self, tributo: Tributo
     ) -> bool:  # TODO: Agregar logica de ataque fallido, cansancio?
         """Ataca a otro tribute. Retorna si es que el otro tribute a muerto en el ataque."""
-        dano = min(
-            [
-                90,
-                max(
-                    [
-                        5,
-                        (
-                            60 * self.fuerza
-                            + 40 * self.agilidad
-                            + 40 * self.ingenio
-                            - 30 * self.peso
-                        )
-                        / self.edad,
-                    ]
-                ),
-            ]
+        dano = round(
+            min(
+                [
+                    90,
+                    max(
+                        [
+                            5,
+                            (
+                                60 * self.fuerza
+                                + 40 * self.agilidad
+                                + 40 * self.ingenio
+                                - 30 * self.peso
+                            )
+                            / self.edad,
+                        ]
+                    ),
+                ]
+            )
         )
 
         tributo.vida -= dano
@@ -130,48 +132,58 @@ class Ambiente(ABC):
         self.eventos = eventos
 
     @abstractmethod
-    def calcular_dano(self, evento: Evento):
+    def calcular_dano(self, evento: Evento) -> int:
         pass
 
 
 class Playa(Ambiente):
-    def calcular_dano(self, evento: Evento):
-        return max(
-            [
-                5,
-                (0.4 * p.HUMEDAD_PLAYA + 0.2 * p.VELOCIDAD_VIENTOS_PLAYA + evento.dano)
-                / 5,
-            ]
+    def calcular_dano(self, evento: Evento) -> int:
+        return round(
+            max(
+                [
+                    5,
+                    (
+                        0.4 * p.HUMEDAD_PLAYA
+                        + 0.2 * p.VELOCIDAD_VIENTOS_PLAYA
+                        + evento.dano
+                    )
+                    / 5,
+                ]
+            )
         )
 
 
 class Bosque(Ambiente):
-    def calcular_dano(self, evento: Evento):
-        return max(
-            [
-                5,
-                (
-                    0.2 * p.VELOCIDAD_VIENTOS_BOSQUE
-                    + 0.1 * p.PRECIPITACIONES_BOSQUE
-                    + evento.dano
-                )
-                / 5,
-            ]
+    def calcular_dano(self, evento: Evento) -> int:
+        return round(
+            max(
+                [
+                    5,
+                    (
+                        0.2 * p.VELOCIDAD_VIENTOS_BOSQUE
+                        + 0.1 * p.PRECIPITACIONES_BOSQUE
+                        + evento.dano
+                    )
+                    / 5,
+                ]
+            )
         )
 
 
 class Montana(Ambiente):
-    def calcular_dano(self, evento: Evento):
-        return max(
-            [
-                5,
-                (
-                    0.1 * p.PRECIPITACIONES_MONTANA
-                    + 0.3 * p.NUBOSIDAD_MONTANA
-                    + evento.dano
-                )
-                / 5,
-            ]
+    def calcular_dano(self, evento: Evento) -> int:
+        return round(
+            max(
+                [
+                    5,
+                    (
+                        0.1 * p.PRECIPITACIONES_MONTANA
+                        + 0.3 * p.NUBOSIDAD_MONTANA
+                        + evento.dano
+                    )
+                    / 5,
+                ]
+            )
         )
 
 
@@ -250,6 +262,11 @@ class Arena:
     def jugadores(self) -> list[Tributo]:
         return self.tributos + [self.jugador]
 
+    def siguiente_ambiente(self) -> Ambiente:
+        """Trancisiona al siguiente ambiente."""
+        self.i_ambiente = (self.i_ambiente + 1) % 3
+        return self.ambiente
+
     def cargar_jugadores(self, jugador: Tributo, tributos: list[Tributo]):
         assert len(tributos) > 0
         assert jugador not in tributos
@@ -265,7 +282,7 @@ class Arena:
 
         if hay_evento:
             evento = choice(self.ambiente.eventos)
-            dano = evento.calcular_dano()
+            dano = self.ambiente.calcular_dano(evento)
             print(f"Se ha producido un evento: {evento.nombre}.")
             for tributo in self.jugadores:
                 tributo.vida -= dano

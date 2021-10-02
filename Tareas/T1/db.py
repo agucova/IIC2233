@@ -21,7 +21,7 @@ RUTA_AMBIENTES = f"{PROJECT_PATH}/ambientes.csv"
 RUTA_OBJETOS = f"{PROJECT_PATH}/objetos.csv"
 
 DatosCSV = NamedTuple(
-    "DatosCSV", [("cabecera", list[str]), ("lineas", list[list[str]])]
+    "DatosCSV", [("cabecera", "list[str]"), ("lineas", "list[list[str]]")]
 )
 
 
@@ -59,7 +59,7 @@ def cargar_tributos(ruta: str = RUTA_TRIBUTOS) -> list[Tributo]:
 
 def cargar_objetos(ruta: str = RUTA_OBJETOS) -> list[Objeto]:
     datos = cargar_csv(ruta)
-    objetos = []
+    objetos: list[Objeto] = []
     for linea in datos.lineas:
         nombre = linea[0]
         tipo = linea[1]
@@ -80,7 +80,7 @@ def cargar_objetos(ruta: str = RUTA_OBJETOS) -> list[Objeto]:
 
 def cargar_ambientes(ruta: str = RUTA_AMBIENTES) -> list[Ambiente]:
     datos = cargar_csv(ruta)
-    ambientes = []
+    ambientes: list[Ambiente] = []
     for linea in datos.lineas:
         nombre = linea[0]
         eventos = [evento.split(";") for evento in linea[1:4]]
@@ -102,7 +102,7 @@ def cargar_arenas(ambientes: list[Ambiente], ruta: str = RUTA_ARENAS) -> list[Ar
     assert len(ambientes) > 0
 
     datos = cargar_csv(ruta)
-    arenas = []
+    arenas: list[Arena] = []
     for linea in datos.lineas:
         nombre = linea[0]
         dificultad = linea[1]
