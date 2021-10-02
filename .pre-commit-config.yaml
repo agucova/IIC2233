@@ -1,43 +1,43 @@
 # See https://pre-commit.com for more information
 
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
     hooks:
-    # Elimina espacios o tabs innecesarios al final de las lineas
-    -   id: trailing-whitespace
-    # Elimina terminaciones conflictivas entre Windows y UNIX (CRLF y LF)
-    -   id: mixed-line-ending
-    # Arregla archivos sin una linea nueva final
-    -   id: end-of-file-fixer
-    # Revisa que los archivos de YAML sean válidos
-    -   id: check-yaml
-    # Advierte antes de commitear archivos gigantes
-    -   id: check-added-large-files
-    # Verifica que los archivos de Python tengan una sintaxis válida
-    -   id: check-ast
-    # Verifica que no hayan líneas de un merge incompleto
-    -   id: check-merge-conflict
+      # Elimina espacios o tabs innecesarios al final de las lineas
+      - id: trailing-whitespace
+      # Elimina terminaciones conflictivas entre Windows y UNIX (CRLF y LF)
+      - id: mixed-line-ending
+      # Arregla archivos sin una linea nueva final
+      - id: end-of-file-fixer
+      # Revisa que los archivos de YAML sean válidos
+      - id: check-yaml
+      # Advierte antes de commitear archivos gigantes
+      - id: check-added-large-files
+      # Verifica que los archivos de Python tengan una sintaxis válida
+      - id: check-ast
+      # Verifica que no hayan líneas de un merge incompleto
+      - id: check-merge-conflict
     #
 
--   repo: https://github.com/psf/black
+  - repo: https://github.com/psf/black
     rev: 21.6b0
     hooks:
       # Revisa que el código esté en formato Black/PEP-8
-      -   id: black
+      - id: black
 
--   repo: https://github.com/pycqa/flake8
-    rev: '3.8.3'
+  - repo: https://github.com/pycqa/flake8
+    rev: "3.8.3"
     hooks:
-    # Revisa que el código no rompa ninguna regla severa
-    # o bien produzca descuentos
-    -   id: flake8
-        args: ['--select', 'E9,F63,F7,F82,E501,E22,E23,W191,F403,N']
+      # Revisa que el código no rompa ninguna regla severa
+      # o bien produzca descuentos
+      - id: flake8
+        args: ["--select", "E9,F63,F7,F82,E501,E22,E23,W191,F403,N"]
         additional_dependencies: [pep8-naming]
 
--   repo: https://github.com/agucova/check-file-length
-    rev: fca651b8055f00a9f567e965265a9be375b12859
+  - repo: https://github.com/agucova/check-file-length
+    rev: 2fd3b0728585d95a5674cef8eba3f6f46048e7ee
     hooks:
-    # Script personalizado que revisa el criterio de modularización
-    # (LOCs <= 400)
-    -   id: check-file-length
+      # Script personalizado que revisa el criterio de modularización
+      # (LOCs <= 400)
+      - id: check-file-length
