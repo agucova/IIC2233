@@ -2,7 +2,7 @@
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v4.0.1
     hooks:
       # Elimina espacios o tabs innecesarios al final de las lineas
       - id: trailing-whitespace
@@ -21,7 +21,7 @@ repos:
     #
 
   - repo: https://github.com/psf/black
-    rev: 21.6b0
+    rev: 21.9b0
     hooks:
       # Revisa que el código esté en formato Black/PEP-8
       - id: black
