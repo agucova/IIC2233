@@ -123,7 +123,6 @@ class Tributo:
         """Realiza una acción heroíca"""
         if self.energia >= p.ENERGIA_ACCION_HEROICA:
             self.energia -= p.ENERGIA_ACCION_HEROICA
-            # TODO: Agregar aleatoridad?
             self.popularidad += p.POPULARIDAD_ACCION_HEROICA
             print(
                 f"{self.nombre} ha hecho una acción heroíca, impresionando a les patrocinadores."
@@ -337,7 +336,7 @@ class Arena:
         if hay_evento:
             evento = choice(self.ambiente.eventos)
             dano = self.ambiente.calcular_dano(evento)
-            print(f"Se ha producido un evento, {evento.nombre}.")
+            print(f"Se ha producido un evento: {evento.nombre}.")
             print(f"Se ha inflingido {dano} de daño a todos los tributos.")
             for tributo in self.jugadores:
                 tributo.vida -= dano
