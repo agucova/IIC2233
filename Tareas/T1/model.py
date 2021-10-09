@@ -321,8 +321,8 @@ class Arena:
         return self.ambiente
 
     def cargar_jugadores(self, jugador: Tributo, tributos: list[Tributo]):
-        assert len(tributos) > 0
         assert jugador not in tributos
+        assert len(tributos) == 11
         assert not self.jugadores_cargados
 
         self.jugador = jugador
