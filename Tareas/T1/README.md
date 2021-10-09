@@ -1,4 +1,4 @@
-# Tarea X: Nombre de la tarea :school_satchel:
+# Tarea 1
 
 ## Consideraciones generales :octocat:
 
