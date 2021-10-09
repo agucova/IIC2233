@@ -1,113 +1,66 @@
 # Tarea X: Nombre de la tarea :school_satchel:
 
-
-Un buen ```README.md``` puede marcar una gran diferencia en la facilidad con la que corregimos una tarea, y consecuentemente cómo funciona su programa, por lo en general, entre más ordenado y limpio sea éste, mejor será
-
-Para nuestra suerte, GitHub soporta el formato [MarkDown](https://es.wikipedia.org/wiki/Markdown), el cual permite utilizar una amplia variedad de estilos de texto, tanto para resaltar cosas importantes como para separar ideas o poner código de manera ordenada ([pueden ver casi todas las funcionalidades que incluye aquí](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet))
-
-Un buen ```README.md``` no tiene por que ser muy extenso tampoco, hay que ser **concisos** (a menos que lo consideren necesario) pero **tampoco pueden** faltar cosas. Lo importante es que sea claro y limpio
-
-**Dejar claro lo que NO pudieron implementar y lo que no funciona a la perfección. Esto puede sonar innecesario pero permite que el ayudante se enfoque en lo que sí podría subir su puntaje.**
-
 ## Consideraciones generales :octocat:
 
-<Descripción de lo que hace y que **_no_** hace la tarea que entregaron junto
-con detalles de último minuto y consideraciones como por ejemplo cambiar algo
-en cierta línea del código o comentar una función>
+En teoría, la tarea es una implementación completa.
 
 ### Cosas implementadas y no implementadas :white_check_mark: :x:
 
-Explicación: mantén el emoji correspondiente, de manera honesta, para cada item. Si quieres, también puedes agregarlos a los títulos:
-- ❌ si **NO** completaste lo pedido
-- ✅ si completaste **correctamente** lo pedido
-- 🟠 si el item está **incompleto** o tiene algunos errores
 #### Programación Orientada a Objetos: 38 pts (27%)
-##### ❌✅🟠  Diagrama <explicacion\>
-##### ❌✅🟠 Definición de clases, atributos y métodos <explicacion\>
-##### ❌✅🟠 Relaciones entre clases <explicacion\>
+##### ✅  Diagrama
+##### ✅ Definición de clases, atributos y métodos
+##### ✅ Relaciones entre clases
 #### Simulaciones: 12 pts (8%)
-##### ❌✅🟠 Crear partida <explicacion\>
+##### ✅ Crear partida
 #### Acciones: 43 pts (30%)
-##### ❌✅🟠 Tributo <explicacion\>
-##### ❌✅🟠 Objeto <explicacion\>
-##### ❌✅🟠 Ambiente <explicacion\>
-##### ❌✅🟠 Arena <explicacion\>
+##### ✅ Tributo <explicacion\>
+##### ✅ Objeto <explicacion\>
+##### ✅ Ambiente <explicacion\>
+##### ✅ Arena <explicacion\>
 #### Consola: 34 pts (24%)
-##### ❌✅🟠 Menú inicio <explicacion\>
-##### ❌✅🟠 Menú principal <explicacion\>
-##### ❌✅🟠 Simular Hora <explicacion\>
-##### ❌✅🟠 Robustez <explicacion\>
+##### ✅ Menú inicio <explicacion\>
+##### ✅ Menú principal <explicacion\>
+##### ✅ Simular Hora <explicacion\>
+##### ✅ Robustez <explicacion\>
 #### Manejo de archivos: 15 pts (11%)
-##### ❌✅🟠 Archivos CSV  <explicacion\>
-##### ❌✅🟠 parametros.py <explicacion\>
+##### ✅ Archivos CSV  <explicacion\>
+##### ✅ parametros.py <explicacion\>
 #### Bonus: 3 décimas máximo
-##### ❌✅🟠 Guardar Partida <explicacion\>
+##### ❌ Guardar Partida <explicacion\>
 ## Ejecución :computer:
-El módulo principal de la tarea a ejecutar es  ```archivo.py```. Además se debe crear los siguientes archivos y directorios adicionales:
-1. ```archivo.ext``` en ```ubicación```
-2. ```directorio``` en ```ubicación```
-3. ...
-
+El módulo principal de la tarea a ejecutar es  ```main.py```. Se requiere de `{ambientes,arenas,objetos,tributos}.csv`.
 
 ## Librerías :books:
 ### Librerías externas utilizadas
 La lista de librerías externas que utilicé fue la siguiente:
 
-1. ```librería_1```: ```función() / módulo```
-2. ```librería_2```: ```función() / módulo``` (debe instalarse)
-3. ...
+1. ```colorama```: Se utiliza la función ```init()``` para traducir automáticamente señales de negrita o limpieza de pantalla en Windows (debe instalarse).
+2. ```dataclasses```: Se utiliza `@dataclass` para crear `Evento`.
+3. `sys`: provee `exit()` para terminar la ejecución limpiamente.
+4. `os`: permite correr `clear` o `cls` para limpiar la pantalla en menús de forma portable.
+5. `__future__`: se utiliza para proveer type hints de colecciones en formato retrocompatible a 3.8. (`list[str]` en vez de `List[str]` importado de `typing`).
+6. `typing`: se utiliza para crear objetos de tipo `NamedTuple` que faciliten la lectura de datos de CSV de forma genérica. El uso de `typing` permite declarar sus tipos para facilitar análisis estático.
 
 ### Librerías propias
 Por otro lado, los módulos que fueron creados fueron los siguientes:
 
-1. ```librería_1```: Contiene a ```ClaseA```, ```ClaseB```, (ser general, tampoco es necesario especificar cada una)...
-2. ```librería_2```: Hecha para <insertar descripción **breve** de lo que hace o qué contiene>
-3. ...
+1. `model.py`: Contiene la definición de todas las entidades, incluyendo `Arena`, `Tributo`, `Ambiente`, `Objeto`, y sus subclases.
+2. `menus.py`: Contiene la definición de todas los menús y el flujo interactivo entre estos. Es dónde se concentra la lógica del programa.
+3. `db.py`: Incluye las funciones de cargado de los archivos, instanciando los objetos necesarios de `model`. Toma buena parte de la T0.
+4. `parameters.py`: Incluye los parámetros constantes del programa.
 
 ## Supuestos y consideraciones adicionales :thinking:
 Los supuestos que realicé durante la tarea son los siguientes:
 
-1. <Descripción/consideración 1 y justificación del por qué es válido/a>
-2. <Descripción/consideración 2 y justificación del por qué es válido/a>
-3. ...
-
-PD: <una última consideración (de ser necesaria) o comentario hecho anteriormente que se quiera **recalcar**>
+1. Todos los tipos del programa están específicados utilizando type hints acorde con [PEP 484](https://www.python.org/dev/peps/pep-0484/) y [PEP 585](https://www.python.org/dev/peps/pep-0585/). Estos no afectan el flujo de ejecución del programa y solo ayudan al análisis estático del programa.
+2. Asumo que rendirse y salir son acciones equivalentes (ambos se mencionan en el enunciado, pero de forma aparentemente similar). Por eso, la acción para salir se implementa de forma genérica.
 
 
 -------
 
-
-
-**EXTRA:** si van a explicar qué hace específicamente un método, no lo coloquen en el README mismo. Pueden hacerlo directamente comentando el método en su archivo. Por ejemplo:
-
-```python
-class Corrector:
-
-    def __init__(self):
-          pass
-
-    # Este método coloca un 6 en las tareas que recibe
-    def corregir(self, tarea):
-        tarea.nota  = 6
-        return tarea
-```
-
-Si quieren ser más formales, pueden usar alguna convención de documentación. Google tiene la suya, Python tiene otra y hay muchas más. La de Python es la [PEP287, conocida como reST](https://www.python.org/dev/peps/pep-0287/). Lo más básico es documentar así:
-
-```python
-def funcion(argumento):
-    """
-    Mi función hace X con el argumento
-    """
-    return argumento_modificado
-```
-Lo importante es que expliquen qué hace la función y que si saben que alguna parte puede quedar complicada de entender o tienen alguna función mágica usen los comentarios/documentación para que el ayudante entienda sus intenciones.
-
 ## Referencias de código externo :book:
-Las funciones que ayudan a generar menús fueron tomado mi tarea 0, al igual que las funciones que ayudan a cargar CSVs.
 
-Para realizar mi tarea saqué código de:
-1. \<link de código>: este hace \<lo que hace> y está implementado en el archivo <nombre.py> en las líneas <número de líneas> y hace <explicación breve de que hace>
+1. El código de limpieza de pantalla, negritas y menús abstractos implementado en `menus.py:10-65` proviene de mi tarea 0 al igual que el código abstracto para el cargado de CSVs genéricos en `db.py:23-39`.
 
 
 

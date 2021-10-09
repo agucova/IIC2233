@@ -39,13 +39,6 @@ def mostrar_cabecera(title: str, body: Optional[str] = None) -> None:
         print()
 
 
-def mostrar_advertencia(titulo: str, mensaje: str):
-    """Muestra una advertencia"""
-    opcion = mostrar_menu_opciones(titulo, ["Volver", "Salir"], body=mensaje)
-    if opcion == 2:
-        sys.exit()
-
-
 def mostrar_menu_opciones(
     title: str, options: list[str], body: Optional[str] = None
 ) -> int:
@@ -70,6 +63,13 @@ def mostrar_menu_opciones(
     except ValueError as e:
         print("[ERROR] Procesamiento de entero inválido.")
         raise e
+
+
+def mostrar_advertencia(titulo: str, mensaje: str):
+    """Muestra una advertencia"""
+    opcion = mostrar_menu_opciones(titulo, ["Volver", "Salir"], body=mensaje)
+    if opcion == 2:
+        sys.exit()
 
 
 def menu_inicio(tributos: list[Tributo], objetos: list[Objeto], arenas: list[Arena]):
