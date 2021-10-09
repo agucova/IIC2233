@@ -13,20 +13,20 @@ En teoría, la tarea es una implementación completa.
 #### Simulaciones: 12 pts (8%)
 ##### ✅ Crear partida
 #### Acciones: 43 pts (30%)
-##### ✅ Tributo <explicacion\>
-##### ✅ Objeto <explicacion\>
-##### ✅ Ambiente <explicacion\>
-##### ✅ Arena <explicacion\>
+##### ✅ Tributo
+##### ✅ Objeto
+##### ✅ Ambiente
+##### ✅ Arena
 #### Consola: 34 pts (24%)
-##### ✅ Menú inicio <explicacion\>
-##### ✅ Menú principal <explicacion\>
-##### ✅ Simular Hora <explicacion\>
-##### ✅ Robustez <explicacion\>
+##### ✅ Menú inicio
+##### ✅ Menú principal
+##### ✅ Simular Hora
+##### ✅ Robustez
 #### Manejo de archivos: 15 pts (11%)
-##### ✅ Archivos CSV  <explicacion\>
-##### ✅ parametros.py <explicacion\>
+##### ✅ Archivos CSV
+##### ✅ parametros.py
 #### Bonus: 3 décimas máximo
-##### ❌ Guardar Partida <explicacion\>
+##### ❌ Guardar Partida
 ## Ejecución :computer:
 El módulo principal de la tarea a ejecutar es  ```main.py```. Se requiere de `{ambientes,arenas,objetos,tributos}.csv`.
 
