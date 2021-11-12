@@ -1,3 +1,5 @@
 *.pdf
 sprites/
 canciones/
+.vscode/
+.qt_for_python/

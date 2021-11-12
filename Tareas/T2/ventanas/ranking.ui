@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VentanaRanking</class>
+ <widget class="QMainWindow" name="VentanaRanking">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>845</width>
+    <height>591</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Ventana de Ranking</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../sprites/Logo.png</normaloff>../sprites/Logo.png</iconset>
+  </property>
+  <widget class="QWidget" name="widgetcentral">
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>500</y>
+      <width>151</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Volver</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>50</y>
+      <width>661</width>
+      <height>431</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="titulo_ranking">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 75 28pt &quot;Roboto Slab&quot;;</string>
+       </property>
+       <property name="text">
+        <string>**Ranking de Puntajes**</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::MarkdownText</enum>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="texto_ranking">
+       <property name="styleSheet">
+        <string notr="true">font: 57 16pt &quot;Roboto Medium&quot;;</string>
+       </property>
+       <property name="text">
+        <string>1. </string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

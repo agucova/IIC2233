@@ -21,13 +21,13 @@ repos:
     #
 
   - repo: https://github.com/psf/black
-    rev: 21.9b0
+    rev: 21.10b0
     hooks:
       # Revisa que el código esté en formato Black/PEP-8
       - id: black
 
   - repo: https://github.com/pycqa/flake8
-    rev: "3.8.4"
+    rev: "4.0.1"
     hooks:
       # Revisa que el código no rompa ninguna regla severa
       # o bien produzca descuentos
@@ -36,7 +36,7 @@ repos:
         additional_dependencies: [pep8-naming]
 
   - repo: https://github.com/agucova/check-file-length
-    rev: 9813753639a82b864abe0b01ff364193438c61db
+    rev: 9f9fb3c59875ae22d908bbb4d4abbfa62f16115b
     hooks:
       # Script personalizado que revisa el criterio de modularización
       # (LOCs <= 400)
