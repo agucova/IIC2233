@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from operator import le
 from typing import Optional
 
 import parametros as p
@@ -11,11 +12,11 @@ from random import choice
 class Froggy(QObject):
     # Signals
     updated_lifes_signal = pyqtSignal(str)
-    level_ended = pyqtSignal(str)
+    level_ended_signal = pyqtSignal()
     updated_score_signal = pyqtSignal(str)
     updated_coins_signal = pyqtSignal(str)
     updated_time_signal = pyqtSignal(str)
-    game_over_signal = pyqtSignal()
+    game_started_signal = pyqtSignal()
 
     def __init__(self, username: str):
         super().__init__()
@@ -30,6 +31,17 @@ class Froggy(QObject):
         self._time_left = 60
         self._car_speed = p.VELOCIDAD_AUTOS
         self._log_speed = p.VELOCIDAD_TRONCOS
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.handle_time_left)
+        self.game_started_signal.connect(self.start)
+
+    # Start signal
+    def start(self):
+        self._time_left = 60
+        self.timer.start(1000)
+
+    def pause(self):
+        self.timer.stop()
 
     @property
     def level(self) -> int:
@@ -41,8 +53,6 @@ class Froggy(QObject):
         self._level = value
         self._car_speed *= 2 / (1 + p.PONDERADOR_DIFICULTAD)
         self._log_speed *= 2 / (1 + p.PONDERADOR_DIFICULTAD)
-        self.update_score()
-        self.level_ended.emit(str(value))
 
     @property
     def score(self) -> int:
@@ -72,7 +82,9 @@ class Froggy(QObject):
         self.updated_lifes_signal.emit(str(lifes))
         self._lifes = lifes
         if self._lifes <= 0:
-            self.game_over_signal.emit()
+            self.pause()
+            self.update_score()
+            self.level_ended_signal.emit()
 
     @property
     def time_left(self):
@@ -84,7 +96,14 @@ class Froggy(QObject):
         self.updated_time_signal.emit(str(value))
 
     def update_score(self):
-        self.score = (self.lifes * 100 + self.time_left * 50) * self._level
+        self.score = (self.lifes * 100 + self.time_left * 50) * self.level
+
+    def handle_time_left(self):
+        self.time_left -= 1
+        if self.time_left == 0:
+            self.pause()
+            self.update_score()
+            self.level_ended_signal.emit()
 
 
 class Car:

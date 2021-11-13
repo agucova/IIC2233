@@ -21,8 +21,6 @@ import parametros as p
 
 
 class FroggyView(QObject):
-    game_started = pyqtSignal()
-
     def __init__(
         self,
         username: str,
@@ -60,14 +58,14 @@ class FroggyView(QObject):
         self.item.setFlags(self.item.GraphicsItemFlag.ItemIsFocusable)
         self.scene.setFocusItem(self.item)
         self.item.keyPressEvent = self.key_press_handler
-        self.item.mousePressEvent = lambda event: self.game_started.emit()
+        self.item.mousePressEvent = lambda event: self.player.game_started_signal.emit()
 
     def to_start(self):
         self.item.setOffset(self.scene_x + 500, self.scene_y + 500)
         self.item.setPos(0, 0)
 
     def key_press_handler(self, event: QKeyEvent):
-        self.pressed_once or self.game_started.emit()
+        self.pressed_once or self.player.game_started_signal.emit()
         if event.key() in (Qt.Key_Up, Qt.Key_W):
             self.move("up")
         elif event.key() in (Qt.Key_Down, Qt.Key_S):
