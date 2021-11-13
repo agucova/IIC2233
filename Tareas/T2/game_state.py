@@ -102,7 +102,7 @@ class RoadGame(QObject):
 
         self.level = level
         # The directions of each lane are chosen randomly on each game
-        self.lane_directions = (choice(("left", "right")) for _ in range(3))
+        self.lane_directions = [choice(("left", "right")) for _ in range(3)]
         self.lanes: list[list[Car]] = [[], [], []]
 
     def spawn_car(self):
