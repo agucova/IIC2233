@@ -1,9 +1,11 @@
 import sys
 from random import choice
+from typing import Optional
+from datetime import datetime, timedelta
 
 from PyQt5 import uic
 from PyQt5.Qt import Qt
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, pyqtSignal, QObject
 from PyQt5.QtGui import QKeyEvent, QPainter, QPixmap
 from PyQt5.QtWidgets import (
     QApplication,
@@ -54,10 +56,12 @@ class VentanaJuego(QMainWindow):
 
         view = QGraphicsView(self.scene, self)
         view.setRenderHint(QPainter.Antialiasing)
+        view.grabKeyboard()
 
         self.scene_container.addWidget(view)
 
         self.show()
+        self.activateWindow()
 
     def init_games(self):
         self.paint_scene_background("sprites/Mapa/areas/scene_frame.png")
@@ -103,6 +107,14 @@ class VentanaJuego(QMainWindow):
         self.froggy.player.updated_time_signal.connect(self.valor_tiempo.setText)
         self.valor_tiempo.setText(str(self.froggy.player._time_left))
 
+        self.froggy.game_started.connect(self.empezar.hide)
+
+        # Set up collision detection
+        self.road_game_down.player = self.froggy.item
+        self.road_game_up.player = self.froggy.item
+        self.road_game_down.collision_signal.connect(self.froggy.car_collision)
+        self.road_game_up.collision_signal.connect(self.froggy.car_collision)
+
     def paint_scene_background(self, path):
         """Scales and adds the given background to the Graphics Scene."""
         background = QGraphicsPixmapItem(
@@ -112,7 +124,9 @@ class VentanaJuego(QMainWindow):
         self.scene.addItem(background)
 
 
-class FroggyView:
+class FroggyView(QObject):
+    game_started = pyqtSignal()
+
     def __init__(
         self,
         username: str,
@@ -122,6 +136,7 @@ class FroggyView:
         scene_width: int,
         scene_height: int,
     ):
+        super().__init__()
         self.player = Froggy(username)
         self.scene = scene
         self.scene_x = scene_x
@@ -130,7 +145,11 @@ class FroggyView:
         self.scene_height = scene_height
         self.color = choice(p.COLORES_PERSONAJE)
 
+        self.pressed_once = False
+
         self.spawn_froggy()
+
+        self.last_collision_time: Optional[datetime] = None
 
     def spawn_froggy(self):
         # Load initial still image
@@ -143,15 +162,16 @@ class FroggyView:
         self.scene.addItem(self.item)
         # Connect to our key handler
         self.item.setFlags(self.item.GraphicsItemFlag.ItemIsFocusable)
-        self.scene.setActivePanel(self.item)
-        print(f"{self.scene.isActive()}")
-        print(
-            f"{self.item.isActive()}, {self.item.isEnabled()}, {self.item.isVisible()}"
-        )
         self.scene.setFocusItem(self.item)
         self.item.keyPressEvent = self.key_press_handler
+        self.item.mousePressEvent = lambda event: self.game_started.emit()
+
+    def to_start(self):
+        self.item.setOffset(self.scene_x + 500, self.scene_y + 500)
+        self.item.setPos(0, 0)
 
     def key_press_handler(self, event: QKeyEvent):
+        self.pressed_once or self.game_started.emit()
         if event.key() in (Qt.Key_Up, Qt.Key_W):
             self.move("up")
         elif event.key() in (Qt.Key_Down, Qt.Key_S):
@@ -185,10 +205,17 @@ class FroggyView:
         self.item.setPixmap(self.image)
 
     def car_collision(self):
-        self.player.lifes -= 1
+        lct = self.last_collision_time
+        time_now = datetime.now()
+        if lct is None or (time_now - lct > timedelta(seconds=1)):
+            self.player.lifes -= 1
+            self.last_collision_time = time_now
+            self.to_start()
 
 
-class RoadGameView:
+class RoadGameView(QObject):
+    collision_signal = pyqtSignal()
+
     def __init__(
         self,
         scene: QGraphicsScene,
@@ -198,12 +225,15 @@ class RoadGameView:
         scene_height: int,
         level: str,
     ):
+        super().__init__()
+
         self.scene = scene
         self.scene_x: int = scene_x
         self.scene_y: int = scene_y
         self.scene_width: int = scene_width
         self.scene_height: int = scene_height
         self.level: str = level
+        self.player: Optional[QGraphicsPixmapItem] = None
         self.init_road()
 
     def init_road(self):
@@ -253,7 +283,9 @@ class RoadGameView:
             return False
 
         for car, item in self.cars:
-            item.moveBy(-3 if car.direction == "left" else 3, 0)
+            item.moveBy(-7 if car.direction == "left" else 7, 0)
+            if self.player is not None and item.collidesWithItem(self.player):
+                self.collision_signal.emit()
             if left_scene(car, item):
                 self.scene.removeItem(item)
                 self.cars.remove((car, item))
