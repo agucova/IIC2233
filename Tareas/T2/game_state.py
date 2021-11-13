@@ -11,7 +11,7 @@ from random import choice
 class Froggy(QObject):
     # Signals
     updated_lifes_signal = pyqtSignal(str)
-    updated_level_signal = pyqtSignal(str)
+    level_ended = pyqtSignal(str)
     updated_score_signal = pyqtSignal(str)
     updated_coins_signal = pyqtSignal(str)
     updated_time_signal = pyqtSignal(str)
@@ -25,9 +25,11 @@ class Froggy(QObject):
         self._lifes: int = p.VIDAS_INICIO
         self._level = 1
         self._score = 0
+        self.last_score = 0
         self._coins = 0
         self._time_left = 60
         self._car_speed = p.VELOCIDAD_AUTOS
+        self._log_speed = p.VELOCIDAD_TRONCOS
 
     @property
     def level(self) -> int:
@@ -35,8 +37,12 @@ class Froggy(QObject):
 
     @level.setter
     def level(self, value: int):
+        assert value == self._level + 1
         self._level = value
-        self.updated_level_signal.emit(str(value))
+        self._car_speed *= 2 / (1 + p.PONDERADOR_DIFICULTAD)
+        self._log_speed *= 2 / (1 + p.PONDERADOR_DIFICULTAD)
+        self.update_score()
+        self.level_ended.emit(str(value))
 
     @property
     def score(self) -> int:
@@ -44,6 +50,7 @@ class Froggy(QObject):
 
     @score.setter
     def score(self, value: int):
+        self.last_score = self._score
         self._score = value
         self.updated_score_signal.emit(str(value))
 
@@ -75,6 +82,9 @@ class Froggy(QObject):
     def time_left(self, value):
         self._time_left = value
         self.updated_time_signal.emit(str(value))
+
+    def update_score(self):
+        self.score = (self.lifes * 100 + self.time_left * 50) * self._level
 
 
 class Car:

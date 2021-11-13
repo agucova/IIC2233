@@ -92,7 +92,9 @@ class VentanaJuego(QMainWindow):
         self.froggy.player.updated_score_signal.connect(self.valor_puntaje.setText)
         self.valor_puntaje.setText(str(self.froggy.player.score))
 
-        self.froggy.player.updated_level_signal.connect(self.valor_nivel.setText)
+        self.froggy.player.level_ended.connect(self.valor_nivel.setText)
+        self.froggy.player.level_ended.connect(self.abrir_post_nivel)
+
         self.valor_nivel.setText(str(self.froggy.player.level))
 
         self.froggy.player.updated_coins_signal.connect(self.valor_monedas.setText)
@@ -117,6 +119,16 @@ class VentanaJuego(QMainWindow):
         background.setOffset(self.scene_x, self.scene_y)
         self.scene.addItem(background)
 
+    def abrir_post_nivel(self):
+        self.hide()
+        self.post_nivel = VentanaPostNivel(
+            self.froggy.player.level,
+            self.froggy.player.score,
+            self.foggy.player.last_score,
+            self.froggy.player.lifes,
+            self.froggy.player.coins,
+        )
+
 
 class VentanaRanking(QMainWindow):
     def __init__(self):
@@ -126,7 +138,29 @@ class VentanaRanking(QMainWindow):
 
 
 class VentanaPostNivel(QMainWindow):
-    pass
+    def __init__(
+        self,
+        level: int,
+        total_score: int,
+        score_obtained: int,
+        lives_left: int,
+        coins_collected: int,
+    ):
+        super(VentanaPostNivel, self).__init__()
+        uic.loadUi("ventanas/post-nivel.ui", self)
+        self.show()
+        self.nivel_actual.setText(str(level))
+        self.puntaje_total.setText(str(total_score))
+        self.puntaje_obtenido.setText(str(score_obtained))
+        lives_left = 0 if lives_left < 0 else lives_left
+        self.vidas_restantes.setText(str(lives_left))
+        dead = lives_left == 0
+        self.total_monedas.setText(str(coins_collected))
+
+        if dead:
+            self.seguir_jugando.setText("No puedes seguir jugando, porque perdiste :(")
+        else:
+            self.seguir_jugando.setText("Puedes seguir jugando!")
 
 
 if __name__ == "__main__":
