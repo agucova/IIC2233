@@ -1,6 +1,7 @@
 import sys
 
 from PyQt5 import uic
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPainter, QPixmap
 from PyQt5.QtWidgets import (
     QApplication,
@@ -85,29 +86,33 @@ class VentanaJuego(QMainWindow):
             self.scene_height,
         )
         # Signals fromn the back-end
-        self.froggy.player.updated_lifes_signal.connect(self.valor_vidas.setText)
-        self.valor_vidas.setText(str(self.froggy.player.lifes))
+        self.froggy.procesador.updated_lifes_signal.connect(self.valor_vidas.setText)
+        self.valor_vidas.setText(str(self.froggy.procesador.lifes))
 
-        self.froggy.player.updated_score_signal.connect(self.valor_puntaje.setText)
-        self.valor_puntaje.setText(str(self.froggy.player.score))
+        self.froggy.procesador.updated_score_signal.connect(self.valor_puntaje.setText)
+        self.valor_puntaje.setText(str(self.froggy.procesador.score))
 
-        self.froggy.player.level_ended_signal.connect(self.abrir_post_nivel)
+        self.froggy.procesador.level_ended_signal.connect(self.abrir_post_nivel)
 
-        self.valor_nivel.setText(str(self.froggy.player.level))
+        self.valor_nivel.setText(str(self.froggy.procesador.level))
 
-        self.froggy.player.updated_coins_signal.connect(self.valor_monedas.setText)
-        self.valor_monedas.setText(str(self.froggy.player.coins))
+        self.froggy.procesador.updated_coins_signal.connect(self.valor_monedas.setText)
+        self.valor_monedas.setText(str(self.froggy.procesador.coins))
 
-        self.froggy.player.updated_time_signal.connect(self.valor_tiempo.setText)
-        self.valor_tiempo.setText(str(self.froggy.player._time_left))
+        self.froggy.procesador.updated_time_signal.connect(self.valor_tiempo.setText)
+        self.valor_tiempo.setText(str(self.froggy.procesador._time_left))
 
-        self.froggy.player.game_started_signal.connect(self.empezar.hide)
+        self.froggy.procesador.game_started_signal.connect(self.empezar.hide)
 
         # Set up collision detection
         self.road_game_down.player = self.froggy.item
         self.road_game_up.player = self.froggy.item
         self.road_game_down.collision_signal.connect(self.froggy.car_collision)
         self.road_game_up.collision_signal.connect(self.froggy.car_collision)
+
+        # Buttons
+        self.boton_salir.clicked.connect(sys.exit)
+        self.boton_pausar.clicked.connect(self.froggy.procesador.pause)
 
     def paint_scene_background(self, path):
         """Scales and adds the given background to the Graphics Scene."""
@@ -117,16 +122,28 @@ class VentanaJuego(QMainWindow):
         background.setOffset(self.scene_x, self.scene_y)
         self.scene.addItem(background)
 
+    def pause(self):
+        self.froggy.procesador.pause()
+        self.boton_pausar.setText("Resumir")
+
     def abrir_post_nivel(self):
         self.froggy.to_start()
         self.hide()
         self.post_nivel = VentanaPostNivel(
-            self.froggy.player.level,
-            self.froggy.player.score,
-            self.froggy.player.last_score,
-            self.froggy.player.lifes,
-            self.froggy.player.coins,
+            self.froggy.procesador.level,
+            self.froggy.procesador.score,
+            self.froggy.procesador.last_score,
+            self.froggy.procesador.lifes,
+            self.froggy.procesador.coins,
         )
+        self.post_nivel.next_level_signal.connect(self.cerrar_post_nivel)
+        self.post_nivel.next_level_signal.connect(
+            self.froggy.procesador.game_started_signal.emit
+        )
+
+    def cerrar_post_nivel(self):
+        self.post_nivel.close()
+        self.show()
 
 
 class VentanaRanking(QMainWindow):
@@ -137,6 +154,8 @@ class VentanaRanking(QMainWindow):
 
 
 class VentanaPostNivel(QMainWindow):
+    next_level_signal = pyqtSignal()
+
     def __init__(
         self,
         level: int,
@@ -163,6 +182,7 @@ class VentanaPostNivel(QMainWindow):
         self.show()
 
         self.salir.clicked.connect(sys.exit)
+        self.siguiente_nivel.clicked.connect(self.next_level_signal.emit)
 
 
 if __name__ == "__main__":

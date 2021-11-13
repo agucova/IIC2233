@@ -9,7 +9,7 @@ from PyQt5.QtCore import QTimer, QObject, pyqtSignal
 from random import choice
 
 
-class Froggy(QObject):
+class Procesador(QObject):
     # Signals
     updated_lifes_signal = pyqtSignal(str)
     level_ended_signal = pyqtSignal()

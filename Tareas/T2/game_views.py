@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import (
     QMainWindow,
 )
 
-from game_state import Car, Froggy, RoadGame
+from game_state import Car, Procesador, RoadGame
 import parametros as p
 
 
@@ -31,7 +31,7 @@ class FroggyView(QObject):
         scene_height: int,
     ):
         super().__init__()
-        self.player = Froggy(username)
+        self.procesador = Procesador(username)
         self.scene = scene
         self.scene_x = scene_x
         self.scene_y = scene_y
@@ -58,14 +58,16 @@ class FroggyView(QObject):
         self.item.setFlags(self.item.GraphicsItemFlag.ItemIsFocusable)
         self.scene.setFocusItem(self.item)
         self.item.keyPressEvent = self.key_press_handler
-        self.item.mousePressEvent = lambda event: self.player.game_started_signal.emit()
+        self.item.mousePressEvent = (
+            lambda event: self.procesador.game_started_signal.emit()
+        )
 
     def to_start(self):
         self.item.setOffset(self.scene_x + 500, self.scene_y + 500)
         self.item.setPos(0, 0)
 
     def key_press_handler(self, event: QKeyEvent):
-        self.pressed_once or self.player.game_started_signal.emit()
+        self.pressed_once or self.procesador.game_started_signal.emit()
         if event.key() in (Qt.Key_Up, Qt.Key_W):
             self.move("up")
         elif event.key() in (Qt.Key_Down, Qt.Key_S):
@@ -100,7 +102,7 @@ class FroggyView(QObject):
         lct = self.last_collision_time
         time_now = datetime.now()
         if lct is None or (time_now - lct > timedelta(seconds=1)):
-            self.player.lifes -= 1
+            self.procesador.lifes -= 1
             self.last_collision_time = time_now
             self.to_start()
 
