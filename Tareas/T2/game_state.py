@@ -27,6 +27,7 @@ class Froggy(QObject):
         self._score = 0
         self._coins = 0
         self._time_left = 60
+        self._car_speed = p.VELOCIDAD_AUTOS
 
     @property
     def level(self) -> int:
@@ -99,6 +100,8 @@ class RoadGame(QObject):
         self.car_spawner = QTimer()
         self.car_spawner.timeout.connect(self.spawn_car)
         self.car_spawner.start(self.car_spawn_period)
+
+        self.speed = p.VELOCIDAD_AUTOS
 
         self.level = level
         # The directions of each lane are chosen randomly on each game

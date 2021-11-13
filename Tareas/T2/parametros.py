@@ -5,3 +5,8 @@ PERIODO_AUTOS: int = 3
 COLORES_AUTOS = ("amarillo", "azul", "blanco", "morado", "negro", "plata", "rojo")
 COLORES_PERSONAJE = ("Naranjo", "Rojo", "Verde")
 VELOCIDAD_CAMINAR: int = 10
+# Dificultad
+DURACION_RONDA_INICIAL = 30
+VELOCIDAD_AUTOS = 7
+VELOCIDAD_TRONCOS = 5
+PONDERADOR_DIFICULTAD = 0.7
