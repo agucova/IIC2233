@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 VIDAS_INICIO: int = 5
-PERIODO_AUTOS: int = 3
+PERIODO_AUTOS: float = 1.5
 VELOCIDAD_CAMINAR: int = 10
 
 # Dificultad

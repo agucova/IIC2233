@@ -174,14 +174,16 @@ class Processor(QObject):
         """Do a state transition to the next level."""
         self.level += 1
         self.level_score = 0
+        self.elapsed_time = 0
 
     def calculate_score(self) -> int:
         """
         Calculate the score for a finished level.
         """
-        self.level_score = (
-            self.lives_left * 100 + self.remaining_time * 50
-        ) * self.level
+        # Note we adjust the formula with level + 1 due to our zero-indexing.
+        self.level_score = (self.lives_left * 100 + self.remaining_time * 50) * (
+            self.level + 1
+        )
         return self.level_score
 
     def tick(self) -> None:
@@ -244,7 +246,7 @@ class RoadGame(QObject):
         assert level in ("up", "down")
 
         super().__init__()
-        self.car_spawn_period = 1000 * p.PERIODO_AUTOS
+        self.car_spawn_period = round(1000 * p.PERIODO_AUTOS)
         self.car_spawner = QTimer()
         self.car_spawner.timeout.connect(self.spawn_car)
         self.car_spawner.start(self.car_spawn_period)

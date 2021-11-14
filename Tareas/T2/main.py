@@ -11,8 +11,8 @@ from PyQt5.QtWidgets import (
     QMainWindow,
 )
 
-from game_views import FroggyView, RoadGameView
-from game_state_neo import GameState, Processor
+from views import FroggyView, RoadGameView
+from state import GameState, Processor
 
 
 class VentanaInicio(QMainWindow):

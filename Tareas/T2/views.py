@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import (
 )
 
 # from game_state import Car, Procesador, RoadGame
-from game_state_neo import Processor, Car, RoadGame
+from state import Processor, Car, RoadGame
 import parametros as p
 
 
