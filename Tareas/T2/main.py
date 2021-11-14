@@ -9,10 +9,14 @@ from PyQt5.QtWidgets import (
     QGraphicsScene,
     QGraphicsView,
     QMainWindow,
+    QMessageBox,
 )
 
-from views import FroggyView, RoadGameView
+import parametros as p
+from db import load_scores
 from state import GameState, Processor
+from froggy_and_objects import FroggyView, SpecialObjectsView
+from games import RoadGameView, RiverGameView
 
 
 class VentanaInicio(QMainWindow):
@@ -20,12 +24,51 @@ class VentanaInicio(QMainWindow):
         super(VentanaInicio, self).__init__()
         uic.loadUi("ventanas/inicio.ui", self)
         self.show()
-        self.iniciar_partida.clicked.connect(self.abrir_juego)
+        self.start_game.clicked.connect(self.open_game)
+        self.see_ranking.clicked.connect(self.open_ranking)
 
-    def abrir_juego(self):
+    def open_game(self):
+        usuario: str = self.usuario.text()
+        if (
+            usuario
+            and usuario.isalnum()
+            and p.MIN_CARACTERES <= len(usuario) <= p.MAX_CARACTERES
+        ):
+            self.hide()
+            self.juego = VentanaJuego(usuario)
+        else:
+            error = (
+                f"El usuario debe ser alfanumérico"
+                f" y tener entre {p.MIN_CARACTERES} y {p.MAX_CARACTERES} caracteres."
+            )
+            QMessageBox.warning(self, "Error", error)
+
+    def open_ranking(self):
         self.hide()
-        usuario = self.usuario.text()
-        self.juego = VentanaJuego(usuario)
+        self.ranking = VentanaRanking()
+        self.ranking.return_home.clicked.connect(self.close_ranking)
+        self.ranking.show()
+
+    def close_ranking(self):
+        self.ranking.close()
+        self.show()
+
+
+class VentanaRanking(QMainWindow):
+    def __init__(self):
+        super(VentanaRanking, self).__init__()
+        self.lista_ranking = []
+        uic.loadUi("ventanas/ranking.ui", self)
+        self.show()
+
+        # Load scores, rank them and set the text in the inner, markdown label.
+        scores = sorted(load_scores(p.PUNTAJES_PATH), key=lambda x: x[1], reverse=True)[
+            :5
+        ]
+        ranking = [
+            f"{i}. {username}, {score}" for i, (username, score) in enumerate(scores)
+        ]
+        self.texto_ranking.setText("\n".join(ranking))
 
 
 class VentanaJuego(QMainWindow):
@@ -41,7 +84,7 @@ class VentanaJuego(QMainWindow):
         # Initialize the game views
         self.init_games()
         # Initialize the froggy view
-        self.init_froggy()
+        self.init_froggy_and_objects()
         # Connect signals
         self.init_signals()
 
@@ -57,11 +100,11 @@ class VentanaJuego(QMainWindow):
             self.scene_x, self.scene_y, self.scene_width, self.scene_height
         )
 
-        view = QGraphicsView(self.scene, self)
-        view.setRenderHint(QPainter.Antialiasing)
-        view.grabKeyboard()
+        self.view = QGraphicsView(self.scene, self)
+        self.view.setRenderHint(QPainter.Antialiasing)
+        self.view.grabKeyboard()
 
-        self.scene_container.addWidget(view)
+        self.scene_container.addWidget(self.view)
 
         self.show()
         self.activateWindow()
@@ -87,9 +130,29 @@ class VentanaJuego(QMainWindow):
             "up",
         )
 
-    def init_froggy(self):
+        self.river_game = RiverGameView(
+            self.processor,
+            self.scene,
+            self.scene_x,
+            self.scene_y,
+            self.scene_width,
+            self.scene_height,
+        )
+
+    def init_froggy_and_objects(self):
         self.froggy = FroggyView(
             self.processor,
+            self.scene,
+            self.view,
+            self.scene_x,
+            self.scene_y,
+            self.scene_width,
+            self.scene_height,
+        )
+
+        self.objects = SpecialObjectsView(
+            self.processor,
+            self.froggy.item,
             self.scene,
             self.scene_x,
             self.scene_y,
@@ -115,19 +178,22 @@ class VentanaJuego(QMainWindow):
         # Collision detection signals
         self.road_game_down.player = self.froggy.item
         self.road_game_up.player = self.froggy.item
-        self.road_game_down.collision_signal.connect(self.froggy.car_collision)
-        self.road_game_up.collision_signal.connect(self.froggy.car_collision)
+        self.river_game.player = self.froggy.item
+        self.road_game_down.collision_signal.connect(self.froggy.collision)
+        self.road_game_up.collision_signal.connect(self.froggy.collision)
+        self.objects.collision_signal.connect(self.processor.use_special_object)
+        self.river_game.fall_signal.connect(self.froggy.collision)
 
         # Level finished signals
         self.froggy.level_finished_signal.connect(self.processor.pause)
+        self.froggy.level_finished_signal.connect(self.objects.clear_objects)
         self.froggy.level_finished_signal.connect(self.open_post_level)
 
-        # Post-level signals are found on open_post_level
-
         # Buttons
-        self.boton_salir.clicked.connect(sys.exit)
-        self.boton_pausar.clicked.connect(self.processor.pause_or_unpause)
+        self.boton_salir.clicked.connect(self.save_and_close)
         self.boton_pausar.clicked.connect(self.pause_or_unpause)
+
+        # Note: Post-level signals are found on open_post_level.
 
     def update_parameters(self, state: GameState):
         self.valor_vidas.setText(str(state.lives_left))
@@ -156,7 +222,7 @@ class VentanaJuego(QMainWindow):
         self.processor.calculate_score()
         self.froggy.send_to_start()
         self.hide()
-        self.post_nivel = VentanaPostNivel(self.froggy.processor.state)
+        self.post_nivel = VentanaPostNivel(self.processor.state)
         # Post-level signals
         # Must be wired up here due to on demand instantiation
         self.post_nivel.next_level_signal.connect(self.close_post_level)
@@ -164,17 +230,15 @@ class VentanaJuego(QMainWindow):
             self.froggy.processor.level_start_signal.emit
         )
         self.post_nivel.next_level_signal.connect(self.processor.next_level)
+        self.post_nivel.exit.clicked.connect(self.save_and_close)
 
     def close_post_level(self):
         self.post_nivel.close()
         self.show()
 
-
-class VentanaRanking(QMainWindow):
-    def __init__(self):
-        super(VentanaRanking, self).__init__()
-        uic.loadUi("ventanas/ranking.ui", self)
-        self.show()
+    def save_and_close(self):
+        self.processor.save_total_score()
+        sys.exit()
 
 
 class VentanaPostNivel(QMainWindow):
@@ -200,7 +264,6 @@ class VentanaPostNivel(QMainWindow):
 
         self.show()
 
-        self.exit.clicked.connect(sys.exit)
         # TODO: Check connection
         self.next_level.clicked.connect(self.next_level_signal.emit)
 

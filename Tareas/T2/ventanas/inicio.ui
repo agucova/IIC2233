@@ -64,7 +64,7 @@
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QPushButton" name="iniciar_partida">
+      <widget class="QPushButton" name="start_game">
        <property name="text">
         <string>Iniciar partida</string>
        </property>
@@ -84,7 +84,7 @@
       </spacer>
      </item>
      <item row="4" column="0">
-      <widget class="QPushButton" name="ver_ranking">
+      <widget class="QPushButton" name="see_ranking">
        <property name="text">
         <string>Ver Ranking</string>
        </property>

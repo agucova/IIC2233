@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from random import choice
-from typing import NamedTuple, Optional
+from typing import NamedTuple, Optional, Union
 
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
 
 import parametros as p
+from db import add_score
 
 
 class GameState(NamedTuple):
@@ -127,9 +128,19 @@ class Processor(QObject):
     def coins(self) -> int:
         return self._coins
 
+    @coins.setter
+    def coins(self, value: int) -> None:
+        assert value >= 0, "Coins cannot be negative."
+        self._coins = value
+
     @property
     def round_duration(self) -> int:
         return round(self.difficulties[self.level]["round_duration"])
+
+    @round_duration.setter
+    def round_duration(self, value: int) -> None:
+        assert value > 0, "Round duration must be greater than 0."
+        self.difficulties[self.level]["round_duration"] = value
 
     @property
     def car_speed(self) -> int:
@@ -141,6 +152,7 @@ class Processor(QObject):
 
     @log_speed.setter
     def log_speed(self, value: int) -> None:
+        assert value > 0, "Log speed must be greater than 0."
         # Implemented for the skulls.
         self.difficulties[self.level]["log_speed"] = value
 
@@ -196,9 +208,25 @@ class Processor(QObject):
             self.alive = False
             self.game_over_signal.emit(self.state)
 
+    def use_special_object(self, object_type: str) -> None:
+        """
+        Use a special object, such as a skull.
+        """
+        assert object_type in ("Calavera", "Corazon", "Moneda", "Reloj")
+        if object_type == "Calavera":
+            self.log_speed = round(self.log_speed * 1.05)
+        elif object_type == "Corazon":
+            self.lives_left += 1
+        elif object_type == "Moneda":
+            self.coins += 1
+        elif object_type == "Reloj":
+            self.round_duration += round(
+                10 * (self.remaining_time / self.round_duration)
+            )
+
     def precompute_difficulties(self) -> None:
         """
-        Precompute the difficulty of the game for each level.
+        Precompute the difficulty of the game for the first 200 levels.
         """
         self.difficulties: list[dict[str, float]] = []
         round_duration: float = p.DURACION_RONDA_INICIAL
@@ -213,7 +241,7 @@ class Processor(QObject):
             }
         )
 
-        for _ in range(100):
+        for _ in range(200):
             round_duration = p.PONDERADOR_DIFICULTAD * round_duration
             car_speed = car_speed * (2 / (1 + p.PONDERADOR_DIFICULTAD))
             log_speed = log_speed * (2 / (1 + p.PONDERADOR_DIFICULTAD))
@@ -224,6 +252,10 @@ class Processor(QObject):
                     "log_speed": log_speed,
                 }
             )
+
+    def save_total_score(self):
+        """Save the total score to the scores file."""
+        add_score(p.PUNTAJES_PATH, self.username, self.total_score)
 
 
 class Car:
@@ -250,9 +282,6 @@ class RoadGame(QObject):
         self.car_spawner = QTimer()
         self.car_spawner.timeout.connect(self.spawn_car)
         self.car_spawner.start(self.car_spawn_period)
-
-        self.speed = p.VELOCIDAD_AUTOS
-
         self.level = level
         # The directions of each lane are chosen randomly on each game
         self.lane_directions = [choice(("left", "right")) for _ in range(3)]
@@ -268,7 +297,39 @@ class RoadGame(QObject):
         self.paint_car_signal.emit(car)
 
 
-# if __name__ == "__main__":
-#     # For testing
-#     p = Processor("agucova")
-#     print(p.state)
+class Log:
+    def __init__(self, lane, direction):
+        assert lane in (0, 1, 2)
+        assert direction in ("left", "right")
+
+        self.lane: int = lane
+        self.direction: str = direction
+
+
+class RiverGame(QObject):
+    # Signal to be sent when a log needs to spawn on the view
+    paint_log_signal = pyqtSignal(Log)
+
+    def __init__(self):
+        super().__init__()
+
+        # Intercalated lanes
+        self.lanes: list[list[Log]] = [[], [], []]
+        first_lane = choice(("left", "right"))
+        second_lane = "right" if first_lane == "left" else "left"
+        third_lane = first_lane
+        self.lane_directions = [first_lane, second_lane, third_lane]
+
+        # Log spawner clock
+        self.log_spawner = QTimer()
+        self.log_spawn_period = round(1000 * p.PERIODO_TRONCOS)
+        self.log_spawner.timeout.connect(self.spawn_log)
+        self.log_spawner.start(self.log_spawn_period)
+
+    def spawn_log(self):
+        lane = choice((0, 1, 2))
+        log = Log(lane, self.lane_directions[lane])
+        self.lanes[lane].append(log)
+
+        # Ask the front-end to draw the log in the screen
+        self.paint_log_signal.emit(log)

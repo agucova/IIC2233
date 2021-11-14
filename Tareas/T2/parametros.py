@@ -1,8 +1,22 @@
 from __future__ import annotations
 
+# Paths
+PUNTAJES_PATH = "puntajes.txt"
+
+# Usuarios
+MIN_CARACTERES = 3
+MAX_CARACTERES = 20
+
+# Valores iniciales
 VIDAS_INICIO: int = 5
 PERIODO_AUTOS: float = 1.5
+PERIODO_TRONCOS: float = 2
+TIEMPO_OBJETO: int = 4
 VELOCIDAD_CAMINAR: int = 10
+PIXELES_SALTO: int = 20
+
+# Trampas
+VIDAS_TRAMPA: int = 20
 
 # Dificultad
 DURACION_RONDA_INICIAL = 30
