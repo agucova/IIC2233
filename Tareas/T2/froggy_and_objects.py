@@ -1,3 +1,4 @@
+from re import L
 import sys
 from datetime import datetime, timedelta
 from random import choice, randint
@@ -5,7 +6,7 @@ from typing import Optional
 
 from PyQt5.Qt import Qt
 from PyQt5.QtCore import QObject, QTimer, pyqtSignal
-from PyQt5.QtGui import QKeyEvent, QPixmap
+from PyQt5.QtGui import QKeyEvent, QPixmap, QPen, QBrush
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsScene, QGraphicsView
 
 import parametros as p
@@ -65,6 +66,16 @@ class FroggyView(QObject):
         self.combo_clock = QTimer()
         self.combo_clock.timeout.connect(self.combo_clock_tick)
         self.combo_clock.start(3)
+
+        # River bounding box
+        self.river_box = self.scene.addRect(
+            0,
+            565,
+            30 + self.scene_width,
+            89,
+            QPen(Qt.black),
+            QBrush(Qt.NoBrush),
+        )
 
     def spawn_froggy(self):
         """Do all the graphic heavylifting to spawn froggy!"""
@@ -131,22 +142,34 @@ class FroggyView(QObject):
                 self.last_combo = now
                 self.level_finished_signal.emit()
 
-    def is_inside_view(self):
+    def is_in_view(self):
         return self.item in self.view.items(self.view.viewport().rect())
+
+    def is_in_river(self):
+        return self.river_box.collidesWithItem(self.item)
 
     def move(self, direction: str):
         if not self.processor.is_paused:
             assert direction in ("up", "down", "right", "left", "jump")
             if not direction == "jump":
-                speed = p.VELOCIDAD_CAMINAR
-                x = (
-                    speed
-                    if direction == "right"
-                    else -speed
-                    if direction == "left"
-                    else 0
-                )
-                y = speed if direction == "down" else -speed if direction == "up" else 0
+                if (not self.is_in_river()) or direction in ("left", "right"):
+                    speed = p.VELOCIDAD_CAMINAR
+                    x = (
+                        speed
+                        if direction == "right"
+                        else -speed
+                        if direction == "left"
+                        else 0
+                    )
+                    y = (
+                        speed
+                        if direction == "down"
+                        else -speed
+                        if direction == "up"
+                        else 0
+                    )
+                else:
+                    x, y = 0, 0
                 self.set_direction(direction)
             else:
                 speed = p.PIXELES_SALTO
@@ -167,9 +190,16 @@ class FroggyView(QObject):
             is_finished = self.check_finished_round()
 
             # Prevent player from going outside the screen
-            if not self.is_inside_view() and not is_finished:
+            if not self.is_in_view() and not is_finished:
                 self.processor.lives_left -= 1
                 self.send_to_start()
+
+            # # You can't walk through the logs
+            # if self.is_in_river() and not is_finished:
+            #     print("in river")
+            # if self.is_in_river() and direction in ("right", "left"):
+            #     self.processor.lives_left -= 1
+            #     self.send_to_start()
 
     def set_direction(self, direction: str):
         if not self.processor.is_paused:
