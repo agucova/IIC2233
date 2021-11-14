@@ -166,7 +166,7 @@ class VentanaJuego(QMainWindow):
         self.processor.parameter_change_signal.connect(self.update_parameters)
 
         # Pause-unpause signal
-        self.froggy.pause_or_unpause_signal.connect(self.processor.pause_or_unpause)
+        self.froggy.pause_or_unpause_signal.connect(self.pause_or_unpause)
 
         # Level start signals
         self.processor.level_start_signal.connect(self.processor.play_or_resume)
@@ -211,12 +211,11 @@ class VentanaJuego(QMainWindow):
         self.scene.addItem(background)
 
     def pause_or_unpause(self):
+        self.processor.pause_or_unpause()
         if self.processor.is_paused:
-            self.boton_pausar.setText("Pausar")
-            self.processor.pause_or_unpause()
-        else:
             self.boton_pausar.setText("Resumir")
-            self.processor.pause_or_unpause()
+        else:
+            self.boton_pausar.setText("Pausar")
 
     def open_post_level(self):
         self.processor.calculate_score()
@@ -230,6 +229,8 @@ class VentanaJuego(QMainWindow):
             self.froggy.processor.level_start_signal.emit
         )
         self.post_nivel.next_level_signal.connect(self.processor.next_level)
+        self.post_nivel.next_level_signal.connect(self.empezar.show)
+        self.post_nivel.next_level_signal.connect(self.froggy.next_level)
         self.post_nivel.exit.clicked.connect(self.save_and_close)
 
     def close_post_level(self):

@@ -17,6 +17,10 @@
    <string notr="true">background-color: rgb(137, 255, 176)</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">font-family: Roboto, sans-serif;
+font-size: 12pt;</string>
+   </property>
    <widget class="QLabel" name="title">
     <property name="geometry">
      <rect>
@@ -27,10 +31,14 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">font: 26pt &quot;Sans Serif&quot;;</string>
+     <string notr="true">font-family: Roboto Black, sans-serif;
+font-size: 26pt;</string>
     </property>
     <property name="text">
      <string>Resumen del Nivel</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QWidget" name="formLayoutWidget">

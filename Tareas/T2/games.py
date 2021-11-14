@@ -1,4 +1,3 @@
-import sys
 from random import choice
 from typing import Optional
 
@@ -132,7 +131,7 @@ class RiverGameView(QObject):
             565,
             30 + self.scene_width,
             89,
-            QPen(Qt.black),
+            QPen(Qt.NoPen),
             QBrush(Qt.NoBrush),
         )
 

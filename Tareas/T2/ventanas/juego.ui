@@ -48,7 +48,8 @@ QLabel {
      <item>
       <widget class="QWidget" name="display1" native="true">
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(137, 255, 176)</string>
+        <string notr="true">background-color: rgb(137, 255, 176);
+font-family: Roboto Black, sans-serif;</string>
        </property>
        <widget class="QWidget" name="formLayoutWidget">
         <property name="geometry">
@@ -155,7 +156,8 @@ QLabel {
      <item>
       <widget class="QWidget" name="display2" native="true">
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(137, 255, 176)</string>
+        <string notr="true">background-color: rgb(137, 255, 176);
+font-family: Roboto Black, sans-serif;</string>
        </property>
        <widget class="QWidget" name="gridLayoutWidget">
         <property name="geometry">
@@ -183,6 +185,9 @@ QLabel {
          </item>
          <item row="0" column="1">
           <widget class="QLabel" name="valor_nivel">
+           <property name="styleSheet">
+            <string notr="true">font-family: Roboto Black, sans-serif;</string>
+           </property>
            <property name="text">
             <string>TextLabel</string>
            </property>
@@ -266,7 +271,8 @@ QLabel {
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(255, 255, 255)</string>
+     <string notr="true">color: rgb(255, 255, 255);
+font-family: Roboto Black, sans-serif;</string>
     </property>
     <property name="text">
      <string>Clickea a Froggy para empezar</string>

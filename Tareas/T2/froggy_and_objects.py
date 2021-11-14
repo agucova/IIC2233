@@ -1,5 +1,3 @@
-from re import L
-import sys
 from datetime import datetime, timedelta
 from random import choice, randint
 from typing import Optional
@@ -73,7 +71,7 @@ class FroggyView(QObject):
             565,
             30 + self.scene_width,
             89,
-            QPen(Qt.black),
+            QPen(Qt.NoPen),
             QBrush(Qt.NoBrush),
         )
 
@@ -94,16 +92,26 @@ class FroggyView(QObject):
         self.item.keyPressEvent = self.key_press_handler
         self.item.keyReleaseEvent = self.key_release_handler
 
-        self.item.mousePressEvent = (
-            lambda event: self.processor.level_start_signal.emit()
-        )
+        self.item.mousePressEvent = self.froggy_clicked
 
     def send_to_start(self):
         """Sends froggy to its starting place."""
         self.item.setOffset(self.scene_x + 500, self.scene_y + 500)
         self.item.setPos(0, 0)
 
+    def froggy_clicked(self, event):
+        """Called when Froggy is clicked."""
+        if not self.pressed_once:
+            self.processor.level_start_signal.emit()
+        self.pressed_once = True
+
+    def next_level(self):
+        """Called when the level is finished."""
+        self.pressed_once = False
+        self.send_to_start()
+
     def key_press_handler(self, event: QKeyEvent):
+        """Capture keys and handle their behaviour"""
         self.pressed_once or self.processor.level_start_signal.emit()
         if not self.processor.is_paused:
             self.pressed_keys.add(event.key())
@@ -193,13 +201,6 @@ class FroggyView(QObject):
             if not self.is_in_view() and not is_finished:
                 self.processor.lives_left -= 1
                 self.send_to_start()
-
-            # # You can't walk through the logs
-            # if self.is_in_river() and not is_finished:
-            #     print("in river")
-            # if self.is_in_river() and direction in ("right", "left"):
-            #     self.processor.lives_left -= 1
-            #     self.send_to_start()
 
     def set_direction(self, direction: str):
         if not self.processor.is_paused:
