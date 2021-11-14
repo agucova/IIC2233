@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
 )
 
 from game_views import FroggyView, RoadGameView
+from game_state_neo import GameState, Processor
 
 
 class VentanaInicio(QMainWindow):
@@ -30,16 +31,22 @@ class VentanaInicio(QMainWindow):
 class VentanaJuego(QMainWindow):
     def __init__(self, username):
         super(VentanaJuego, self).__init__()
-        self.username = username
 
+        # Initialize basic UI elements
         self.init_ui()
+        # Initialize main processor from the back-end
+        self.processor = Processor(username)
+        # Initialize the game views
         self.init_games()
+        # Initialize the froggy view
         self.init_froggy()
+        # Connect signals
+        self.init_signals()
 
     def init_ui(self):
         uic.loadUi("ventanas/juego.ui", self)
 
-        self.scene_x = 20
+        self.wwx = 20
         self.scene_y = 330
         self.scene_width = 1040
         self.scene_height = 560
@@ -78,31 +85,23 @@ class VentanaJuego(QMainWindow):
 
     def init_froggy(self):
         self.froggy = FroggyView(
-            self.username,
+            self.processor,
             self.scene,
             self.scene_x,
             self.scene_y,
             self.scene_width,
             self.scene_height,
         )
-        # Signals fromn the back-end
-        self.froggy.procesador.updated_lifes_signal.connect(self.valor_vidas.setText)
-        self.valor_vidas.setText(str(self.froggy.procesador.lifes))
 
-        self.froggy.procesador.updated_score_signal.connect(self.valor_puntaje.setText)
-        self.valor_puntaje.setText(str(self.froggy.procesador.score))
-
-        self.froggy.procesador.level_ended_signal.connect(self.abrir_post_nivel)
-
-        self.valor_nivel.setText(str(self.froggy.procesador.level))
-
-        self.froggy.procesador.updated_coins_signal.connect(self.valor_monedas.setText)
-        self.valor_monedas.setText(str(self.froggy.procesador.coins))
-
-        self.froggy.procesador.updated_time_signal.connect(self.valor_tiempo.setText)
-        self.valor_tiempo.setText(str(self.froggy.procesador._time_left))
-
-        self.froggy.procesador.game_started_signal.connect(self.empezar.hide)
+    def init_signals(self):
+        # Wire up signals from the back-end to the front-end and vice-versa
+        self.processor.parameter_change_signal.connect(self.update_parameters)
+        self.froggy.pause_or_unpause_signal.connect(self.processor.pause_or_unpause)
+        self.processor.level_start_signal.connect(self.processor.play_or_resume)
+        self.processor.level_start_signal.connect(self.empezar.hide)
+        self.processor.game_over_signal.connect(self.abrir_post_nivel)
+        self.froggy.level_finished_signal.connect(self.pause)
+        self.froggy.level_finished_signal.connect(self.abrir_post_nivel)
 
         # Set up collision detection
         self.road_game_down.player = self.froggy.item
@@ -112,7 +111,14 @@ class VentanaJuego(QMainWindow):
 
         # Buttons
         self.boton_salir.clicked.connect(sys.exit)
-        self.boton_pausar.clicked.connect(self.froggy.procesador.pause)
+        self.boton_pausar.clicked.connect(self.processor.pause_or_unpause)
+
+    def update_parameters(self, state: GameState):
+        self.valor_vidas.setText(str(state.lives_left))
+        self.valor_puntaje.setText(str(state.total_score))
+        self.valor_nivel.setText(str(state.level))
+        self.valor_monedas.setText(str(state.coins))
+        self.valor_tiempo.setText(str(state.remaining_time))
 
     def paint_scene_background(self, path):
         """Scales and adds the given background to the Graphics Scene."""
@@ -123,22 +129,16 @@ class VentanaJuego(QMainWindow):
         self.scene.addItem(background)
 
     def pause(self):
-        self.froggy.procesador.pause()
+        self.froggy.processor.pause_or_unpause()
         self.boton_pausar.setText("Resumir")
 
     def abrir_post_nivel(self):
-        self.froggy.to_start()
+        self.froggy.send_to_start()
         self.hide()
-        self.post_nivel = VentanaPostNivel(
-            self.froggy.procesador.level,
-            self.froggy.procesador.score,
-            self.froggy.procesador.last_score,
-            self.froggy.procesador.lifes,
-            self.froggy.procesador.coins,
-        )
+        self.post_nivel = VentanaPostNivel(self.froggy.processor.state)
         self.post_nivel.next_level_signal.connect(self.cerrar_post_nivel)
         self.post_nivel.next_level_signal.connect(
-            self.froggy.procesador.game_started_signal.emit
+            self.froggy.processor.level_start_signal.emit
         )
 
     def cerrar_post_nivel(self):
@@ -156,33 +156,30 @@ class VentanaRanking(QMainWindow):
 class VentanaPostNivel(QMainWindow):
     next_level_signal = pyqtSignal()
 
-    def __init__(
-        self,
-        level: int,
-        total_score: int,
-        last_score: int,
-        lives_left: int,
-        coins_collected: int,
-    ):
+    def __init__(self, state: GameState):
         super(VentanaPostNivel, self).__init__()
         uic.loadUi("ventanas/post-nivel.ui", self)
-        self.nivel_actual.setText(str(level))
-        self.puntaje_total.setText(str(total_score))
-        self.puntaje_obtenido.setText(str(total_score - last_score))
-        lives_left = 0 if lives_left < 0 else lives_left
-        self.vidas_restantes.setText(str(lives_left))
-        dead = lives_left == 0
-        self.total_monedas.setText(str(coins_collected))
 
-        if dead:
-            self.seguir_jugando.setText("No puedes seguir jugando, porque perdiste :(")
-            self.siguiente_nivel.setEnabled(False)
+        # Load the game state to the labels
+        print(state)
+        self.level.setText(str(state.level))
+        self.total_score.setText(str(state.total_score))
+        self.level_score.setText(str(state.level_score))
+        self.lives_left.setText(str(state.lives_left))
+        self.coins.setText(str(state.coins))
+
+        if not state.alive:
+            self.keep_playing.setText("No puedes seguir jugando, porque perdiste :(")
+            self.next_level.setEnabled(False)
         else:
-            self.seguir_jugando.setText("Puedes seguir jugando!")
+            self.keep_playing.setText("Pasaste este nivel. Sigue jugando!")
+            self.next_level.setEnabled(True)
+
         self.show()
 
-        self.salir.clicked.connect(sys.exit)
-        self.siguiente_nivel.clicked.connect(self.next_level_signal.emit)
+        self.exit.clicked.connect(sys.exit)
+        # TODO: Check connection
+        self.next_level.clicked.connect(self.next_level_signal.emit)
 
 
 if __name__ == "__main__":

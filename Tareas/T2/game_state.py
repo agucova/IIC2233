@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from operator import le
 from typing import Optional
 
 import parametros as p

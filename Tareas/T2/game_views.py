@@ -16,14 +16,22 @@ from PyQt5.QtWidgets import (
     QMainWindow,
 )
 
-from game_state import Car, Procesador, RoadGame
+# from game_state import Car, Procesador, RoadGame
+from game_state_neo import Processor, Car, RoadGame
 import parametros as p
 
 
 class FroggyView(QObject):
+    """Handles displaying Froggy inside the scene, as well as
+    communicating collisions and other events to the back-end."""
+
+    pause_or_unpause_signal = pyqtSignal()
+    # Sent when the user won the level
+    level_finished_signal = pyqtSignal()
+
     def __init__(
         self,
-        username: str,
+        processor: Processor,
         scene: QGraphicsScene,
         scene_x: int,
         scene_y: int,
@@ -31,21 +39,30 @@ class FroggyView(QObject):
         scene_height: int,
     ):
         super().__init__()
-        self.procesador = Procesador(username)
+        # Connect main processor
+        self.processor = processor
+
+        # Save scene parameters
         self.scene = scene
         self.scene_x = scene_x
         self.scene_y = scene_y
         self.scene_width = scene_width
         self.scene_height = scene_height
+
+        # Choose a froggy color
         self.color = choice(p.COLORES_PERSONAJE)
 
+        # Check if Froggy was properly clicked
         self.pressed_once = False
 
+        # Spawn froggy
         self.spawn_froggy()
 
+        # Save the last collision time to avoid multiple collisions
         self.last_collision_time: Optional[datetime] = None
 
     def spawn_froggy(self):
+        """Do all the graphic heavylifting to spawn froggy!"""
         # Load initial still image
         self.image = QPixmap(f"sprites/Personajes/{self.color}/still.png")
         self.image = self.image.scaledToHeight(50)
@@ -59,25 +76,28 @@ class FroggyView(QObject):
         self.scene.setFocusItem(self.item)
         self.item.keyPressEvent = self.key_press_handler
         self.item.mousePressEvent = (
-            lambda event: self.procesador.game_started_signal.emit()
+            lambda event: self.processor.level_start_signal.emit()
         )
 
-    def to_start(self):
+    def send_to_start(self):
         self.item.setOffset(self.scene_x + 500, self.scene_y + 500)
         self.item.setPos(0, 0)
 
     def key_press_handler(self, event: QKeyEvent):
-        self.pressed_once or self.procesador.game_started_signal.emit()
-        if event.key() in (Qt.Key_Up, Qt.Key_W):
-            self.move("up")
-        elif event.key() in (Qt.Key_Down, Qt.Key_S):
-            self.move("down")
-        elif event.key() in (Qt.Key_Left, Qt.Key_A):
-            self.move("left")
-        elif event.key() in (Qt.Key_Right, Qt.Key_D):
-            self.move("right")
-        elif event.key() == Qt.Key_Space:
-            self.update_image("jump")
+        self.pressed_once or self.processor.level_start_signal.emit()
+        if not self.processor.is_paused:
+            if event.key() in (Qt.Key_Up, Qt.Key_W):
+                self.move("up")
+            elif event.key() in (Qt.Key_Down, Qt.Key_S):
+                self.move("down")
+            elif event.key() in (Qt.Key_Left, Qt.Key_A):
+                self.move("left")
+            elif event.key() in (Qt.Key_Right, Qt.Key_D):
+                self.move("right")
+            elif event.key() == Qt.Key_Space:
+                self.update_image("jump")
+        if event.key() == Qt.Key_P:
+            self.pause_or_unpause_signal.emit()
 
     def move(self, direction: str):
         assert direction in ("up", "down", "right", "left")
@@ -86,6 +106,12 @@ class FroggyView(QObject):
         y = speed if direction == "down" else -speed if direction == "up" else 0
         self.update_image(direction)
         self.item.moveBy(x, y)
+        self.check_finished_round()
+
+    def check_finished_round(self):
+        print(f"item's y: {self.item.y()}")
+        if self.item.y() <= -self.scene_height + 40 and self.processor.alive:
+            self.level_finished_signal.emit()
 
     def update_image(self, state: str):
         assert state in ("up", "down", "right", "left", "jump", "still")
@@ -99,15 +125,18 @@ class FroggyView(QObject):
         self.item.setPixmap(self.image)
 
     def car_collision(self):
-        lct = self.last_collision_time
-        time_now = datetime.now()
-        if lct is None or (time_now - lct > timedelta(seconds=1)):
-            self.procesador.lifes -= 1
-            self.last_collision_time = time_now
-            self.to_start()
+        if not self.processor.is_paused:
+            lct = self.last_collision_time
+            time_now = datetime.now()
+            if lct is None or (time_now - lct > timedelta(seconds=1)):
+                self.processor.lives_left -= 1
+                self.last_collision_time = time_now
+                self.send_to_start()
 
 
 class RoadGameView(QObject):
+    # Signal for communicating collisions to the Froggy View, which then communicates it
+    # to the back-end processor.
     collision_signal = pyqtSignal()
 
     def __init__(
