@@ -43,7 +43,7 @@ El módulo principal de la tarea a ejecutar es  ```main.py```. No se requiren ot
 ### Librerías externas utilizadas
 La lista de librerías externas que utilicé fue la siguiente:
 
-1. \_\_future\_\_`: se utiliza para proveer type hints de colecciones en formato retrocompatible a 3.8. (`list[str]` en vez de `List[str]` importado de `typing`).
+1. `__future__`: se utiliza para proveer type hints de colecciones en formato retrocompatible a 3.8. (`list[str]` en vez de `List[str]` importado de `typing`).
 2. `typing`: se utiliza para crear objetos de tipo `NamedTuple` que mejoran la versión incluída en `collection`, permitiendo declarar sus tipos para facilitar análisis estático. También agrega hints como `Union` y `Optional`, para facilitar el tipado.
 
 ### Librerías propias
