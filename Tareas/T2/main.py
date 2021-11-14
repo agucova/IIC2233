@@ -46,7 +46,7 @@ class VentanaJuego(QMainWindow):
     def init_ui(self):
         uic.loadUi("ventanas/juego.ui", self)
 
-        self.wwx = 20
+        self.scene_x = 20
         self.scene_y = 330
         self.scene_width = 1040
         self.scene_height = 560
