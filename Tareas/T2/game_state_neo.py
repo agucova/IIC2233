@@ -175,6 +175,15 @@ class Processor(QObject):
         self.level += 1
         self.level_score = 0
 
+    def calculate_score(self) -> int:
+        """
+        Calculate the score for a finished level.
+        """
+        self.level_score = (
+            self.lives_left * 100 + self.remaining_time * 50
+        ) * self.level
+        return self.level_score
+
     def tick(self) -> None:
         """
         The game clock.

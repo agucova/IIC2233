@@ -35,7 +35,9 @@ class VentanaJuego(QMainWindow):
         # Initialize basic UI elements
         self.init_ui()
         # Initialize main processor from the back-end
+        # and load initial values
         self.processor = Processor(username)
+        self.update_parameters(self.processor.state)
         # Initialize the game views
         self.init_games()
         # Initialize the froggy view
@@ -68,6 +70,7 @@ class VentanaJuego(QMainWindow):
         self.paint_scene_background("sprites/Mapa/areas/scene_frame.png")
         self.road_game_down = RoadGameView(
             self.scene,
+            self.processor,
             self.scene_x,
             self.scene_y,
             self.scene_width,
@@ -76,6 +79,7 @@ class VentanaJuego(QMainWindow):
         )
         self.road_game_up = RoadGameView(
             self.scene,
+            self.processor,
             self.scene_x,
             self.scene_y,
             self.scene_width,
@@ -95,23 +99,35 @@ class VentanaJuego(QMainWindow):
 
     def init_signals(self):
         # Wire up signals from the back-end to the front-end and vice-versa
+        # Parameter update signal
         self.processor.parameter_change_signal.connect(self.update_parameters)
+
+        # Pause-unpause signal
         self.froggy.pause_or_unpause_signal.connect(self.processor.pause_or_unpause)
+
+        # Level start signals
         self.processor.level_start_signal.connect(self.processor.play_or_resume)
         self.processor.level_start_signal.connect(self.empezar.hide)
-        self.processor.game_over_signal.connect(self.abrir_post_nivel)
-        self.froggy.level_finished_signal.connect(self.pause)
-        self.froggy.level_finished_signal.connect(self.abrir_post_nivel)
 
-        # Set up collision detection
+        # Game over signal
+        self.processor.game_over_signal.connect(self.open_post_level)
+
+        # Collision detection signals
         self.road_game_down.player = self.froggy.item
         self.road_game_up.player = self.froggy.item
         self.road_game_down.collision_signal.connect(self.froggy.car_collision)
         self.road_game_up.collision_signal.connect(self.froggy.car_collision)
 
+        # Level finished signals
+        self.froggy.level_finished_signal.connect(self.processor.pause)
+        self.froggy.level_finished_signal.connect(self.open_post_level)
+
+        # Post-level signals are found on open_post_level
+
         # Buttons
         self.boton_salir.clicked.connect(sys.exit)
         self.boton_pausar.clicked.connect(self.processor.pause_or_unpause)
+        self.boton_pausar.clicked.connect(self.pause_or_unpause)
 
     def update_parameters(self, state: GameState):
         self.valor_vidas.setText(str(state.lives_left))
@@ -128,20 +144,28 @@ class VentanaJuego(QMainWindow):
         background.setOffset(self.scene_x, self.scene_y)
         self.scene.addItem(background)
 
-    def pause(self):
-        self.froggy.processor.pause_or_unpause()
-        self.boton_pausar.setText("Resumir")
+    def pause_or_unpause(self):
+        if self.processor.is_paused:
+            self.boton_pausar.setText("Pausar")
+            self.processor.pause_or_unpause()
+        else:
+            self.boton_pausar.setText("Resumir")
+            self.processor.pause_or_unpause()
 
-    def abrir_post_nivel(self):
+    def open_post_level(self):
+        self.processor.calculate_score()
         self.froggy.send_to_start()
         self.hide()
         self.post_nivel = VentanaPostNivel(self.froggy.processor.state)
-        self.post_nivel.next_level_signal.connect(self.cerrar_post_nivel)
+        # Post-level signals
+        # Must be wired up here due to on demand instantiation
+        self.post_nivel.next_level_signal.connect(self.close_post_level)
         self.post_nivel.next_level_signal.connect(
             self.froggy.processor.level_start_signal.emit
         )
+        self.post_nivel.next_level_signal.connect(self.processor.next_level)
 
-    def cerrar_post_nivel(self):
+    def close_post_level(self):
         self.post_nivel.close()
         self.show()
 
@@ -161,7 +185,6 @@ class VentanaPostNivel(QMainWindow):
         uic.loadUi("ventanas/post-nivel.ui", self)
 
         # Load the game state to the labels
-        print(state)
         self.level.setText(str(state.level))
         self.total_score.setText(str(state.total_score))
         self.level_score.setText(str(state.level_score))

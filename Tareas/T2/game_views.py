@@ -109,7 +109,6 @@ class FroggyView(QObject):
         self.check_finished_round()
 
     def check_finished_round(self):
-        print(f"item's y: {self.item.y()}")
         if self.item.y() <= -self.scene_height + 40 and self.processor.alive:
             self.level_finished_signal.emit()
 
@@ -142,6 +141,7 @@ class RoadGameView(QObject):
     def __init__(
         self,
         scene: QGraphicsScene,
+        processor: Processor,
         scene_x: int,
         scene_y: int,
         scene_width: int,
@@ -151,6 +151,7 @@ class RoadGameView(QObject):
         super().__init__()
 
         self.scene = scene
+        self.processor = processor
         self.scene_x: int = scene_x
         self.scene_y: int = scene_y
         self.scene_width: int = scene_width
@@ -201,10 +202,11 @@ class RoadGameView(QObject):
         self.cars.append((car, car_item))
 
     def move_cars(self):
-        for car, item in self.cars:
-            item.moveBy(
-                -self.game.speed if car.direction == "left" else self.game.speed, 0
-            )
-            # Emit collisions using the collision detection system of the scene
-            if self.player is not None and item.collidesWithItem(self.player):
-                self.collision_signal.emit()
+        if not self.processor.is_paused:
+            for car, item in self.cars:
+                item.moveBy(
+                    -self.game.speed if car.direction == "left" else self.game.speed, 0
+                )
+                # Emit collisions using the collision detection system of the scene
+                if self.player is not None and item.collidesWithItem(self.player):
+                    self.collision_signal.emit()
