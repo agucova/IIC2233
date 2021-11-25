@@ -26,34 +26,50 @@ class NodoGrafo:
         if ex_amistad in ex_amistad.amistades:
             ex_amistad.amistades.remove(self)
 
+    def __repr__(self):
+        return f"{self.usuario}"
 
-def recomendar_amistades(nodo_inicial, profundidad) -> list[NodoGrafo]:
+
+def recomendar_amistades(
+    nodo_inicial: NodoGrafo, max_profundidad: int
+) -> list[NodoGrafo]:
     """
     Recibe un NodoGrafo inicial y una profundidad de busqueda, retorna una
     lista de nodos NodoGrafo recomendados como amistad a esa profundidad.
     """
-    assert profundidad > 0
+    assert max_profundidad > 0
 
     # BFS
-    queue = deque([nodo_inicial])
+    # Queue also stores depth
+    profundidad = 0
+    queue: deque[tuple[int, NodoGrafo]] = deque([(profundidad, nodo_inicial)])
     visitados = set()
     recomendados = []
     while queue:
-        if profundidad == 0:
+        if profundidad == max_profundidad:
             break
 
-        nodo = queue.popleft()
+        assert profundidad >= 0
+        # print(f"queue: {queue}, prof: {profundidad}")
+
+        nueva_profundidad, nodo = queue.popleft()
+        profundidad = (
+            nueva_profundidad if nueva_profundidad > profundidad else profundidad
+        )
+
         if nodo not in visitados:
             visitados.add(nodo)
             for amistad in nodo.amistades or []:
                 if amistad not in visitados:
-                    queue.append(amistad)
+                    queue.append((profundidad + 1, amistad))
                     if (
                         amistad not in recomendados
                         and amistad not in nodo_inicial.amistades
                     ):
                         recomendados.append(amistad)
-            profundidad -= 1
+                        # print(
+                        # f"recomendado encontrado: {amistad} (profundidad: {profundidad})"
+                        # )
 
     return recomendados
 

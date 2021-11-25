@@ -30,10 +30,10 @@ class NodoAmigoSecreto:
         while posicion_actual < posicion:
             assert nodo_actual.siguiente is not None, "Premisa de circularidad rota."
 
-            nodo = nodo_actual.siguiente
+            nodo_actual = nodo_actual.siguiente
             posicion_actual += 1
 
-        nodo_a_insertar = NodoAmigoSecreto(nuevo_nodo, siguiente=self)
+        nodo_a_insertar = NodoAmigoSecreto(nuevo_nodo, siguiente=nodo_actual.siguiente)
         nodo_actual.siguiente = nodo_a_insertar
 
     def entregar_regalos(self):
