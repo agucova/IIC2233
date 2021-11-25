@@ -1,21 +1,23 @@
 from __future__ import annotations
 
+from json import dumps
 from os import path
 from random import choice, uniform
 
+from cargar_usuarios import cargar_usuarios
 from parametros import PATH_REGALOS
 from usuario import Usuario
-from cargar_usuarios import cargar_usuarios
 
 
 class NodoAmigoSecreto:
     # Holi agregué solo type hints (PEP 484) para entender el código
     # No modifiqué nada funcional
-    def __init__(self, usuario, siguiente=None):
+    def __init__(self, usuario, id, siguiente=None):
         # No modificar
         self.usuario: Usuario = usuario
         self.siguiente: NodoAmigoSecreto = siguiente or self
         self.regalo_entregado = False
+        self.id = id
 
     def __repr__(self):
         return f"{self.usuario}"
@@ -39,7 +41,9 @@ class NodoAmigoSecreto:
             nodo_actual = nodo_actual.siguiente
             posicion_actual += 1
 
-        nodo_a_insertar = NodoAmigoSecreto(nuevo_nodo, siguiente=nodo_actual.siguiente)
+        nodo_a_insertar = NodoAmigoSecreto(
+            nuevo_nodo, posicion + 1, siguiente=nodo_actual.siguiente
+        )
         nodo_actual.siguiente = nodo_a_insertar
 
     def entregar_regalos(self):
@@ -63,6 +67,26 @@ class NodoAmigoSecreto:
     def __str__(self):
         return f"Amigo Secreto {self.usuario}"
 
+    def visualize(self):
+        nodos = []
+        bordes = []
+        i = 0
+        visitados = set()
+        nodo = self
+        while nodo not in visitados:
+            nodos.append({"id": str(nodo), "label": str(nodo)})
+            bordes.append({"from": str(nodo), "to": str(nodo.siguiente)})
+            visitados.add(nodo)
+            nodo = nodo.siguiente
+
+        json_dict = {
+            "kind": {"graph": True},
+            "nodes": nodos,
+            "edges": bordes,
+        }
+
+        return dumps(json_dict)
+
 
 def escoger_regalo():
     # No modificar
@@ -84,7 +108,7 @@ if __name__ == "__main__":
     # Crear lista
     def crear_lista(dict_usuarios):
         usuarios = iter(dict_usuarios.values())
-        lista_ligada = NodoAmigoSecreto(next(usuarios))
+        lista_ligada = NodoAmigoSecreto(next(usuarios), 0)
         usuarios_recorridos = 0
         for usuario in usuarios:
             lista_ligada.insertar_amigo_secreto(usuario, usuarios_recorridos)
