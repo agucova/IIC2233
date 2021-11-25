@@ -1,16 +1,21 @@
+from __future__ import annotations
+from usuario import Usuario
+from typing import Optional
+
+
 class NodoFama:
     def __init__(self, usuario, padre=None):
         # No modificar
-        self.usuario = usuario
-        self.padre = padre
-        self.hijo_izquierdo = None
-        self.hijo_derecho = None
+        self.usuario: Usuario = usuario
+        self.padre: Optional[NodoFama] = padre
+        self.hijo_izquierdo: Optional[NodoFama] = None
+        self.hijo_derecho: Optional[NodoFama] = None
 
 
 class ArbolBinario:
     def __init__(self):
         # No modificar
-        self.raiz = None
+        self.raiz: Optional[NodoFama] = None
 
     def crear_arbol(self, nodos_fama):
         # No modificar
@@ -18,12 +23,31 @@ class ArbolBinario:
             self.insertar_nodo(nodo, self.raiz)
 
     def insertar_nodo(self, nuevo_nodo, padre=None):
-        # Completar
-        pass
+        padre = padre or self.raiz
+        if padre is None:
+            self.raiz = nuevo_nodo
+        else:
+            if nuevo_nodo.usuario.fama <= padre.usuario.fama:
+                if padre.hijo_izquierdo is None:
+                    padre.hijo_izquierdo = nuevo_nodo
+                else:
+                    self.insertar_nodo(nuevo_nodo, padre.hijo_izquierdo)
+            else:
+                if padre.hijo_derecho is None:
+                    padre.hijo_derecho = nuevo_nodo
+                else:
+                    self.insertar_nodo(nuevo_nodo, padre.hijo_derecho)
 
     def buscar_nodo(self, fama, padre=None):
-        # Completar
-        pass
+        padre = padre or self.raiz
+        if padre is None:
+            return None
+        if padre.usuario.fama == fama:
+            return padre
+        if padre.usuario.fama < fama:
+            return self.buscar_nodo(fama, padre.hijo_izquierdo)
+        else:
+            return self.buscar_nodo(fama, padre.hijo_derecho)
 
     def print_arbol(self, nodo=None, nivel_indentacion=0):
         # No modificar
