@@ -5,6 +5,7 @@ from random import choice, uniform
 
 from parametros import PATH_REGALOS
 from usuario import Usuario
+from cargar_usuarios import cargar_usuarios
 
 
 class NodoAmigoSecreto:
@@ -13,6 +14,9 @@ class NodoAmigoSecreto:
         self.usuario: Usuario = usuario
         self.siguiente: NodoAmigoSecreto = siguiente or self
         self.regalo_entregado = False
+
+    def __repr__(self):
+        return f"{self.usuario}"
 
     def insertar_amigo_secreto(
         self, nuevo_nodo: Usuario, posicion: int, posicion_actual=0
@@ -65,3 +69,25 @@ def escoger_regalo():
         regalos = [line.strip().split(",") for line in file]
     regalo = choice(list(regalos))
     return regalo[0], float(regalo[1])
+
+
+if __name__ == "__main__":
+    # Para debugging
+    info_usuarios = cargar_usuarios()
+    dict_usuarios = {
+        nombre: Usuario(nombre, atributos["correo"], atributos["fama"])
+        for nombre, atributos in info_usuarios.items()
+    }
+
+    # Crear lista
+    def crear_lista(dict_usuarios):
+        usuarios = iter(dict_usuarios.values())
+        lista_ligada = NodoAmigoSecreto(next(usuarios))
+        usuarios_recorridos = 0
+        for usuario in usuarios:
+            lista_ligada.insertar_amigo_secreto(usuario, usuarios_recorridos)
+            usuarios_recorridos += 1
+        return lista_ligada
+
+    lista_ligada = crear_lista(dict_usuarios)
+    pass
