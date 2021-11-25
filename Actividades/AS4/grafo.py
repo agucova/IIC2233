@@ -7,6 +7,8 @@ from usuario import Usuario
 
 
 class NodoGrafo:
+    # Holi agregué solo type hints (PEP 484) para entender el código
+    # No modifiqué nada funcional
     def __init__(self, usuario):
         # No modificar
         self.usuario: Usuario = usuario

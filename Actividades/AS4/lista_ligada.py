@@ -9,6 +9,8 @@ from cargar_usuarios import cargar_usuarios
 
 
 class NodoAmigoSecreto:
+    # Holi agregué solo type hints (PEP 484) para entender el código
+    # No modifiqué nada funcional
     def __init__(self, usuario, siguiente=None):
         # No modificar
         self.usuario: Usuario = usuario
