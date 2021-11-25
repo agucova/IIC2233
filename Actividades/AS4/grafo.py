@@ -32,20 +32,28 @@ def recomendar_amistades(nodo_inicial, profundidad) -> list[NodoGrafo]:
     Recibe un NodoGrafo inicial y una profundidad de busqueda, retorna una
     lista de nodos NodoGrafo recomendados como amistad a esa profundidad.
     """
-    # DFS
-    stack = deque([nodo_inicial])
+    assert profundidad > 0
+
+    # BFS
+    queue = deque([nodo_inicial])
     visitados = set()
     recomendados = []
-    while stack:
-        nodo = stack.pop()
+    while queue:
+        if profundidad == 0:
+            break
+
+        nodo = queue.popleft()
         if nodo not in visitados:
             visitados.add(nodo)
-            if profundidad > 0:
-                stack.extend(nodo.amistades or [])
-                if nodo_inicial not in nodo.amistades:
-                    recomendados.append(nodo)
-
-        profundidad -= 1
+            for amistad in nodo.amistades or []:
+                if amistad not in visitados:
+                    queue.append(amistad)
+                    if (
+                        amistad not in recomendados
+                        and amistad not in nodo_inicial.amistades
+                    ):
+                        recomendados.append(amistad)
+            profundidad -= 1
 
     return recomendados
 
