@@ -1,6 +1,8 @@
 from __future__ import annotations
-from usuario import Usuario
+
 from typing import Optional
+
+from usuario import Usuario
 
 
 class NodoFama:
