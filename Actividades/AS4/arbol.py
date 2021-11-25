@@ -40,13 +40,13 @@ class ArbolBinario:
                 else:
                     self.insertar_nodo(nuevo_nodo, padre.hijo_derecho)
 
-    def buscar_nodo(self, fama, padre=None):
+    def buscar_nodo(self, fama: int, padre=None) -> Optional[NodoFama]:
         padre = padre or self.raiz
         if padre is None:
             return None
         if padre.usuario.fama == fama:
             return padre
-        if padre.usuario.fama < fama:
+        if fama < padre.usuario.fama:
             return self.buscar_nodo(fama, padre.hijo_izquierdo)
         else:
             return self.buscar_nodo(fama, padre.hijo_derecho)

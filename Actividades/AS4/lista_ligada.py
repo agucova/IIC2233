@@ -1,16 +1,22 @@
-from random import uniform, choice
+from __future__ import annotations
+
 from os import path
+from random import choice, uniform
+
 from parametros import PATH_REGALOS
+from usuario import Usuario
 
 
 class NodoAmigoSecreto:
     def __init__(self, usuario, siguiente=None):
         # No modificar
-        self.usuario = usuario
-        self.siguiente = siguiente or self
+        self.usuario: Usuario = usuario
+        self.siguiente: NodoAmigoSecreto = siguiente or self
         self.regalo_entregado = False
 
-    def insertar_amigo_secreto(self, nuevo_nodo, posicion, posicion_actual=0):
+    def insertar_amigo_secreto(
+        self, nuevo_nodo: Usuario, posicion: int, posicion_actual=0
+    ):
         """
         Insertar un nuevo NodoAmigoSecreto en la posicion.
         :param nuevo_nodo: instancia de Usuario que debe ser
@@ -20,11 +26,15 @@ class NodoAmigoSecreto:
         dando vueltas hasta alcanzar el índice pedido.
         :param posicion_actual: Posición en la lista actual.
         """
-        if posicion_actual == posicion:
-            nuevo_nodo.siguiente = self.siguiente
-            self.siguiente = nuevo_nodo
-            return
-        self.siguiente.insertar_amigo_secreto(nuevo_nodo, posicion, posicion_actual + 1)
+        nodo_actual = self
+        while posicion_actual < posicion:
+            assert nodo_actual.siguiente is not None, "Premisa de circularidad rota."
+
+            nodo = nodo_actual.siguiente
+            posicion_actual += 1
+
+        nodo_a_insertar = NodoAmigoSecreto(nuevo_nodo, siguiente=self)
+        nodo_actual.siguiente = nodo_a_insertar
 
     def entregar_regalos(self):
         # No modificar
