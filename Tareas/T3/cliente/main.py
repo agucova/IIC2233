@@ -4,7 +4,7 @@ import sys
 from calamarlib.helpers import load_config
 from PyQt5 import uic
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QLabel, QPushButton
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QPushButton
 
 from client import Client
 from processor import GameProcessor

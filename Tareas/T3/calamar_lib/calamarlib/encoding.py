@@ -7,10 +7,12 @@ Pickle fue desactivado por defecto por preocupaciones de seguridad.
 """
 
 from __future__ import annotations
-from pickle import dumps, loads, UnpicklingError, PicklingError, Unpickler
-from typing import Any, Union
-from calamarlib.encryption import pseudo_encrypt, pseudo_decrypt
+
 import json
+from pickle import PicklingError, Unpickler, UnpicklingError, dumps, loads
+from typing import Any, Union
+
+from calamarlib.encryption import pseudo_decrypt, pseudo_encrypt
 
 LENGTH_SIZE = 4
 N_BLOCK_SIZE = 4

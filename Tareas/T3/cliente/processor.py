@@ -6,11 +6,13 @@ Está diseñado para que la vasta mayoría del estado resida en el servidor.
 """
 
 from __future__ import annotations
-from typing import Optional, Any
+
+from typing import Any, Optional
+
+from calamarlib.entities import Player
+from PyQt5.QtCore import QObject, pyqtSignal
 
 from client import Client
-from PyQt5.QtCore import QObject, pyqtSignal
-from calamarlib.entities import Player
 
 
 class GameProcessor(QObject):

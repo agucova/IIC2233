@@ -10,8 +10,9 @@ nombre de variables de PEP8 en base a la convención usada en el enunciado (A, B
 """
 
 from __future__ import annotations
-from typing import Sequence, TypeVar, Union
+
 from pickle import dumps
+from typing import Sequence, TypeVar, Union
 
 # La siguiente linea permite que el código pase por mi chequeo automático :P
 # flake8: noqa: N806

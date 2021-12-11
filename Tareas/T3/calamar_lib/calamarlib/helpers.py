@@ -2,9 +2,10 @@
 Este módulo contiene funciones útiles para tareas comunes entre el cliente y el servidor.
 """
 from __future__ import annotations
+
+import json
 import socket
 from sys import exit
-import json
 
 
 def load_config(filepath: str) -> tuple[str, int]:

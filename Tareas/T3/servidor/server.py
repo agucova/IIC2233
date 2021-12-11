@@ -10,11 +10,11 @@ ser compatible con el protocolo especificado.
 from __future__ import annotations
 
 import socket
-import threading
 import sys
+import threading
 from typing import Any
 
-from calamarlib.encoding import encode, decode, LENGTH_SIZE
+from calamarlib.encoding import LENGTH_SIZE, decode, encode
 from calamarlib.protocol import VALID_COMMANDS
 
 from processor import GameProcessor

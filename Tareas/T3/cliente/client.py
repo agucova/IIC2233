@@ -8,7 +8,6 @@ from typing import Any
 
 from calamarlib.encoding import decode, encode
 from calamarlib.protocol import VALID_COMMANDS
-
 from PyQt5.QtCore import QObject, pyqtSignal
 
 
