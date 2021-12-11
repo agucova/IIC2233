@@ -21,6 +21,9 @@ class VentanaInicio(QMainWindow):
         self.start_game.clicked.connect(self.open_game)
         self.processor = processor
 
+        # Signals
+        self.processor.client.server_disconnect_signal.connect(self.server_disconnect)
+
     def open_game(self):
         usuario: str = self.usuario.text()
         fecha_de_nacimiento: str = self.fecha_de_nacimiento.text()
@@ -30,6 +33,10 @@ class VentanaInicio(QMainWindow):
         else:
             self.hide()
             # self.juego = VentanaJuego(usuario)
+
+    def server_disconnect(self):
+        QMessageBox.warning(self, "Error", "No se pudo conectar con el servidor.")
+        self.close()
 
 
 if __name__ == "__main__":

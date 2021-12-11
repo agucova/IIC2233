@@ -1,3 +1,4 @@
+from http import server
 import socket
 import threading
 from typing import Any
@@ -5,8 +6,10 @@ from typing import Any
 from calamarlib.encoding import decode, encode
 from calamarlib.protocol import VALID_COMMANDS
 
+from PyQt5.QtCore import QObject, pyqtSignal
 
-class Client:
+
+class Client(QObject):
     # Ref: Ejemplo de cliente en networking.ipynb
     """
     Maneja toda la comunicación desde el lado del cliente.
@@ -15,18 +18,22 @@ class Client:
     mensaje indicarán el largo del mensaje enviado.
     """
 
+    server_disconnect_signal = pyqtSignal()
+
     def __init__(self, host, port):
+        super().__init__()
         print("[INFO] Inicializando cliente...")
 
         self.host = host
         self.port = port
         self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        self.connect_to_server()
+        try:
+            self.connect_to_server()
+        except ConnectionError:
+            self.server_disconnect_signal.emit()
 
     def connect_to_server(self):
         """Crea la conexión al servidor."""
-
         self.socket_client.connect((self.host, self.port))
         print("[INFO] Cliente conectado exitosamente al servidor.")
 
@@ -60,17 +67,26 @@ class Client:
         return self.listen()
 
     def listen(self):
-        response_bytes_length = self.socket_client.recv(4)
-        response_length = int.from_bytes(response_bytes_length, byteorder="big")
-        response = bytearray()
+        try:
+            response_bytes_length = self.socket_client.recv(4)
+            response_length = int.from_bytes(response_bytes_length, byteorder="big")
+            response = bytearray()
 
-        # Recibimos datos hasta que alcancemos la totalidad de los datos
-        # indicados en los primeros 4 bytes recibidos.
-        while len(response) < response_length:
-            read_length = min(4096, response_length - len(response))
-            response.extend(self.socket_client.recv(read_length))
+            # Recibimos datos hasta que alcancemos la totalidad de los datos
+            # indicados en los primeros 4 bytes recibidos.
+            while len(response) < response_length:
+                read_length = min(4096, response_length - len(response))
+                response.extend(self.socket_client.recv(read_length))
+            if response_length == 0:
+                raise ConnectionError("No se recibió una respuesta del servidor.")
+            message = decode(response, encrypted=True)
+        except ConnectionError:
+            print(
+                "[ERROR] El servidor se ha desconectado o no se ha podido conectarse."
+            )
+            self.server_disconnect_signal.emit()
+            return None
 
-        message = decode(response, encrypted=True)
         print("[INFO] Recibido mensaje:", message)
         return message
 

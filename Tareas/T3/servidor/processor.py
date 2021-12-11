@@ -45,6 +45,7 @@ class GameProcessor:
         if GameProcessor.check_user_data(username, birthdate):
             player = Player(username, GameProcessor.str_to_date(birthdate))  # type: ignore
             self.players.append(player)
+            print(f"[INFO] Se registró al jugador {player.username}.")
             return True
         return False
 
