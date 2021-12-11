@@ -1,123 +1,90 @@
-# Tarea X: Nombre de la tarea :school_satchel:
-
-
-Un buen ```README.md``` puede marcar una gran diferencia en la facilidad con la que corregimos una tarea, y consecuentemente cómo funciona su programa, por lo en general, entre más ordenado y limpio sea éste, mejor será
-
-Para nuestra suerte, GitHub soporta el formato [MarkDown](https://es.wikipedia.org/wiki/Markdown), el cual permite utilizar una amplia variedad de estilos de texto, tanto para resaltar cosas importantes como para separar ideas o poner código de manera ordenada ([pueden ver casi todas las funcionalidades que incluye aquí](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet))
-
-Un buen ```README.md``` no tiene por que ser muy extenso tampoco, hay que ser **concisos** (a menos que lo consideren necesario) pero **tampoco pueden** faltar cosas. Lo importante es que sea claro y limpio
-
-**Dejar claro lo que NO pudieron implementar y lo que no funciona a la perfección. Esto puede sonar innecesario pero permite que el ayudante se enfoque en lo que sí podría subir su puntaje.**
+# Tarea 3: DCCalamar :school_satchel:
 
 ## Consideraciones generales :octocat:
-
-<Descripción de lo que hace y que **_no_** hace la tarea que entregaron junto
-con detalles de último minuto y consideraciones como por ejemplo cambiar algo
-en cierta línea del código o comentar una función>
+La tarea implementa el modelo cliente-servidor, el protocolo de comunicación,
+el algoritmo de cifrado y la ventana de inicio y de sala de espera. No implementa las partidas en si o el resto de ventanas.
 
 ### Cosas implementadas y no implementadas :white_check_mark: :x:
 
-Explicación: mantén el emoji correspondiente, de manera honesta, para cada item. Si quieres, también puedes agregarlos a los títulos:
-- ❌ si **NO** completaste lo pedido
-- ✅ si completaste **correctamente** lo pedido
-- 🟠 si el item está **incompleto** o tiene algunos errores
 #### Networking: 23 pts (18%)
-##### ❌✅🟠 Protocolo <explicacion\>
-##### ❌✅🟠 Correcto uso de sockets <explicacion\>
-##### ❌✅🟠 Conexión <explicacion\>
-##### ❌✅🟠 Manejo de clientes <explicacion\>
+##### ✅ Protocolo
+##### ✅ Correcto uso de sockets
+##### ✅ Conexión
+##### ✅ Manejo de clientes
 #### Arquitectura Cliente - Servidor: 31 pts (24%)
-##### ❌✅🟠 Roles <explicacion\>
-##### ❌✅🟠 Consistencia <explicacion\>
-##### ❌✅🟠 Logs <explicacion\>
+##### ✅ Roles
+##### ✅ Consistencia
+##### 🟠 Logs: Se agregó loggeo en toda la funcionalidad implementada.
 #### Manejo de Bytes: 20 pts (15%)
-##### ❌✅🟠 Codificación <explicacion\>
-##### ❌✅🟠 Decodificación <explicacion\>
-##### ❌✅🟠 Encriptación <explicacion\>
-##### ❌✅🟠 Integración <explicacion\>
+##### ✅ Codificación
+##### ✅ Decodificación
+##### ✅ Encriptación
+##### ✅ Integración
 #### Interfaz gráfica: 31 pts (24%)
-##### ❌✅🟠 Modelación <explicacion\>
-##### ❌✅🟠 Ventana inicio <explicacion\>
-##### ❌✅🟠 Sala Principal <explicacion\>
-##### ❌✅🟠 Ventana de Invitación <explicacion\>
-##### ❌✅🟠 Sala de juego <explicacion\>
-##### ❌✅🟠 Ventana final <explicacion\>
+##### 🟠 Modelación: No estoy seguro a que se refiere, pero intenté desligar el front del back-end.
+##### ✅ Ventana inicio
+##### ✅ Sala Principal
+##### ❌ Ventana de Invitación
+##### ❌ Sala de juego
+##### ❌ Ventana final
 #### Reglas de DCCalamar: 21 pts (16%)
-##### ❌✅🟠 Inicio del juego <explicacion\>
-##### ❌✅🟠 Ronda <explicacion\>
-##### ❌✅🟠 Termino del juego <explicacion\>
+##### 🟠 Inicio del juego
+##### ❌ Ronda
+##### ❌ Termino del juego
 #### General: 4 pts (3%)
-##### ❌✅🟠 Parámetros (JSON) <explicacion\>
+##### ✅ Parámetros (JSON)
 #### Bonus: 5 décimas máximo
-##### ❌✅🟠 Cheatcode <explicacion\>
-##### ❌✅🟠 Turnos con tiempo <explicacion\>
+##### ❌ Cheatcode
+##### ❌ Turnos con tiempo
 ## Ejecución :computer:
-El módulo principal de la tarea a ejecutar es  ```archivo.py```. Además se debe crear los siguientes archivos y directorios adicionales:
-1. ```archivo.ext``` en ```ubicación```
-2. ```directorio``` en ```ubicación```
-3. ...
+Tanto el cliente como el servidor dependen del paquete propio calamarlib,
+que debe estar disponible en el PYTHONPATH. La forma mas fácil de hacerlo es aprovechando pip:
+```shell
+$ pip install -e calamar_lib/
+```
+Esto debería instalar el paquete localmente en modo de desarrollo.
 
+Porque no se me ocurrió testear los sprites independiente de mi repo local,
+no me di cuenta que la estructura modificada de la carpeta `Sprites` estaba
+cubierta por mi `gitignore`. En consecuencia, debe moverse la carpeta `Sprites` a dentro de la carpeta `cliente/` y cambiar `Avatares`, `Decoraciones`, `Juego` y `Logos` a minúscula.
+
+Se puede iniciar el servidor con:
+```shell
+$ python3 servidor/main.py
+```
+
+Y el el cliente con:
+```shell
+$ python cliente/.py
+```
 
 ## Librerías :books:
 ### Librerías externas utilizadas
-La lista de librerías externas que utilicé fue la siguiente:
 
-1. ```librería_1```: ```función() / módulo```
-2. ```librería_2```: ```función() / módulo``` (debe instalarse)
-3. ...
+La lista de paquetes de la librería estándar que utilicé fue las siguientes:
+
+1. `__future__`: se utiliza para proveer type hints de colecciones en formato retrocompatible a 3.8. (`list[str]` en vez de `List[str]` importado de `typing`).
+2. `typing`: se utiliza para crear objetos de tipo `NamedTuple` que mejoran la versión incluída en `collection`, permitiendo declarar sus tipos para facilitar análisis estático. También agrega hints como `Union` y `Optional`, para facilitar el tipado.
+
+Ninguna de las dos cambian la ejecución del código, sino que simplemente permiten anotar los tipos del código acorde con [PEP 484](https://www.python.org/dev/peps/pep-0484/), cosa de que mi editor pueda reconocer los tipos normalmente. Consulté por este uso de type hints en tanto Discord como en [issues](https://github.com/IIC2233/Syllabus/issues/31#issuecomment-908031345) en tareas pasadas y me dieron permiso para usarlos.
+
+Además se usó `pickle`, `json` y `socket` de la librería estándar y `PyQt5` como única librería externa.
 
 ### Librerías propias
-Por otro lado, los módulos que fueron creados fueron los siguientes:
-
-1. ```librería_1```: Contiene a ```ClaseA```, ```ClaseB```, (ser general, tampoco es necesario especificar cada una)...
-2. ```librería_2```: Hecha para <insertar descripción **breve** de lo que hace o qué contiene>
-3. ...
+Se creó un paquete compartido `calamarlib` para evitar la duplicación de código, entendido
+que si bien el enunciado indicaba que el cliente y el servidor no podían depender mutuamente,
+no decía nada en contra de que compartieran código de una tercera carpeta, evitando repetir alrededor de 400 líneas.
 
 ## Supuestos y consideraciones adicionales :thinking:
 Los supuestos que realicé durante la tarea son los siguientes:
 
-1. <Descripción/consideración 1 y justificación del por qué es válido/a>
-2. <Descripción/consideración 2 y justificación del por qué es válido/a>
-3. ...
+1. Supuse que los sockets del servidor no tenían que necesiamente ser terminados, dado que la combinación del garbage collection, el timeout del kernel y el uso de ADDR_REUSE, permiten que no haya ningún problema práctico.
+2. Supuse que el cliente podía conectarse de forma sincrónica con el servidor.
+3. Supuse que el contenido de los mensajes entre cliente y servidor quedaba a mi juicio, por lo que implementé un protocolo en base a JSON (también cambiable a `pickle` usando la constante `PROVIDER`).
 
-PD: <una última consideración (de ser necesaria) o comentario hecho anteriormente que se quiera **recalcar**>
-
-
--------
-
-
-
-**EXTRA:** si van a explicar qué hace específicamente un método, no lo coloquen en el README mismo. Pueden hacerlo directamente comentando el método en su archivo. Por ejemplo:
-
-```python
-class Corrector:
-
-    def __init__(self):
-          pass
-
-    # Este método coloca un 6 en las tareas que recibe
-    def corregir(self, tarea):
-        tarea.nota  = 6
-        return tarea
-```
-
-Si quieren ser más formales, pueden usar alguna convención de documentación. Google tiene la suya, Python tiene otra y hay muchas más. La de Python es la [PEP287, conocida como reST](https://www.python.org/dev/peps/pep-0287/). Lo más básico es documentar así:
-
-```python
-def funcion(argumento):
-    """
-    Mi función hace X con el argumento
-    """
-    return argumento_modificado
-```
-Lo importante es que expliquen qué hace la función y que si saben que alguna parte puede quedar complicada de entender o tienen alguna función mágica usen los comentarios/documentación para que el ayudante entienda sus intenciones.
 
 ## Referencias de código externo :book:
 
-Para realizar mi tarea saqué código de:
-1. \<link de código>: este hace \<lo que hace> y está implementado en el archivo <nombre.py> en las líneas <número de líneas> y hace <explicación breve de que hace>
+Mi mayor referencia fue el [ejemplo de servidor](https://github.com/IIC2233/contenidos/blob/main/semana-12/3-ejemplos.ipynb) con concurrencia en la semana 12 de los contendiso curso.
 
-
-
-## Descuentos
-La guía de descuentos se encuentra [link](https://github.com/IIC2233/syllabus/blob/main/Tareas/Descuentos.md).
+También tomé la base de la inicialización de ventanas de mi propia T2, y tomé una implementación de generador por chunks en `encoding.py` de [GeeksForGeeks](https://www.geeksforgeeks.org/break-list-chunks-size-n-python/).
