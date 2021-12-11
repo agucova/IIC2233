@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import datetime
-from typing import Any
+from typing import Any, Optional
 
 from calamarlib.protocol import VALID_COMMANDS
 
@@ -17,12 +17,12 @@ class GameProcessor:
         self.players: list[Player] = []
 
     @staticmethod
-    def str_to_date(date_str):
+    def str_to_date(date_str: str) -> Optional[datetime.date]:
         # Format is dd/MM/yyyy
         try:
             day, month, year = map(int, date_str.split("/"))
         except ValueError:
-            print("[WARNING} Invalid date format received.")
+            print("[WARNING] Invalid date format received.")
             return None
 
         return datetime.date(year, month, day)
@@ -36,14 +36,14 @@ class GameProcessor:
         return GameProcessor.str_to_date(date_str) is not None
 
     @staticmethod
-    def check_user_data(username: str, birth_date: str) -> bool:
+    def check_user_data(username: str, birthdate: str) -> bool:
         return GameProcessor.check_username(username) and GameProcessor.check_date(
-            birth_date
+            birthdate
         )
 
-    def register_user(self, username: str, birth_date: str) -> bool:
-        if GameProcessor.check_user_data(username, birth_date):
-            player = Player(username, GameProcessor.str_to_date(birth_date))  # type: ignore
+    def register_user(self, username: str, birthdate: str) -> bool:
+        if GameProcessor.check_user_data(username, birthdate):
+            player = Player(username, GameProcessor.str_to_date(birthdate))  # type: ignore
             self.players.append(player)
             return True
         return False
@@ -55,9 +55,9 @@ class GameProcessor:
             return {"error": "Invalid command"}
         try:
             if command == "check_user_data":
-                return {"result": self.check_user_data(*arguments)}
+                return {"result": self.check_user_data(**arguments)}
             elif command == "register_user":
-                return {"result": self.register_user(*arguments)}
+                return {"result": self.register_user(**arguments)}
             else:
                 return {"error": "Command not implemented."}
         except (TypeError, ValueError) as e:

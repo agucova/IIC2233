@@ -103,7 +103,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Escribe tu nombre de usuario (alfanumerico):</string>
+        <string>Escribe tu nombre de usuario:</string>
        </property>
       </widget>
      </item>

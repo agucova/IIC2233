@@ -77,7 +77,11 @@ class Server:
         Debemos implementar en este método el protocolo de comunicación
         donde los primeros 4 bytes indicarán el largo del mensaje.
         """
-        sock.send(encode(value, encrypt=True))
+
+        response = encode(value, encrypt=True)
+        length = len(response)
+        length_bytes = length.to_bytes(LENGTH_SIZE, byteorder="big")
+        sock.sendall(length_bytes + response)
 
     def listen_client_thread(self, client_socket: socket.socket):
         """
@@ -86,7 +90,7 @@ class Server:
         Implementa las funcionalidades del protocolo de comunicación
         que permiten recuperar la informacion enviada.
         """
-        print(f"[INFO] Recibido conexión de cliente #{client_socket.fileno()}.")
+        print(f"[INFO] Recibido conexión de cliente #{client_socket.fileno() - 4}.")
 
         while True:
             # The official python documentation suggests checking even

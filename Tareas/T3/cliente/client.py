@@ -23,13 +23,12 @@ class Client:
         self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         self.connect_to_server()
-        self.listen()
 
     def connect_to_server(self):
         """Crea la conexión al servidor."""
 
         self.socket_client.connect((self.host, self.port))
-        print("Cliente conectado exitosamente al servidor.")
+        print("[INFO] Cliente conectado exitosamente al servidor.")
 
     def send(self, msg: Any):
         """
@@ -71,7 +70,9 @@ class Client:
             read_length = min(4096, response_length - len(response))
             response.extend(self.socket_client.recv(read_length))
 
-        return decode(response, encrypted=True)
+        message = decode(response, encrypted=True)
+        print("[INFO] Recibido mensaje:", message)
+        return message
 
     def repl(self):
         """

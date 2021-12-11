@@ -19,6 +19,7 @@ class VentanaInicio(QMainWindow):
         uic.loadUi(f"{CURRENT_DIR}/ventanas/inicio.ui", self)
         self.show()
         self.start_game.clicked.connect(self.open_game)
+        self.processor = processor
 
     def open_game(self):
         usuario: str = self.usuario.text()
