@@ -124,8 +124,8 @@ def decode(byte_seq: Union[bytes, bytearray], encrypted=False) -> Any:
 
     # We start by decoding the length of the message
     length = int.from_bytes(byte_seq[:LENGTH_SIZE], byteorder="little")
-    assert (
-        length <= len(byte_seq) <= length + CHUNK_SIZE - 1
+    assert length <= len(
+        byte_seq
     ), "The provided length is not consistent with the data."
 
     # We then decode the content

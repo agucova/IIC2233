@@ -64,7 +64,8 @@ class Client(QObject):
         message = {"command": command, "arguments": {**content}}
         print(f"[INFO] Enviando mensaje: {message}")
         self.send(message)
-        return self.listen()
+        response = self.listen()
+        return response
 
     def listen(self):
         try:
