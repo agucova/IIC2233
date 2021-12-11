@@ -5,7 +5,7 @@ Valida extensamente los mensajes para evitar errores de codificación.
 
 from __future__ import annotations
 from pickle import dumps, loads, UnpicklingError, PicklingError
-from typing import Any, Union
+from typing import Any, Sequence, Union
 from encryption import pseudo_encrypt, pseudo_decrypt
 
 LENGTH_SIZE = 4
@@ -14,8 +14,9 @@ CHUNK_SIZE = 80
 PADDING_CHAR = b"\x00"
 
 
-def chunked_read(seq, chunk_size):
-    # thanks to https://www.geeksforgeeks.org/break-list-chunks-size-n-python/
+def chunked_read(seq, chunk_size: int):
+    """Reads an arbitrary sequence in chunks of size chunk_size."""
+    # REF: Thanks to https://www.geeksforgeeks.org/break-list-chunks-size-n-python/
     # for a clean inspiration for this generator
     for i in range(0, len(seq), chunk_size):
         yield seq[i : i + chunk_size]
