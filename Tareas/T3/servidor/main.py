@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 import socket
 import threading
 import json
 import sys
 from typing import Any
 
-from ..lib.encoding import encode, decode, LENGTH_SIZE
+from calamarlib.encoding import encode, decode, LENGTH_SIZE
+from calamarlib.helpers import load_config
 
 
 class Server:
@@ -64,7 +67,7 @@ class Server:
         Debemos implementar en este método el protocolo de comunicación
         donde los primeros 4 bytes indicarán el largo del mensaje.
         """
-        sock.send(encode(value))
+        sock.send(encode(value, encrypt=True))
 
     def listen_client_thread(self, client_socket: socket.socket):
         """
@@ -75,55 +78,42 @@ class Server:
         """
         print("[INFO] Recibido conexión de cliente...")
 
-        # The official python documentation suggests checking even
-        # this kind of recv() call for full message receipt.
-        # https://docs.python.org/3/library/socket.html#socket.socket.recv
-
-        length_response = bytearray()
-        while len(length_response) < 4:
-            length_response += client_socket.recv(4)
-
         while True:
-            response_bytes_length = client_socket.recv(4)
-            response_length = int.from_bytes(response_bytes_length, byteorder="big")
+            # The official python documentation suggests checking even
+            # this kind of recv() call for full message receipt.
+            # https://docs.python.org/3/library/socket.html#socket.socket.recv
+
+            length_response = bytearray()
+            while len(length_response) < LENGTH_SIZE:
+                length_response += client_socket.recv(LENGTH_SIZE)
+
+            length = int.from_bytes(length_response, byteorder="big")
             response = bytearray()
 
-            while len(response) < response_length:
-                read_length = min(4096, response_length - len(response))
+            while len(response) < length:
+                read_length = min(4096, length - len(response))
                 response.extend(client_socket.recv(read_length))
 
-            received = response.decode()
+            received = decode(response, encrypted=True)
 
-            if received != "":
-                # El método `self.handle_command()` debe ser definido.
-                # Este realizará toda la lógica asociado a los mensajes
-                # que llegan al servidor desde un cliente en particular.
-                # Se espera que retorne la respuesta que el servidor
-                # debe enviar hacia el cliente.
-                response = self.handle_command(received, client_socket)
-                self.send(response, client_socket)
+            response = self.handle_command(received, client_socket)
+            self.send(response, client_socket)
 
-    def handle_command(self, received, client_socket: socket.socket):
-        print("Comando recibido:", received)
+    def handle_command(self, received: dict[str, Any], client_socket: socket.socket):
+        # Quien sabe, esto podria recibir URLs y empezaríamos a reimplementar HTTP
+        # Hasta respondemos de forma RESTful!
+        assert isinstance(received, dict), "El mensaje recibido no es un diccionario"
+        assert (
+            "command" in received.keys()
+        ), "El mensaje recibido no tiene la clave 'command'"
+
+        print("Comando recibido:", received["command"])
         # Este método debería ejecutar la acción y enviar una respuesta.
-        return "Acción asociada a " + received
+        return "Acción asociada a " + received["command"] + " ejecutada."
 
 
 if __name__ == "__main__":
     # Load parameters from configuration and pass host and port to server.
-    with open("parametros.json") as config_file:
-        try:
-            config = json.load(config_file)
-        except json.JSONDecodeError:
-            print("[FATAL] El archivo de configuración no es válido.")
-            sys.exit(1)
-
-        host = config.get("host") or socket.gethostname()
-        try:
-            # A 4 digit port is a sane default
-            port = int(config.get("port") or 4200)
-        except TypeError:
-            print("[FATAL] El puerto debe ser un número.")
-            sys.exit(1)
+    host, port = load_config("servidor/parametros.json")
 
     server = Server(host, port)

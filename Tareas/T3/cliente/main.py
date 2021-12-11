@@ -1,6 +1,9 @@
 import socket
 import threading
 
+from calamarlib.encoding import encode, decode
+from calamarlib.helpers import load_config
+
 
 class Client:
     """
@@ -10,21 +13,21 @@ class Client:
     mensaje indicarán el largo del mensaje enviado.
     """
 
-    def __init__(self, port, host):
-        print("Inicializando cliente...")
+    def __init__(self, host, port):
+        print("[INFO] Inicializando cliente...")
 
         self.host = host
         self.port = port
         self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        try:
-            self.connect_to_server()
-            self.listen()
-            self.repl()
-        except ConnectionError:
-            print("Conexión terminada.")
-            self.socket_client.close()
-            exit()
+        # try:
+        self.connect_to_server()
+        self.listen()
+        self.repl()
+        # except ConnectionError:
+        #     print("Conexión terminada.")
+        #     self.socket_client.close()
+        #     exit()
 
     def connect_to_server(self):
         """Crea la conexión al servidor."""
@@ -54,9 +57,7 @@ class Client:
         indicando el largo del mensaje enviado.
         """
 
-        msg_bytes = msg.encode()
-        msg_length = len(msg_bytes).to_bytes(4, byteorder="big")
-        self.socket_client.sendall(msg_length + msg_bytes)
+        self.socket_client.sendall(encode(msg, encrypt=True))
 
     def listen_thread(self):
         while True:
@@ -70,7 +71,7 @@ class Client:
                 read_length = min(4096, response_length - len(response))
                 response.extend(self.socket_client.recv(read_length))
 
-            print(f"{response.decode()}\n>>> ", end="")
+            print(f"{decode(response, encrypted=True)}\n>>> ", end="")
 
     def repl(self):
         """
@@ -86,7 +87,6 @@ class Client:
 
 
 if __name__ == "__main__":
-    port = 8080
-    host = socket.gethostname()
+    host, port = load_config("cliente/parametros.json")
 
-    client = Client(port, host)
+    client = Client(host, port)

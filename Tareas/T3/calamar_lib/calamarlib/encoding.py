@@ -9,7 +9,7 @@ Pickle fue desactivado por defecto por preocupaciones de seguridad.
 from __future__ import annotations
 from pickle import dumps, loads, UnpicklingError, PicklingError, Unpickler
 from typing import Any, Sequence, Union
-from encryption import pseudo_encrypt, pseudo_decrypt
+from calamarlib.encryption import pseudo_encrypt, pseudo_decrypt
 import json
 
 LENGTH_SIZE = 4
