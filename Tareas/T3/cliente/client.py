@@ -3,9 +3,11 @@ import threading
 from typing import Any
 
 from calamarlib.encoding import decode, encode
+from calamarlib.protocol import VALID_COMMANDS
 
 
 class Client:
+    # Ref: Ejemplo de cliente en networking.ipynb
     """
     Maneja toda la comunicación desde el lado del cliente.
 
@@ -29,19 +31,6 @@ class Client:
         self.socket_client.connect((self.host, self.port))
         print("Cliente conectado exitosamente al servidor.")
 
-    def listen(self):
-        """
-        Inicializa el thread que escuchará los mensajes del servidor.
-
-        Es útil hacer un thread diferente para escuchar al servidor,
-        ya que de esa forma podremos tener comunicación asíncrona con este.
-        Luego, el servidor nos podrá enviar mensajes sin necesidad de
-        iniciar una solicitud desde el lado del cliente.
-        """
-
-        thread = threading.Thread(target=self.listen_thread, daemon=True)
-        thread.start()
-
     def send(self, msg: Any):
         """
         Envía mensajes al servidor.
@@ -57,29 +46,32 @@ class Client:
         length = len(encoded_message).to_bytes(4, byteorder="big")
         self.socket_client.sendall(length + encoded_message)
 
-    def send_command(self, command, content):
+    def send_command(self, command, **content):
         """
         Envía un comando al servidor.
 
         `command` es el comando a enviar, y `content` es el contenido del
         mensaje.
         """
+        assert command in VALID_COMMANDS, "Comando inválido."
 
-        self.send({"command": command, "content": content})
+        message = {"command": command, "arguments": {**content}}
+        print(f"[INFO] Enviando mensaje: {message}")
+        self.send(message)
+        return self.listen()
 
-    def listen_thread(self):
-        while True:
-            response_bytes_length = self.socket_client.recv(4)
-            response_length = int.from_bytes(response_bytes_length, byteorder="big")
-            response = bytearray()
+    def listen(self):
+        response_bytes_length = self.socket_client.recv(4)
+        response_length = int.from_bytes(response_bytes_length, byteorder="big")
+        response = bytearray()
 
-            # Recibimos datos hasta que alcancemos la totalidad de los datos
-            # indicados en los primeros 4 bytes recibidos.
-            while len(response) < response_length:
-                read_length = min(4096, response_length - len(response))
-                response.extend(self.socket_client.recv(read_length))
+        # Recibimos datos hasta que alcancemos la totalidad de los datos
+        # indicados en los primeros 4 bytes recibidos.
+        while len(response) < response_length:
+            read_length = min(4096, response_length - len(response))
+            response.extend(self.socket_client.recv(read_length))
 
-            print(f"{decode(response, encrypted=True)}\n>>> ", end="")
+        return decode(response, encrypted=True)
 
     def repl(self):
         """
@@ -91,4 +83,4 @@ class Client:
         print("------ Consola ------\n>>> ", end="")
         while True:
             msg = input()
-            self.send({"command": "msg", "content": msg})
+            self.send({"command": "msg", "arguments": msg})

@@ -73,7 +73,7 @@
      <item row="4" column="0">
       <widget class="QDateTimeEdit" name="fecha_de_nacimiento">
        <property name="displayFormat">
-        <string>d/M/yyyy</string>
+        <string>dd/MM/yyyy</string>
        </property>
        <property name="calendarPopup">
         <bool>true</bool>

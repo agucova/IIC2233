@@ -6,12 +6,16 @@ import sys
 from typing import Any
 
 from calamarlib.encoding import encode, decode, LENGTH_SIZE
+from calamarlib.protocol import VALID_COMMANDS
+
+from processor import GameProcessor
 
 
 class Server:
     def __init__(self, host, port):
         self.host = host
         self.port = port
+        self.processor = GameProcessor()
 
     def start(self):
         """
@@ -122,6 +126,7 @@ class Server:
             "command" in received.keys()
         ), "El mensaje recibido no tiene la clave 'command'"
 
-        print("Comando recibido:", received["command"])
-        # Este método debería ejecutar la acción y enviar una respuesta.
-        return "Acción asociada a " + received["command"] + " ejecutada."
+        command = received["command"]
+        arguments = received.get("arguments", {})
+
+        return self.processor.handle_command(command, arguments)
