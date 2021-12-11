@@ -2,8 +2,9 @@ import socket
 import threading
 import json
 import sys
+from typing import Any
 
-from ..lib.encoding import encode, decode
+from ..lib.encoding import encode, decode, LENGTH_SIZE
 
 
 class Server:
@@ -56,26 +57,31 @@ class Server:
             listening_client_thread.start()
 
     @staticmethod
-    def send(value, sock):
+    def send(value: Any, sock: socket.socket):
         """
         Envía mensajes hacia algún socket cliente.
 
         Debemos implementar en este método el protocolo de comunicación
         donde los primeros 4 bytes indicarán el largo del mensaje.
         """
-        stringified_value = str(value)
-        msg_bytes = stringified_value.encode()
-        msg_length = len(msg_bytes).to_bytes(4, byteorder="big")
-        sock.send(msg_length + msg_bytes)
+        sock.send(encode(value))
 
-    def listen_client_thread(self, client_socket):
+    def listen_client_thread(self, client_socket: socket.socket):
         """
         Es ejecutado como thread que escuchará a un cliente en particular.
 
         Implementa las funcionalidades del protocolo de comunicación
         que permiten recuperar la informacion enviada.
         """
-        print("Servidor conectado a un nuevo cliente...")
+        print("[INFO] Recibido conexión de cliente...")
+
+        # The official python documentation suggests checking even
+        # this kind of recv() call for full message receipt.
+        # https://docs.python.org/3/library/socket.html#socket.socket.recv
+
+        length_response = bytearray()
+        while len(length_response) < 4:
+            length_response += client_socket.recv(4)
 
         while True:
             response_bytes_length = client_socket.recv(4)
@@ -97,7 +103,7 @@ class Server:
                 response = self.handle_command(received, client_socket)
                 self.send(response, client_socket)
 
-    def handle_command(self, received, client_socket):
+    def handle_command(self, received, client_socket: socket.socket):
         print("Comando recibido:", received)
         # Este método debería ejecutar la acción y enviar una respuesta.
         return "Acción asociada a " + received

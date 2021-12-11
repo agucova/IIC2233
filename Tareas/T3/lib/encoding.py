@@ -1,17 +1,43 @@
 """
 Este modulo maneja la codificación y decodificación de mensajes entre el cliente y el servidor.
 Valida extensamente los mensajes para evitar errores de codificación.
+
+Implementa una capa de representación con tanto pickle como json.
+Pickle fue desactivado por defecto por preocupaciones de seguridad.
 """
 
 from __future__ import annotations
-from pickle import dumps, loads, UnpicklingError, PicklingError
+from pickle import dumps, loads, UnpicklingError, PicklingError, Unpickler
 from typing import Any, Sequence, Union
 from encryption import pseudo_encrypt, pseudo_decrypt
+import json
 
 LENGTH_SIZE = 4
 N_BLOCK_SIZE = 4
 CHUNK_SIZE = 80
 PADDING_CHAR = b"\x00"
+PROVIDER = "json"
+
+
+class SecurityViolation(Exception):
+    """
+    Exception raised when the message attempts loading globals.
+    """
+
+    pass
+
+
+class RestrictedUnpickler(Unpickler):
+    """By default, pickle would allow unsafe globals to be loaded.
+    Since we can't trust the clients, we'll treat the data as tainted
+    and forbid loading any globals at all."""
+
+    # Based on https://docs.python.org/3.4/library/pickle.html#restricting-globals
+    def find_class(self, module, name):
+        # Forbid globals.
+        raise SecurityViolation(
+            f"Se intentó cargar el global {module}.{name}, denegando."
+        )
 
 
 def chunked_read(seq, chunk_size: int):
@@ -46,10 +72,19 @@ def encode(obj: Any, encrypt=False) -> bytes:
     """
     encoded_message = bytearray()
     # We start by encoding the Python object with Pickle
-    try:
-        content = dumps(obj) if not encrypt else pseudo_encrypt(dumps(obj))
-    except PicklingError:
-        raise ValueError("Unable to encode object, might not be serializable.")
+    if PROVIDER == "pickle":
+        try:
+            content = dumps(obj) if not encrypt else pseudo_encrypt(dumps(obj))
+        except PicklingError:
+            raise ValueError("Unable to encode message, unknown encoding.")
+
+    elif PROVIDER == "json":
+        # For the record I think JSON is actually a demonic format
+        json_content = json.dumps(obj).encode("utf-8")
+        content = json_content if not encrypt else pseudo_encrypt(json_content)
+
+    else:
+        raise ValueError("Unknown provider.")
 
     length = len(content)
     assert length > 0, "Empty content."
@@ -112,11 +147,22 @@ def decode(byte_seq: Union[bytes, bytearray], encrypted=False) -> Any:
 
     assert len(content) == length, "Invalid content length."
 
-    # We try to decode the content with Pickle
-    try:
-        obj = loads(content) if not encrypted else loads(pseudo_decrypt(content))
-    except UnpicklingError:
-        raise ValueError("Unable to decode message, unknown encoding.")
+    if PROVIDER == "pickle":
+        try:
+            obj = loads(content) if not encrypted else loads(pseudo_decrypt(content))
+        except UnpicklingError:
+            raise ValueError("Unable to encode message, unknown encoding.")
+
+    elif PROVIDER == "json":
+        # For the record I think JSON is actually a demonic format
+        obj = (
+            json.loads(content.decode("utf-8"))
+            if not encrypted
+            else json.loads(pseudo_decrypt(content).decode("utf-8"))
+        )
+    else:
+        raise ValueError("Unknown provider.")
+
     return obj
 
 
