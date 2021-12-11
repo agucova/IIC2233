@@ -1,3 +1,12 @@
+"""
+Este módulo implementa el servidor asíncrono y multihilo que entabla la comunicación
+con los clientes. Todas las transiciones de estado se delegan al procesador.
+
+Está fuertemente basada en el ejemplo de servidor en los contenidos de networking,
+pero lo modifica para ser mas resiliente, toleranta a fallas y
+ser compatible con el protocolo especificado.
+"""
+
 from __future__ import annotations
 
 import socket
@@ -12,6 +21,8 @@ from processor import GameProcessor
 
 
 class Server:
+    # REF: Está basado en el ejemplo de networking de contenidos/
+    # Pero ya cambié casi todo el código uwu
     def __init__(self, host, port):
         self.host = host
         self.port = port

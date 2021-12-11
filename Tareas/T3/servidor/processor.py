@@ -1,3 +1,8 @@
+"""
+Este módulo administra el estado del juego desde el lado del servidor,
+recibiendo los comandos recibidos de los clientes y generando las transiciones necesarias.
+"""
+
 from __future__ import annotations
 import datetime
 from typing import Any, Optional
@@ -30,13 +35,19 @@ class GameProcessor:
         return GameProcessor.str_to_date(date_str) is not None
 
     def check_user_data(self, username: str, birthdate: str) -> bool:
-        return self.check_username(username) and GameProcessor.check_date(birthdate)
+        valid = self.check_username(username) and GameProcessor.check_date(birthdate)
+        # This could print tainted data, so consider sanitization.
+        print(
+            f"[INFO] El usuario {username} tiene un usuario y fecha"
+            f" {'válido' if valid else 'inválido'}."
+        )
+        return valid
 
     def register_user(self, username: str, birthdate: str) -> bool:
         if self.check_user_data(username, birthdate):
             player = Player(username, GameProcessor.str_to_date(birthdate))  # type: ignore
             self.players.append(player)
-            print(f"[INFO] Se registró al jugador {player.username}.")
+            print(f"[INFO] Se registró exitosamente al jugador {player.username}.")
             return True
         return False
 

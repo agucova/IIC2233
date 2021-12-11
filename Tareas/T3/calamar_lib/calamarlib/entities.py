@@ -1,3 +1,8 @@
+"""
+Este módulo establece entidades que el cliente y
+el servidor deben poder interoperar.
+"""
+
 import datetime
 from typing import Optional
 

@@ -28,7 +28,8 @@ class VentanaInicio(QMainWindow):
     def open_game(self):
         usuario: str = self.usuario.text()
         fecha_de_nacimiento: str = self.fecha_de_nacimiento.text()
-        if not self.processor.check_user_data(usuario, fecha_de_nacimiento):
+        checked = self.processor.check_user_data(usuario, fecha_de_nacimiento)
+        if not checked and checked is not None:
             error = f"El usuario debe ser alfanumérico, único y no puede estar vacío."
             QMessageBox.warning(self, "Error", error)
         else:
@@ -39,6 +40,7 @@ class VentanaInicio(QMainWindow):
     def server_disconnect(self):
         QMessageBox.warning(self, "Error", "No se pudo conectar con el servidor.")
         self.close()
+        sys.exit(1)
 
 
 class SalaEspera(QMainWindow):

@@ -1,6 +1,9 @@
-from http import server
+"""
+Este módulo sostiene la comunicación con el servidor en base a sockets.
+Nótese que el cliente funciona de forma sincrónica.
+"""
+
 import socket
-import threading
 from typing import Any
 
 from calamarlib.encoding import decode, encode
@@ -29,7 +32,7 @@ class Client(QObject):
         self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.connect_to_server()
-        except ConnectionError:
+        except (ConnectionError, BrokenPipeError) as e:
             self.server_disconnect_signal.emit()
 
     def connect_to_server(self):
@@ -60,33 +63,32 @@ class Client(QObject):
         mensaje.
         """
         assert command in VALID_COMMANDS, "Comando inválido."
-
-        message = {"command": command, "arguments": {**content}}
-        print(f"[INFO] Enviando mensaje: {message}")
-        self.send(message)
-        response = self.listen()
-        return response
-
-    def listen(self):
         try:
-            response_bytes_length = self.socket_client.recv(4)
-            response_length = int.from_bytes(response_bytes_length, byteorder="big")
-            response = bytearray()
-
-            # Recibimos datos hasta que alcancemos la totalidad de los datos
-            # indicados en los primeros 4 bytes recibidos.
-            while len(response) < response_length:
-                read_length = min(4096, response_length - len(response))
-                response.extend(self.socket_client.recv(read_length))
-            if response_length == 0:
-                raise ConnectionError("No se recibió una respuesta del servidor.")
-            message = decode(response, encrypted=True)
-        except ConnectionError:
+            message = {"command": command, "arguments": {**content}}
+            print(f"[INFO] Enviando mensaje: {message}")
+            self.send(message)
+            response = self.listen()
+        except (ConnectionError, BrokenPipeError) as e:
             print(
                 "[ERROR] El servidor se ha desconectado o no se ha podido conectarse."
             )
             self.server_disconnect_signal.emit()
             return None
+        return response
+
+    def listen(self):
+        response_bytes_length = self.socket_client.recv(4)
+        response_length = int.from_bytes(response_bytes_length, byteorder="big")
+        response = bytearray()
+
+        # Recibimos datos hasta que alcancemos la totalidad de los datos
+        # indicados en los primeros 4 bytes recibidos.
+        while len(response) < response_length:
+            read_length = min(4096, response_length - len(response))
+            response.extend(self.socket_client.recv(read_length))
+        if response_length == 0:
+            raise ConnectionError("No se recibió una respuesta del servidor.")
+        message = decode(response, encrypted=True)
 
         print("[INFO] Recibido mensaje:", message)
         return message

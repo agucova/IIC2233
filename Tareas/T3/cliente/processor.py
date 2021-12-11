@@ -1,3 +1,10 @@
+"""
+Este módulo implementa el procesador que gestiona todas las transiciones de estado del juego
+y se asegura que el servidor y el cliente estén en sincronización.
+
+Está diseñado para que la vasta mayoría del estado resida en el servidor.
+"""
+
 from __future__ import annotations
 from typing import Optional, Any
 

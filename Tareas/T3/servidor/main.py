@@ -8,7 +8,4 @@ if __name__ == "__main__":
     host, port = load_config("servidor/parametros.json")
 
     server = Server(host, port)
-    # Lo separé de la inicialización para registrar un handler de cerrado
-    # Pero no alcancé a pedir permiso para usar atexit así que sorry por
-    # dejar sockets abiertos :(
     server.start()

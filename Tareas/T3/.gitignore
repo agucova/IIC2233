@@ -1,3 +1,4 @@
 *.png
 *.pdf
 **/*.egg_info/
+.vscode/

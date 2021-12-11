@@ -10,7 +10,6 @@ nombre de variables de PEP8 en base a la convención usada en el enunciado (A, B
 """
 
 from __future__ import annotations
-from re import L
 from typing import Sequence, TypeVar, Union
 from pickle import dumps
 
