@@ -151,4 +151,6 @@ cython_debug/
 # PDFs
 *.pdf
 *.tmp
-Tareas/T3/calamar_lib/calamar_lib.egg-info/PKG-INFO
+Tareas/T3/calamar_lib/calamar_lib.egg-info/*
+Tareas/T3/.vscode/settings.json
+Tareas/T3/.qt_for_python/*
