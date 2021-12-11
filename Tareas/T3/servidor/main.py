@@ -12,11 +12,19 @@ from calamarlib.helpers import load_config
 
 class Server:
     def __init__(self, host, port):
-        print("[INFO] Inicializando servidor...")
-
         self.host = host
         self.port = port
+
+    def start(self):
+        """
+        Inicia el servidor.
+        """
+        print("[INFO] Inicializando servidor...")
+        # We use REUSEADDR because we want to be able to restart the server
+        # even if the socket is left in a TIME_WAIT state.
         self.socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
         self.bind_and_listen()
         self.accept_connections()
 
@@ -55,7 +63,7 @@ class Server:
         while True:
             client_socket, _ = self.socket_server.accept()
             listening_client_thread = threading.Thread(
-                target=self.listen_client_thread, args=(client_socket,), daemon=True
+                target=self.listen_client_thread, args=(client_socket,)
             )
             listening_client_thread.start()
 
@@ -76,7 +84,7 @@ class Server:
         Implementa las funcionalidades del protocolo de comunicación
         que permiten recuperar la informacion enviada.
         """
-        print("[INFO] Recibido conexión de cliente...")
+        print(f"[INFO] Recibido conexión de cliente #{client_socket.fileno()}.")
 
         while True:
             # The official python documentation suggests checking even
@@ -85,7 +93,7 @@ class Server:
 
             length_response = bytearray()
             while len(length_response) < LENGTH_SIZE:
-                length_response += client_socket.recv(LENGTH_SIZE)
+                length_response.extend(client_socket.recv(LENGTH_SIZE))
 
             length = int.from_bytes(length_response, byteorder="big")
             response = bytearray()
@@ -95,9 +103,18 @@ class Server:
                 response.extend(client_socket.recv(read_length))
 
             received = decode(response, encrypted=True)
-
             response = self.handle_command(received, client_socket)
             self.send(response, client_socket)
+
+    def shutdown(self):
+        """
+        Cierra el socket de servidor y termina el programa.
+        """
+        print("[INFO] Cerrando servidor...")
+        # Nos portaremos bien y haremos un shutdown primero
+        self.socket_server.shutdown(socket.SHUT_RDWR)
+        self.socket_server.close()
+        sys.exit()
 
     def handle_command(self, received: dict[str, Any], client_socket: socket.socket):
         # Quien sabe, esto podria recibir URLs y empezaríamos a reimplementar HTTP
@@ -117,3 +134,7 @@ if __name__ == "__main__":
     host, port = load_config("servidor/parametros.json")
 
     server = Server(host, port)
+    # Lo separé de la inicialización para registrar un handler de cerrado
+    # Pero no alcancé a pedir permiso para usar atexit así que sorry por
+    # dejar sockets abiertos :(
+    server.start()

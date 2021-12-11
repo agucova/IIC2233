@@ -1,5 +1,6 @@
 import socket
 import threading
+from typing import Any
 
 from calamarlib.encoding import encode, decode
 from calamarlib.helpers import load_config
@@ -20,14 +21,9 @@ class Client:
         self.port = port
         self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        # try:
         self.connect_to_server()
         self.listen()
         self.repl()
-        # except ConnectionError:
-        #     print("Conexión terminada.")
-        #     self.socket_client.close()
-        #     exit()
 
     def connect_to_server(self):
         """Crea la conexión al servidor."""
@@ -48,7 +44,7 @@ class Client:
         thread = threading.Thread(target=self.listen_thread, daemon=True)
         thread.start()
 
-    def send(self, msg):
+    def send(self, msg: Any):
         """
         Envía mensajes al servidor.
 
@@ -56,8 +52,22 @@ class Client:
         es decir, agregar 4 bytes al principio de cada mensaje
         indicando el largo del mensaje enviado.
         """
+        # Nótese como nuestro paquete tienes dos LENGTH
+        # Uno es el tamaño del mensaje completo, y el otro de
+        # los datos contenidos en nuestro bytestream (msg)
+        encoded_message = encode(msg, encrypt=True)
+        length = len(encoded_message).to_bytes(4, byteorder="big")
+        self.socket_client.sendall(length + encoded_message)
 
-        self.socket_client.sendall(encode(msg, encrypt=True))
+    def send_command(self, command, content):
+        """
+        Envía un comando al servidor.
+
+        `command` es el comando a enviar, y `content` es el contenido del
+        mensaje.
+        """
+
+        self.send({"command": command, "content": content})
 
     def listen_thread(self):
         while True:
@@ -83,7 +93,7 @@ class Client:
         print("------ Consola ------\n>>> ", end="")
         while True:
             msg = input()
-            response = self.send(msg)
+            self.send({"command": "msg", "content": msg})
 
 
 if __name__ == "__main__":
