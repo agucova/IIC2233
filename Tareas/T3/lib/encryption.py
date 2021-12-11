@@ -1,26 +1,79 @@
+"""
+Este modulo implementa las funciones de pseudo-encriptación
+para el protocolo de comunicación cliente-servidor.
+Hablo de pseudo-encriptación porque nada sobre esto usa criptografía real y
+me siento rompiendo la primera ley de la criptografía:
+"Never roll your own crypto."
+
+También noto que manualmente estoy sobre-escribiendo la convención de
+nombre de variables de PEP8 en base a la convención usada en el enunciado (A, B, C, n)
+"""
+
 from __future__ import annotations
-from typing import Sequence, List, Tuple, TypeVar
+from re import L
+from typing import Sequence, TypeVar, Union
+from pickle import loads, dumps
 
-# Hablo de pseudo-encriptación porque nada sobre esto usa criptografía
-# me siento rompiendo la primera ley de la criptografía,
-# never roll your own crypto.
-
-# También noto que manualmente estoy sobre-escribiendo la convención de
-# nombre de variables de PEP8 en base a la convención usada en el enunciado (A, B, C, n)
-# la siguiente linea permite que el código pase por mi chequeo automático :P
+# La siguiente linea permite que el código pase por mi chequeo automático :P
 # flake8: noqa: N806
 
+# Esto me permite usar genéricos en el tipado de las funciones
+# Acorde con PEP 526: Syntax for Variable Annotations
+# https://www.python.org/dev/peps/pep-0526/
+# https://docs.python.org/3/library/typing.html#typing.TypeVar
+
 SeqVal = TypeVar("SeqVal")
+ByteLike = Union[bytes, bytearray]
 
 
 def zigzag(
     sequence: Sequence[SeqVal],
 ) -> tuple[Sequence[SeqVal], Sequence[SeqVal], Sequence[SeqVal]]:
-    """Converts a sequence to three lists grouping alternating items."""
+    """
+    Converts a sequence to three lists grouping alternating items.
+    """
     sequences = [], [], []
     for index, value in enumerate(sequence):
         sequences[index % 3].append(value)
     return sequences
+
+
+def inverse_zigzag(A: ByteLike, B: ByteLike, C: ByteLike) -> ByteLike:
+    """
+    Inverse function to zigzag.
+    """
+    result = bytearray()
+    length = len(A) + len(B) + len(C)
+    for i in range(length):
+        if i % 3 == 0:
+            result.append(A[i // 3 + (i % 3 > 0)])
+        elif i % 3 == 1:
+            result.append(B[i // 3 + (i % 3 > 1)])
+        else:
+            result.append(C[i // 3])
+
+    return bytes(result)
+
+
+def reverse_reorder_seq(
+    sequence: ByteLike,
+) -> tuple[ByteLike, ByteLike, ByteLike]:
+    """
+    Converts a sequence to three lists grouping alternating items,
+    assuming n = 0.
+    """
+    length = len(sequence)
+    # To find the inverse function, we need to estimate the sizes of the disordered groups first.
+    A_length = length // 3 + (length % 3 > 0)
+    B_length = length // 3 + (length % 3 > 1)
+    C_length = length // 3
+    assert A_length + B_length + C_length == length
+    B, A, C = (
+        sequence[:B_length],
+        sequence[B_length : B_length + A_length],
+        sequence[B_length + A_length :],
+    )
+    return A, B, C
 
 
 def replace_3_5(plain_bytes: bytes) -> bytes:
@@ -42,9 +95,11 @@ def replace_3_5(plain_bytes: bytes) -> bytes:
 
 
 def pseudo_encrypt(plain_bytes: bytes) -> bytes:
-    """Receives a byte sequence and encodes it using our protocol.
+    """
+    Receives a byte sequence and encodes it using our protocol.
     We do not expect length to be included.
-    We return a byte sequence in thes 'A B C n' or 'B A C n' format."""
+    We return a byte sequence in thes 'A B C n' or 'B A C n' format.
+    """
     assert len(plain_bytes) >= 1
     A, B, C = map(bytes, zigzag(plain_bytes))
     if B[0] > C[0]:
@@ -59,17 +114,22 @@ def pseudo_encrypt(plain_bytes: bytes) -> bytes:
 
 
 def pseudo_decrypt(cipher_bytes: bytes) -> bytes:
-    """Receives a pseudo-encrypted byte sequence and decodes it using our protocol.
-    Notably, we expect the sequence to have the 'A B C n' or 'B A C n' format."""
+    """
+    Receives a pseudo-encrypted byte sequence and decodes it using our protocol.
+    Notably, we expect the sequence to have the 'A B C n' or 'B A C n' format.
+    """
     assert len(cipher_bytes) >= 2
     n = cipher_bytes[-1]
     if n == 0:
         A, B, C = map(bytes, zigzag(cipher_bytes[:-1]))
         A, B, C = map(replace_3_5, (A, B, C))
         return A + B + C
+
     elif n == 1:
-        B, A, C = map(bytes, zigzag(cipher_bytes[:-1]))
-        return B + A + C
+        # This is the inverse of the zigzag function.
+        A, B, C = reverse_reorder_seq(cipher_bytes[:-1])
+        return inverse_zigzag(A, B, C)
+
     else:
         raise ValueError("Invalid n value")
 
@@ -99,3 +159,7 @@ if __name__ == "__main__":
     assert pseudo_encrypt(example) == example_encrypted
     # Test pseudo_decrypt
     assert pseudo_decrypt(example_encrypted) == example
+
+    # Random objects
+    a = {"a": 1323, "b": "fdssdf", "c": [1, 2, 3]}
+    assert pseudo_decrypt(pseudo_encrypt(dumps(a))) == dumps(a)
