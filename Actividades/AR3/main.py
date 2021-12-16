@@ -37,12 +37,18 @@ if __name__ == "__main__":
     ventana_final = VentanaFinal()
 
     # ---- Completa y conecta el resto de las señales aquí...
+    # Queremos cargar las cartas a la ventana principal cada vez que comience una ronda
     logica_dccuent.senal_comenzar_juego.connect(ventana_principal.actualizar)
+    # Conectar la selección de una carta a la lógica de juego con esa carta
     ventana_principal.senal_enviar_jugada.connect(logica_dccuent.jugar_carta)
+    # Conectar el resultado de la ronda con la ventana de combate
     logica_dccuent.senal_enviar_resultado_ronda.connect(
         ventana_combate.mostrar_resultado_ronda
     )
+    # Si el usuario apreta regresar, volver a cargar cartas en la ventana principal
+    # (comenzando una nueva ronda)
     ventana_combate.senal_regresar.connect(ventana_principal.actualizar)
+    # Si alguien gana o pierde, mostramos la ventana final del juego
     ventana_combate.senal_abrir_ventana_final.connect(ventana_final.crear_pantalla)
     # -------------------
 
