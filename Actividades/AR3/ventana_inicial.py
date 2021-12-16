@@ -28,13 +28,33 @@ class VentanaInicial(QWidget):
         # Aqui deben crear la pantalla.
         self.setWindowTitle("Ventana Inicial DCCuent")
         # El logo, la caja de texto y el botón.
-        # IMPORTANTE la caja de texto debe llamarse input_usuario
-        # Si usas layout recuerda agregar los labels al layout y finalmente setear el layout
+        vbox = QVBoxLayout()
+        self.setLayout(vbox)
+        self.logo = QLabel()
+        self.logo.setPixmap(QPixmap(ruta_logo))
+        self.texto_ingrese = QLabel("Ingrese su nombre de usuario:")
+        self.input_usuario = QLineEdit()
+        self.input_usuario.setPlaceholderText("Debe ser alfanumérico")
+        self.boton_ingresar = QPushButton("Ingresar")
+        self.boton_ingresar.clicked.connect(self.revisar_input)
+
+        # Layout del texto y la caja de input
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.texto_ingrese)
+        hbox.addWidget(self.input_usuario)
+
+        # Ahora agrego todo al layout principal
+        vbox.addWidget(self.logo)
+        vbox.addLayout(hbox)
+        vbox.addWidget(self.boton_ingresar)
+
+        # Ahora muestro la ventana
+        self.show()
 
     def revisar_input(self):
         # Aquí deben enviar el nombre de usuario, para verificar si es un usuario valido
         # Para esto utilizar senal_revisar_nombre
-        pass
+        self.senal_revisar_nombre.emit(self.input_usuario.text())
 
     def recibir_revision(self, error):
         # Resetea la ventana si es que ocurre algun error,en caso contrario comienza el juego
