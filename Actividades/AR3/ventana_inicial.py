@@ -54,9 +54,6 @@ class VentanaInicial(QWidget):
         vbox.addLayout(hbox)
         vbox.addWidget(self.boton_ingresar)
 
-        # Ahora muestro la ventana
-        self.show()
-
     def revisar_input(self):
         # Aquí deben enviar el nombre de usuario, para verificar si es un usuario valido
         # Para esto utilizar senal_revisar_nombre
