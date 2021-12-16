@@ -25,18 +25,24 @@ class VentanaInicial(QWidget):
         self.crear_pantalla()
 
     def crear_pantalla(self):
-        # Aqui deben crear la pantalla.
         self.setWindowTitle("Ventana Inicial DCCuent")
-        # El logo, la caja de texto y el botón.
+        # Layout principal
         vbox = QVBoxLayout()
         self.setLayout(vbox)
+        # Logo
         self.logo = QLabel()
         self.logo.setPixmap(QPixmap(ruta_logo))
+        # Texto de instrucciones
         self.texto_ingrese = QLabel("Ingrese su nombre de usuario:")
+        # Input del usuario
         self.input_usuario = QLineEdit()
         self.input_usuario.setPlaceholderText("Debe ser alfanumérico")
+        # Botón de ingreso
         self.boton_ingresar = QPushButton("Ingresar")
         self.boton_ingresar.clicked.connect(self.revisar_input)
+
+        # Conectamos el return del input a ingresar para mejorar la UX
+        self.input_usuario.returnPressed.connect(self.revisar_input)
 
         # Layout del texto y la caja de input
         hbox = QHBoxLayout()
