@@ -26,6 +26,15 @@ class VentanaInicial(QWidget):
 
     def crear_pantalla(self):
         self.setWindowTitle("Ventana Inicial DCCuent")
+
+        #################
+        #               #
+        #     LOGO      #
+        #               #
+        # texto | input #
+        #     boton     #
+        #################
+
         # Layout principal
         vbox = QVBoxLayout()
         self.setLayout(vbox)
