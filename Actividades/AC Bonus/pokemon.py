@@ -107,7 +107,7 @@ def obtener_mejores_atacantes(pokemones: list[dict]) -> list:
 
         to_sort.append(pokemon)
 
-    sorted_pokemones = sorted(to_sort, key=obtener_puntaje_ataque, reverse=True)[:5]
+    sorted_pokemones = sorted(to_sort, key=obtener_puntaje_ataque, reverse=True)
     if len(sorted_pokemones) < 5:
         return sorted_pokemones
     return sorted_pokemones[:5]
