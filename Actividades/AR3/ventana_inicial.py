@@ -32,6 +32,7 @@ class VentanaInicial(QWidget):
         # Logo
         self.logo = QLabel()
         self.logo.setPixmap(QPixmap(ruta_logo))
+        self.logo.setAlignment(Qt.AlignCenter)
         # Texto de instrucciones
         self.texto_ingrese = QLabel("Ingrese su nombre de usuario:")
         # Input del usuario
