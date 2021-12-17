@@ -25,7 +25,7 @@ def enviar_test(token: str, test_id: int, respuesta: Any) -> bool:
             "function_response": respuesta,
         }
     }
-    print(data)
+    # print(data)
     test = post_api_cursos(f"tests/{test_id}", params={"api_token": token}, data=data)
 
     if not test:
@@ -33,7 +33,8 @@ def enviar_test(token: str, test_id: int, respuesta: Any) -> bool:
         return False
 
     if test["result"] == "success":
+        print(f"✅ Test {test_id} exitoso.")
         return True
     else:
-        print(f"Error en el test {test_id}: {test['message']}")
+        print(f"❌ Test {test_id} fallido: {test['message']}.")
         return False
